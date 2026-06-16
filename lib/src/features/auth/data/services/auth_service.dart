@@ -1,0 +1,101 @@
+import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:littletech/src/features/auth/data/models/user_model.dart';
+
+class AuthService {
+  static const _usersKey = 'lt_users';
+  static const _sessionKey = 'lt_session';
+
+  static Future<SharedPreferences> get _prefs => SharedPreferences.getInstance();
+
+  // ── Helpers ────────────────────────────────────────────────────────────────
+
+  static Future<List<UserModel>> _loadUsers() async {
+    final prefs = await _prefs;
+    final raw = prefs.getString(_usersKey);
+    if (raw == null) return [];
+    final list = jsonDecode(raw) as List;
+    return list.map((e) => UserModel.fromJson(e as Map<String, dynamic>)).toList();
+  }
+
+  static Future<void> _saveUsers(List<UserModel> users) async {
+    final prefs = await _prefs;
+    final raw = jsonEncode(users.map((u) => u.toJson()).toList());
+    await prefs.setString(_usersKey, raw);
+  }
+
+  // ── Public API ─────────────────────────────────────────────────────────────
+
+  static Future<bool> register({
+    required String username,
+    required String password,
+    String avatarIcon = '🔧',
+  }) async {
+    final users = await _loadUsers();
+    if (users.any((u) => u.username.toLowerCase() == username.toLowerCase())) {
+      return false;
+    }
+    users.add(UserModel(username: username, password: password, avatarIcon: avatarIcon));
+    await _saveUsers(users);
+    return true;
+  }
+
+  static Future<bool> login({required String username, required String password}) async {
+    final users = await _loadUsers();
+    final match = users.firstWhere(
+      (u) => u.username.toLowerCase() == username.toLowerCase() && u.password == password,
+      orElse: () => UserModel(username: '', password: ''),
+    );
+    if (match.username.isEmpty) return false;
+    final prefs = await _prefs;
+    await prefs.setString(_sessionKey, match.username);
+    return true;
+  }
+
+  static Future<void> logout() async {
+    final prefs = await _prefs;
+    await prefs.remove(_sessionKey);
+  }
+
+  static Future<bool> isLoggedIn() async {
+    final prefs = await _prefs;
+    return prefs.getString(_sessionKey) != null;
+  }
+
+  static Future<UserModel?> getCurrentUser() async {
+    final prefs = await _prefs;
+    final username = prefs.getString(_sessionKey);
+    if (username == null) return null;
+    final users = await _loadUsers();
+    try {
+      return users.firstWhere((u) => u.username == username);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  static Future<List<UserModel>> getAllUsers() => _loadUsers();
+
+  static Future<bool> userExists(String username) async {
+    final users = await _loadUsers();
+    return users.any((u) => u.username.toLowerCase() == username.toLowerCase());
+  }
+
+  static Future<bool> updatePassword({required String username, required String newPassword}) async {
+    final users = await _loadUsers();
+    final idx = users.indexWhere((u) => u.username.toLowerCase() == username.toLowerCase());
+    if (idx < 0) return false;
+    users[idx].password = newPassword;
+    await _saveUsers(users);
+    return true;
+  }
+
+  static Future<void> addPoints(String username, int delta) async {
+    final users = await _loadUsers();
+    final idx = users.indexWhere((u) => u.username == username);
+    if (idx >= 0) {
+      users[idx].points += delta;
+      await _saveUsers(users);
+    }
+  }
+}
