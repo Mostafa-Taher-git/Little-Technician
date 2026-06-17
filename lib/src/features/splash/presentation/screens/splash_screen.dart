@@ -53,20 +53,29 @@ class _SplashScreenState extends State<SplashScreen> {
               child: const Icon(Icons.build_circle_rounded, size: 80, color: AppColors.accent),
             ).animate().scale(duration: 600.ms, curve: Curves.easeOutBack),
             const Gap(24),
-            Text(
-              'LittleTech',
-              style: TextStyle(
-                fontSize: 36,
-                fontWeight: FontWeight.w800,
-                color: Colors.white,
-                letterSpacing: 1.2,
+            Animate(
+              effects: [
+                FadeEffect(delay: 300.ms),
+                MoveEffect(begin: const Offset(0, 20), delay: 300.ms),
+              ],
+              child: const Text(
+                'LittleTech',
+                style: TextStyle(
+                  fontSize: 36,
+                  fontWeight: FontWeight.w800,
+                  color: Colors.white,
+                  letterSpacing: 1.2,
+                ),
               ),
-            ).animate(delay: 300.ms).fadeIn().moveY(begin: 20),
+            ),
             const Gap(8),
-            const Text(
-              'Expert Troubleshooting',
-              style: TextStyle(fontSize: 14, color: Colors.white54, letterSpacing: 2),
-            ).animate(delay: 500.ms).fadeIn(),
+            Animate(
+              effects: [FadeEffect(delay: 500.ms)],
+              child: const Text(
+                'Expert Troubleshooting',
+                style: TextStyle(fontSize: 14, color: Colors.white54, letterSpacing: 2),
+              ),
+            ),
             const Gap(60),
             const SizedBox(
               width: 28,

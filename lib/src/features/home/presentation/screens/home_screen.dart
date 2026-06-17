@@ -11,6 +11,10 @@ import 'package:littletech/src/features/solutions/presentation/screens/categorie
 import 'package:littletech/src/features/solutions/presentation/screens/search_screen.dart';
 import 'package:littletech/src/features/settings/presentation/screens/settings_screen.dart';
 import 'package:littletech/src/features/home/presentation/bloc/counter_cubit.dart';
+import 'package:littletech/src/features/game/presentation/screens/world_select_screen.dart';
+import 'package:littletech/src/features/game/presentation/screens/profile_screen.dart';
+import 'package:littletech/src/features/game/presentation/widgets/suptech_avatar.dart';
+import 'package:littletech/src/features/game/domain/cubit/game_cubit.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -61,6 +65,19 @@ class HomeScreen extends StatelessWidget {
                       },
                     ),
                   ),
+                  BlocBuilder<GameCubit, GameState>(
+                    builder: (_, state) {
+                      return GestureDetector(
+                        onTap: () => Nav.push(context, const ProfileScreen()),
+                        child: SupTechAvatar(
+                          availableUses: state.availableSupTechUses,
+                          isGlowing: state.canUseSupTech,
+                          size: 36,
+                        ),
+                      );
+                    },
+                  ),
+                  const Gap(8),
                   IconButton(
                     onPressed: () => Nav.push(context, const SavedSolutionsScreen()),
                     icon: Container(
@@ -176,13 +193,35 @@ class HomeScreen extends StatelessWidget {
               const Gap(12),
 
               // CTA
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton.icon(
-                  onPressed: () => Nav.push(context, const CategoriesScreen()),
-                  icon: const Icon(Icons.rocket_launch_rounded, size: 20),
-                  label: const Text('Start Troubleshooting'),
-                ),
+              Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: () => Nav.push(context, const CategoriesScreen()),
+                      icon: const Icon(Icons.search_rounded, size: 18),
+                      label: const Text('Browse Solutions'),
+                    ),
+                  ),
+                  const Gap(12),
+                  Expanded(
+                    child: BlocBuilder<GameCubit, GameState>(
+                      builder: (_, state) {
+                        return ElevatedButton.icon(
+                          onPressed: () {
+                            context.read<GameCubit>().loadGame();
+                            Nav.push(context, const WorldSelectScreen());
+                          },
+                          icon: const Icon(Icons.rocket_launch_rounded, size: 18),
+                          label: const Text('Play Troubleshooting'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.accent,
+                            foregroundColor: Colors.black,
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
               ).animate(delay: 300.ms).fadeIn().slideY(begin: 0.2),
               const Gap(24),
             ],

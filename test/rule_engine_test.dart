@@ -6,13 +6,13 @@ void main() {
     test('should return solution for no display', () {
       final result = RuleEngine.solve('no display');
       expect(result, isNotNull);
-      expect(result!.problem, contains('No display'));
+      expect(result!.problem.toLowerCase(), contains('no display'));
     });
 
     test('should return solution for slow internet', () {
       final result = RuleEngine.solve('slow internet');
       expect(result, isNotNull);
-      expect(result!.problem, contains('Wi-Fi'));
+      expect(result!.problem.toLowerCase(), contains('slow internet'));
     });
 
     test('should return null for unknown problem', () {

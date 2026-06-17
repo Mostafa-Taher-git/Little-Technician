@@ -79,7 +79,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ).animate().scale(duration: 500.ms, curve: Curves.easeOutBack),
                       const Gap(20),
-                      Center(
+                      const Center(
                         child: Text(
                           'Welcome Back',
                           style: TextStyle(
