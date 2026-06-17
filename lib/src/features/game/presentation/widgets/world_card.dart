@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:gap/gap.dart';
-import 'package:littletech/src/core/constants/colors.dart';
 import 'package:littletech/src/features/game/constants/game_data.dart';
 
 class WorldCard extends StatelessWidget {
@@ -22,10 +21,13 @@ class WorldCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     final progress = totalLevels > 0 ? completedLevels / totalLevels : 0.0;
 
     return Material(
-      color: isLocked ? AppColors.surfaceVariant : AppColors.surface,
+      color: isLocked
+          ? scheme.surface.withValues(alpha: 0.5)
+          : scheme.surface,
       borderRadius: BorderRadius.circular(20),
       child: InkWell(
         onTap: isLocked ? null : onTap,
@@ -33,7 +35,9 @@ class WorldCard extends StatelessWidget {
         child: Container(
           decoration: BoxDecoration(
             border: Border.all(
-              color: isLocked ? AppColors.border : AppColors.accent.withValues(alpha: 0.3),
+              color: isLocked
+                  ? scheme.outline.withValues(alpha: 0.15)
+                  : scheme.secondary.withValues(alpha: 0.3),
             ),
             borderRadius: BorderRadius.circular(20),
           ),
@@ -48,18 +52,21 @@ class WorldCard extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: isLocked
                           ? Colors.grey.withValues(alpha: 0.1)
-                          : AppColors.accent.withValues(alpha: 0.1),
+                          : scheme.secondary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(14),
                     ),
                     child: Icon(
                       world.icon,
-                      color: isLocked ? Colors.grey : AppColors.accent,
+                      color: isLocked
+                          ? Colors.grey
+                          : scheme.secondary,
                       size: 28,
                     ),
                   ),
                   const Spacer(),
                   if (isLocked)
-                    const Icon(Icons.lock_outline, color: Colors.grey, size: 20),
+                    Icon(Icons.lock_outline,
+                        color: scheme.onSurface.withValues(alpha: 0.2), size: 20),
                 ],
               ),
               const Gap(16),
@@ -68,15 +75,19 @@ class WorldCard extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
-                  color: isLocked ? Colors.grey : AppColors.onSurface,
+                  color: isLocked
+                      ? scheme.onSurface.withValues(alpha: 0.3)
+                      : scheme.onSurface,
                 ),
               ),
               const Gap(4),
               Text(
                 world.description,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 12,
-                  color: AppColors.onSurfaceMuted,
+                  color: isLocked
+                      ? scheme.onSurface.withValues(alpha: 0.2)
+                      : scheme.onSurface.withValues(alpha: 0.5),
                 ),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
@@ -86,9 +97,11 @@ class WorldCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8),
                 child: LinearProgressIndicator(
                   value: progress,
-                  backgroundColor: AppColors.border,
+                  backgroundColor: scheme.outline.withValues(alpha: 0.2),
                   valueColor: AlwaysStoppedAnimation<Color>(
-                    isLocked ? Colors.grey : AppColors.accent,
+                    isLocked
+                        ? Colors.grey
+                        : scheme.secondary,
                   ),
                   minHeight: 6,
                 ),
@@ -99,7 +112,9 @@ class WorldCard extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.w600,
-                  color: isLocked ? Colors.grey : AppColors.onSurfaceMuted,
+                  color: isLocked
+                      ? scheme.onSurface.withValues(alpha: 0.2)
+                      : scheme.onSurface.withValues(alpha: 0.5),
                 ),
               ),
             ],

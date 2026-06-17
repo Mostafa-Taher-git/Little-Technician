@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:gap/gap.dart';
-import 'package:littletech/src/core/constants/colors.dart';
 import 'package:littletech/src/core/navigation/nav.dart';
 import 'package:littletech/src/features/game/constants/game_data.dart';
 import 'package:littletech/src/features/game/domain/cubit/game_cubit.dart';
@@ -21,6 +20,8 @@ class LevelCompleteScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+
     return Scaffold(
       backgroundColor: const Color(0xFF0A1A0A),
       body: SafeArea(
@@ -29,12 +30,15 @@ class LevelCompleteScreen extends StatelessWidget {
             return Column(
               children: [
                 const Spacer(),
-                // Confetti placeholder
                 const Icon(
                   Icons.celebration_outlined,
                   size: 80,
-                  color: AppColors.accent,
-                ).animate().scale(begin: const Offset(0, 0), duration: 600.ms, curve: Curves.elasticOut),
+                  color: Color(0xFFF59E0B),
+                ).animate().scale(
+                  begin: const Offset(0, 0),
+                  duration: 600.ms,
+                  curve: Curves.elasticOut,
+                ),
                 const Gap(24),
                 const Text(
                   'LEVEL COMPLETE!',
@@ -54,7 +58,6 @@ class LevelCompleteScreen extends StatelessWidget {
                   ),
                 ).animate().fadeIn(delay: 500.ms),
                 const Gap(40),
-                // Points breakdown
                 Container(
                   margin: const EdgeInsets.symmetric(horizontal: 32),
                   padding: const EdgeInsets.all(24),
@@ -65,14 +68,27 @@ class LevelCompleteScreen extends StatelessWidget {
                   ),
                   child: Column(
                     children: [
-                      _PointRow(label: 'Step points', points: 10 * level.steps.length),
-                      _PointRow(label: 'Level clear bonus', points: level.points),
-                      _PointRow(label: 'Total earned', points: 10 * level.steps.length + level.points, isTotal: true),
+                      _PointRow(
+                        label: 'Step points',
+                        points: 10 * level.steps.length,
+                        accentColor: scheme.secondary,
+                      ),
+                      _PointRow(
+                        label: 'Level clear bonus',
+                        points: level.points,
+                        accentColor: scheme.secondary,
+                      ),
+                      const Divider(color: Colors.white12, height: 24),
+                      _PointRow(
+                        label: 'Total earned',
+                        points: 10 * level.steps.length + level.points,
+                        isTotal: true,
+                        accentColor: scheme.secondary,
+                      ),
                     ],
                   ),
                 ).animate().fadeIn(delay: 700.ms).slideY(begin: 0.2),
                 const Gap(32),
-                // SupTech info
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -92,7 +108,6 @@ class LevelCompleteScreen extends StatelessWidget {
                   ],
                 ),
                 const Spacer(),
-                // Next Level button
                 Padding(
                   padding: const EdgeInsets.fromLTRB(32, 0, 32, 32),
                   child: SizedBox(
@@ -106,7 +121,7 @@ class LevelCompleteScreen extends StatelessWidget {
                         );
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.accent,
+                        backgroundColor: const Color(0xFFF59E0B),
                         foregroundColor: Colors.black,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
@@ -115,10 +130,7 @@ class LevelCompleteScreen extends StatelessWidget {
                       icon: const Icon(Icons.arrow_forward, size: 20),
                       label: const Text(
                         'Next Level',
-                        style: TextStyle(
-                          fontSize: 17,
-                          fontWeight: FontWeight.w700,
-                        ),
+                        style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700),
                       ),
                     ),
                   ),
@@ -136,11 +148,13 @@ class _PointRow extends StatelessWidget {
   final String label;
   final int points;
   final bool isTotal;
+  final Color accentColor;
 
   const _PointRow({
     required this.label,
     required this.points,
     this.isTotal = false,
+    required this.accentColor,
   });
 
   @override
@@ -152,7 +166,9 @@ class _PointRow extends StatelessWidget {
           Text(
             label,
             style: TextStyle(
-              color: isTotal ? AppColors.accent : Colors.white.withValues(alpha: 0.7),
+              color: isTotal
+                  ? accentColor
+                  : Colors.white.withValues(alpha: 0.7),
               fontWeight: isTotal ? FontWeight.w700 : FontWeight.w400,
               fontSize: isTotal ? 16 : 14,
             ),
@@ -161,7 +177,7 @@ class _PointRow extends StatelessWidget {
           Text(
             '+$points',
             style: TextStyle(
-              color: isTotal ? AppColors.accent : Colors.white,
+              color: isTotal ? accentColor : Colors.white,
               fontWeight: isTotal ? FontWeight.w800 : FontWeight.w600,
               fontSize: isTotal ? 18 : 15,
             ),

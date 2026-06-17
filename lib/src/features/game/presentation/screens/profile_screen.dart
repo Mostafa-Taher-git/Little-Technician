@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
-import 'package:littletech/src/core/constants/colors.dart';
 import 'package:littletech/src/features/auth/data/models/user_model.dart';
 import 'package:littletech/src/features/auth/data/services/auth_service.dart';
 import 'package:littletech/src/features/game/constants/reward_pool.dart';
@@ -15,9 +14,14 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+
     return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(title: const Text('Profile')),
+      backgroundColor: scheme.surface,
+      appBar: AppBar(
+        title: const Text('Profile'),
+        backgroundColor: Colors.transparent,
+      ),
       body: FutureBuilder<UserModel?>(
         future: AuthService.getCurrentUser(),
         builder: (_, snap) {
@@ -35,12 +39,18 @@ class ProfileScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Avatar and stats header
                     Container(
                       width: double.infinity,
                       padding: const EdgeInsets.all(24),
                       decoration: BoxDecoration(
-                        gradient: AppColors.darkGradient,
+                        gradient: LinearGradient(
+                          colors: [
+                            scheme.primary,
+                            scheme.primary.withValues(alpha: 0.8),
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Column(
@@ -63,13 +73,13 @@ class ProfileScreen extends StatelessWidget {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              const Icon(Icons.monetization_on,
-                                  color: AppColors.accent, size: 18),
+                              Icon(Icons.monetization_on,
+                                  color: scheme.secondary, size: 18),
                               const Gap(6),
                               Text(
                                 '${progress.points} points',
-                                style: const TextStyle(
-                                  color: AppColors.accent,
+                                style: TextStyle(
+                                  color: scheme.secondary,
                                   fontSize: 16,
                                   fontWeight: FontWeight.w700,
                                 ),
@@ -80,36 +90,37 @@ class ProfileScreen extends StatelessWidget {
                       ),
                     ),
                     const Gap(20),
-                    // Stats
                     Row(
                       children: [
                         _StatCard(
                           icon: Icons.emoji_events,
                           label: 'Levels',
                           value: '${progress.levelsCleared}',
+                          scheme: scheme,
                         ),
                         const Gap(10),
                         _StatCard(
                           icon: Icons.warning,
                           label: 'Bosses',
                           value: '${progress.bossesDefeated}',
+                          scheme: scheme,
                         ),
                         const Gap(10),
                         _StatCard(
                           icon: Icons.redeem,
                           label: 'Rewards',
                           value: '${earnedRewards.length}',
+                          scheme: scheme,
                         ),
                       ],
                     ),
                     const Gap(24),
-                    // Themes
-                    const Text(
+                    Text(
                       'Themes',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
-                        color: AppColors.onSurface,
+                        color: scheme.onSurface,
                       ),
                     ),
                     const Gap(12),
@@ -122,48 +133,54 @@ class ProfileScreen extends StatelessWidget {
                           icon: Icons.palette,
                           isActive: progress.themeId == null || progress.themeId == 'default',
                           onTap: () => _applyTheme(context, 'default'),
+                          scheme: scheme,
                         ),
                         _ThemeChip(
                           label: 'Midnight',
                           icon: Icons.dark_mode,
                           isActive: progress.themeId == 'dark',
                           onTap: () => _applyTheme(context, 'dark'),
+                          scheme: scheme,
                         ),
                         _ThemeChip(
                           label: 'Amber',
                           icon: Icons.light_mode,
                           isActive: progress.themeId == 'amber',
                           onTap: () => _applyTheme(context, 'amber'),
+                          scheme: scheme,
                         ),
                         _ThemeChip(
                           label: 'Ocean',
                           icon: Icons.water_drop,
                           isActive: progress.themeId == 'ocean',
                           onTap: () => _applyTheme(context, 'ocean'),
+                          scheme: scheme,
                         ),
                         _ThemeChip(
                           label: 'Neon',
                           icon: Icons.nights_stay,
                           isActive: progress.themeId == 'neon',
                           onTap: () => _applyTheme(context, 'neon'),
+                          scheme: scheme,
                         ),
                       ],
                     ),
                     const Gap(24),
-                    // Rewards
-                    const Text(
+                    Text(
                       'Earned Rewards',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
-                        color: AppColors.onSurface,
+                        color: scheme.onSurface,
                       ),
                     ),
                     const Gap(12),
                     if (earnedRewards.isEmpty)
-                      const Text(
+                      Text(
                         'Complete levels to earn rewards!',
-                        style: TextStyle(color: AppColors.onSurfaceMuted),
+                        style: TextStyle(
+                          color: scheme.onSurface.withValues(alpha: 0.5),
+                        ),
                       )
                     else
                       Wrap(
@@ -174,20 +191,21 @@ class ProfileScreen extends StatelessWidget {
                             .toList(),
                       ),
                     const Gap(24),
-                    // Skins
-                    const Text(
+                    Text(
                       'SupTech Skins',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
-                        color: AppColors.onSurface,
+                        color: scheme.onSurface,
                       ),
                     ),
                     const Gap(12),
                     if (progress.unlockedSkinIds.isEmpty)
-                      const Text(
+                      Text(
                         'Earn skins from rewards!',
-                        style: TextStyle(color: AppColors.onSurfaceMuted),
+                        style: TextStyle(
+                          color: scheme.onSurface.withValues(alpha: 0.5),
+                        ),
                       )
                     else
                       Wrap(
@@ -197,7 +215,7 @@ class ProfileScreen extends StatelessWidget {
                           return Chip(
                             avatar: const Icon(Icons.terminal, size: 16),
                             label: Text(skinId),
-                            backgroundColor: AppColors.accent.withValues(alpha: 0.1),
+                            backgroundColor: scheme.secondary.withValues(alpha: 0.1),
                           );
                         }).toList(),
                       ),
@@ -221,11 +239,13 @@ class _StatCard extends StatelessWidget {
   final IconData icon;
   final String label;
   final String value;
+  final ColorScheme scheme;
 
   const _StatCard({
     required this.icon,
     required this.label,
     required this.value,
+    required this.scheme,
   });
 
   @override
@@ -234,27 +254,27 @@ class _StatCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: AppColors.surface,
+          color: scheme.surface,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: AppColors.border),
+          border: Border.all(color: scheme.outline.withValues(alpha: 0.3)),
         ),
         child: Column(
           children: [
-            Icon(icon, color: AppColors.accent, size: 24),
+            Icon(icon, color: scheme.secondary, size: 24),
             const Gap(8),
             Text(
               value,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.w800,
-                color: AppColors.onSurface,
+                color: scheme.onSurface,
               ),
             ),
             Text(
               label,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 12,
-                color: AppColors.onSurfaceMuted,
+                color: scheme.onSurface.withValues(alpha: 0.5),
               ),
             ),
           ],
@@ -269,12 +289,14 @@ class _ThemeChip extends StatelessWidget {
   final IconData icon;
   final bool isActive;
   final VoidCallback onTap;
+  final ColorScheme scheme;
 
   const _ThemeChip({
     required this.label,
     required this.icon,
     required this.isActive,
     required this.onTap,
+    required this.scheme,
   });
 
   @override
@@ -285,25 +307,29 @@ class _ThemeChip extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: BoxDecoration(
           color: isActive
-              ? AppColors.accent.withValues(alpha: 0.15)
-              : AppColors.surface,
+              ? scheme.secondary.withValues(alpha: 0.15)
+              : scheme.surface,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isActive ? AppColors.accent : AppColors.border,
+            color: isActive ? scheme.secondary : scheme.outline.withValues(alpha: 0.3),
             width: isActive ? 2 : 1,
           ),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 16, color: isActive ? AppColors.accent : AppColors.onSurfaceMuted),
+            Icon(
+              icon,
+              size: 16,
+              color: isActive ? scheme.secondary : scheme.onSurface.withValues(alpha: 0.5),
+            ),
             const Gap(6),
             Text(
               label,
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
-                color: isActive ? AppColors.accent : AppColors.onSurface,
+                color: isActive ? scheme.secondary : scheme.onSurface,
               ),
             ),
           ],

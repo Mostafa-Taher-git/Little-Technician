@@ -60,7 +60,6 @@ class _RewardSpinScreenState extends State<RewardSpinScreen>
         child: Column(
           children: [
             const Spacer(),
-            // Title
             Text(
               'REWARD UNLOCKED!',
               style: TextStyle(
@@ -71,7 +70,6 @@ class _RewardSpinScreenState extends State<RewardSpinScreen>
               ),
             ).animate().fadeIn(duration: 400.ms),
             const Gap(40),
-            // Spinning reward
             AnimatedBuilder(
               animation: _spinAnimation,
               builder: (_, child) {
@@ -110,7 +108,6 @@ class _RewardSpinScreenState extends State<RewardSpinScreen>
               ),
             ),
             const Gap(24),
-            // Rarity badge
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
               decoration: BoxDecoration(
@@ -129,7 +126,6 @@ class _RewardSpinScreenState extends State<RewardSpinScreen>
               ),
             ).animate().fadeIn(delay: 600.ms),
             const Gap(16),
-            // Reward name
             Text(
               reward.displayName,
               style: const TextStyle(
@@ -139,7 +135,6 @@ class _RewardSpinScreenState extends State<RewardSpinScreen>
               ),
             ).animate().fadeIn(delay: 800.ms).slideY(begin: 0.2),
             const Gap(40),
-            // Collect button
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 32),
               child: SizedBox(

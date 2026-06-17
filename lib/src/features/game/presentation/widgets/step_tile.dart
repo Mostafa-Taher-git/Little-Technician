@@ -1,35 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:littletech/src/core/constants/colors.dart';
 
 class StepTile extends StatelessWidget {
   final int stepNumber;
   final String text;
   final bool isCompleted;
-  final bool isSupTechUsed;
 
   const StepTile({
     super.key,
     required this.stepNumber,
     required this.text,
     this.isCompleted = false,
-    this.isSupTechUsed = false,
   });
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: isCompleted
-            ? AppColors.success.withValues(alpha: 0.05)
-            : AppColors.surface,
+        color: scheme.surface,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
           color: isCompleted
-              ? AppColors.success.withValues(alpha: 0.3)
-              : AppColors.border,
+              ? scheme.secondary.withValues(alpha: 0.3)
+              : scheme.outline.withValues(alpha: 0.3),
         ),
       ),
       child: Row(
@@ -41,16 +37,16 @@ class StepTile extends StatelessWidget {
             alignment: Alignment.center,
             decoration: BoxDecoration(
               color: isCompleted
-                  ? AppColors.success
-                  : AppColors.primary,
+                  ? scheme.secondary
+                  : scheme.primary,
               borderRadius: BorderRadius.circular(8),
             ),
             child: isCompleted
-                ? const Icon(Icons.check, color: Colors.white, size: 16)
+                ? Icon(Icons.check, color: scheme.onSecondary, size: 16)
                 : Text(
                     '$stepNumber',
-                    style: const TextStyle(
-                      color: AppColors.onPrimary,
+                    style: TextStyle(
+                      color: scheme.onPrimary,
                       fontWeight: FontWeight.w700,
                       fontSize: 13,
                     ),
@@ -64,32 +60,13 @@ class StepTile extends StatelessWidget {
                 text,
                 style: TextStyle(
                   fontSize: 14,
-                  color: isCompleted
-                      ? AppColors.onSurfaceMuted
-                      : AppColors.onSurface,
+                  color: scheme.onSurface.withValues(alpha: isCompleted ? 0.6 : 1.0),
                   decoration: isCompleted ? TextDecoration.lineThrough : null,
                   height: 1.4,
                 ),
               ),
             ),
           ),
-          if (isSupTechUsed)
-            Container(
-              margin: const EdgeInsets.only(left: 8),
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              decoration: BoxDecoration(
-                color: AppColors.info.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(6),
-              ),
-              child: const Text(
-                'SupTech',
-                style: TextStyle(
-                  fontSize: 9,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.info,
-                ),
-              ),
-            ),
         ],
       ),
     );

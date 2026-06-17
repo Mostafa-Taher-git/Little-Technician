@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:gap/gap.dart';
-import 'package:littletech/src/core/constants/colors.dart';
 import 'package:littletech/src/core/navigation/nav.dart';
 import 'package:littletech/src/features/auth/data/models/user_model.dart';
 import 'package:littletech/src/features/auth/data/services/auth_service.dart';
@@ -21,8 +20,10 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: scheme.surface,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
@@ -44,7 +45,7 @@ class HomeScreen extends StatelessWidget {
                               height: 48,
                               alignment: Alignment.center,
                               decoration: BoxDecoration(
-                                color: AppColors.surfaceVariant,
+                                color: scheme.surface,
                                 borderRadius: BorderRadius.circular(14),
                               ),
                               child: Text(user?.avatarIcon ?? '🔧', style: const TextStyle(fontSize: 24)),
@@ -55,9 +56,9 @@ class HomeScreen extends StatelessWidget {
                               children: [
                                 Text(
                                   'Hello, ${user?.username ?? 'User'}',
-                                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.onSurface),
+                                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: scheme.onSurface),
                                 ),
-                                const Text('Ready to troubleshoot?', style: TextStyle(color: AppColors.onSurfaceMuted, fontSize: 13)),
+                                Text('Ready to troubleshoot?', style: TextStyle(color: scheme.onSurface.withValues(alpha: 0.6), fontSize: 13)),
                               ],
                             ),
                           ],
@@ -83,11 +84,11 @@ class HomeScreen extends StatelessWidget {
                     icon: Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: AppColors.surface,
+                        color: scheme.surface,
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: AppColors.border),
+                        border: Border.all(color: scheme.outline),
                       ),
-                      child: const Icon(Icons.bookmark_outline, size: 20, color: AppColors.onSurface),
+                      child: Icon(Icons.bookmark_outline, size: 20, color: scheme.onSurface),
                     ),
                   ),
                   const Gap(8),
@@ -96,11 +97,11 @@ class HomeScreen extends StatelessWidget {
                     icon: Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: AppColors.surface,
+                        color: scheme.surface,
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: AppColors.border),
+                        border: Border.all(color: scheme.outline),
                       ),
-                      child: const Icon(Icons.settings_outlined, size: 20, color: AppColors.onSurface),
+                      child: Icon(Icons.settings_outlined, size: 20, color: scheme.onSurface),
                     ),
                   ),
                 ],
@@ -112,13 +113,20 @@ class HomeScreen extends StatelessWidget {
                 width: double.infinity,
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  gradient: AppColors.darkGradient,
+                  gradient: LinearGradient(
+                    colors: [
+                      scheme.surface.withValues(alpha: 0.5),
+                      scheme.surface.withValues(alpha: 0.3),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('Problems Resolved', style: TextStyle(color: Colors.white60, fontSize: 13, letterSpacing: 0.5)),
+                    Text('Problems Resolved', style: TextStyle(color: scheme.onSurface.withValues(alpha: 0.8), fontSize: 13, letterSpacing: 0.5)),
                     const Gap(8),
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.end,
@@ -127,7 +135,7 @@ class HomeScreen extends StatelessWidget {
                           builder: (_, count) {
                             return Text(
                               '$count',
-                              style: const TextStyle(fontSize: 52, fontWeight: FontWeight.w800, color: Colors.white, height: 1),
+                              style: TextStyle(fontSize: 52, fontWeight: FontWeight.w800, color: scheme.onSurface, height: 1),
                             );
                           },
                         ),
@@ -137,10 +145,10 @@ class HomeScreen extends StatelessWidget {
                           child: Container(
                             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                             decoration: BoxDecoration(
-                              color: AppColors.accent.withValues(alpha: 0.2),
+                              color: scheme.secondary.withValues(alpha: 0.2),
                               borderRadius: BorderRadius.circular(8),
                             ),
-                            child: const Text('🎉 Great job!', style: TextStyle(color: AppColors.accent, fontSize: 12, fontWeight: FontWeight.w600)),
+                            child: Text('🎉 Great job!', style: TextStyle(color: scheme.secondary, fontSize: 12, fontWeight: FontWeight.w600)),
                           ),
                         ),
                       ],
@@ -151,7 +159,7 @@ class HomeScreen extends StatelessWidget {
               const Gap(28),
 
               // Quick actions
-              const Text('Quick Actions', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.onSurface)),
+              Text('Quick Actions', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: scheme.onSurface)),
               const Gap(14),
               Row(
                 children: [
@@ -159,8 +167,9 @@ class HomeScreen extends StatelessWidget {
                     child: _QuickAction(
                       icon: Icons.grid_view_rounded,
                       label: 'Categories',
-                      color: AppColors.primary,
+                      color: scheme.primary,
                       onTap: () => Nav.push(context, const CategoriesScreen()),
+                      scheme: scheme,
                     ),
                   ),
                   const Gap(12),
@@ -168,8 +177,9 @@ class HomeScreen extends StatelessWidget {
                     child: _QuickAction(
                       icon: Icons.search_rounded,
                       label: 'Search Problems',
-                      color: AppColors.accent,
+                      color: scheme.secondary,
                       onTap: () => Nav.push(context, const SearchScreen()),
+                      scheme: scheme,
                     ),
                   ),
                 ],
@@ -180,10 +190,10 @@ class HomeScreen extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text('Browse Categories', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.onSurface)),
+                  Text('Browse Categories', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: scheme.onSurface)),
                   TextButton(
                     onPressed: () => Nav.push(context, const CategoriesScreen()),
-                    child: const Text('See All', style: TextStyle(color: AppColors.accent, fontWeight: FontWeight.w600)),
+                    child: Text('See All', style: TextStyle(color: scheme.secondary, fontWeight: FontWeight.w600)),
                   ),
                 ],
               ),
@@ -214,8 +224,8 @@ class HomeScreen extends StatelessWidget {
                           icon: const Icon(Icons.rocket_launch_rounded, size: 18),
                           label: const Text('Play Troubleshooting'),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.accent,
-                            foregroundColor: Colors.black,
+                            backgroundColor: scheme.secondary,
+                            foregroundColor: scheme.onSecondary,
                           ),
                         );
                       },
@@ -232,6 +242,7 @@ class HomeScreen extends StatelessWidget {
   }
 
   List<Widget> _buildCategoryPreview(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     final previewCategories = [
       {'name': 'CPU', 'icon': Icons.memory, 'count': '6'},
       {'name': 'Internet', 'icon': Icons.wifi, 'count': '5'},
@@ -243,31 +254,31 @@ class HomeScreen extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 10),
         padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
         decoration: BoxDecoration(
-          color: AppColors.surface,
+          color: scheme.surface,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: AppColors.border),
+          border: Border.all(color: scheme.outline),
         ),
         child: Row(
           children: [
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: AppColors.surfaceVariant,
+                color: scheme.surface,
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: Icon(c['icon'] as IconData, color: AppColors.primary, size: 20),
+              child: Icon(c['icon'] as IconData, color: scheme.primary, size: 20),
             ),
             const Gap(14),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(c['name'] as String, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15, color: AppColors.onSurface)),
-                  Text('${c['count']} solutions', style: const TextStyle(color: AppColors.onSurfaceMuted, fontSize: 12)),
+                  Text(c['name'] as String, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15, color: scheme.onSurface)),
+                  Text('${c['count']} solutions', style: TextStyle(color: scheme.onSurface.withValues(alpha: 0.6), fontSize: 12)),
                 ],
               ),
             ),
-            const Icon(Icons.chevron_right, color: AppColors.onSurfaceMuted, size: 20),
+            Icon(Icons.chevron_right, color: scheme.onSurface.withValues(alpha: 0.6), size: 20),
           ],
         ),
       );
@@ -280,13 +291,14 @@ class _QuickAction extends StatelessWidget {
   final String label;
   final Color color;
   final VoidCallback onTap;
+  final ColorScheme scheme;
 
-  const _QuickAction({required this.icon, required this.label, required this.color, required this.onTap});
+  const _QuickAction({required this.icon, required this.label, required this.color, required this.onTap, required this.scheme});
 
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: AppColors.surface,
+      color: scheme.surface,
       borderRadius: BorderRadius.circular(16),
       child: InkWell(
         onTap: onTap,
@@ -294,7 +306,7 @@ class _QuickAction extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            border: Border.all(color: AppColors.border),
+            border: Border.all(color: scheme.outline),
             borderRadius: BorderRadius.circular(16),
           ),
           child: Column(
@@ -309,7 +321,7 @@ class _QuickAction extends StatelessWidget {
                 child: Icon(icon, color: color, size: 22),
               ),
               const Gap(12),
-              Text(label, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14, color: AppColors.onSurface)),
+              Text(label, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14, color: scheme.onSurface)),
             ],
           ),
         ),

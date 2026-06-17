@@ -3,22 +3,54 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:gap/gap.dart';
-import 'package:littletech/src/core/constants/colors.dart';
 import 'package:littletech/src/core/navigation/nav.dart';
 import 'package:littletech/src/features/game/constants/game_data.dart';
 import 'package:littletech/src/features/game/domain/cubit/game_cubit.dart';
 import 'package:littletech/src/features/game/presentation/screens/reward_spin_screen.dart';
 import 'package:littletech/src/features/game/presentation/widgets/suptech_avatar.dart';
 
-class BossScreen extends StatelessWidget {
+class BossScreen extends StatefulWidget {
   final WorldDef world;
 
   const BossScreen({super.key, required this.world});
 
   @override
+  State<BossScreen> createState() => _BossScreenState();
+}
+
+class _BossScreenState extends State<BossScreen>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _bossController;
+  late Animation<double> _breathAnimation;
+  late Animation<double> _glowPulse;
+
+  @override
+  void initState() {
+    super.initState();
+    _bossController = AnimationController(
+      vsync: this,
+      duration: 2000.ms,
+    )..repeat(reverse: true);
+
+    _breathAnimation = Tween<double>(begin: 0.95, end: 1.05).animate(
+      CurvedAnimation(parent: _bossController, curve: Curves.easeInOutSine),
+    );
+
+    _glowPulse = Tween<double>(begin: 0.4, end: 0.8).animate(
+      CurvedAnimation(parent: _bossController, curve: Curves.easeInOutSine),
+    );
+  }
+
+  @override
+  void dispose() {
+    _bossController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF1A0000),
+      backgroundColor: const Color(0xFF0A0000),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -27,7 +59,7 @@ class BossScreen extends StatelessWidget {
       ),
       body: BlocBuilder<GameCubit, GameState>(
         builder: (_, state) {
-          final boss = world.boss;
+          final boss = widget.world.boss;
           final hpLeft = state.currentBossHp;
           final isDefeated = hpLeft <= 0;
           final hpProgress = boss.hp > 0 ? (boss.hp - hpLeft) / boss.hp : 1.0;
@@ -41,71 +73,66 @@ class BossScreen extends StatelessWidget {
             });
           }
 
+          final bossIndex = widget.world.id;
+
           return Stack(
             children: [
-              // Particle background
               Positioned.fill(
                 child: CustomPaint(
-                  painter: _BossParticlePainter(),
+                  painter: _ArenaParticlePainter(
+                    phase: _bossController.value,
+                    bossIndex: bossIndex,
+                  ),
                 ),
               ),
               Column(
                 children: [
                   const Spacer(flex: 2),
-                  // Boss portrait area
-                  Container(
-                    width: 160,
-                    height: 160,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: RadialGradient(
-                        colors: [
-                          Colors.red.shade800,
-                          Colors.red.shade900,
-                          Colors.black,
-                        ],
-                        stops: const [0.3, 0.6, 1.0],
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.red.withValues(alpha: 0.4),
-                          blurRadius: 40,
-                          spreadRadius: 10,
+                  AnimatedBuilder(
+                    animation: _breathAnimation,
+                    builder: (_, child) {
+                      return Transform.scale(
+                        scale: _breathAnimation.value,
+                        child: child,
+                      );
+                    },
+                    child: SizedBox(
+                      width: 200,
+                      height: 200,
+                      child: CustomPaint(
+                        painter: _MonsterPainter(
+                          bossIndex: bossIndex,
+                          isDefeated: isDefeated,
+                          glowIntensity: _glowPulse.value,
+                          phase: _bossController.value,
                         ),
-                      ],
+                      ),
                     ),
-                    alignment: Alignment.center,
-                    child: const Text(
-                      '👹',
-                      style: TextStyle(fontSize: 72),
-                    ),
-                  ).animate().fadeIn().scale(begin: const Offset(0.5, 0.5)),
-                  const Gap(24),
-                  // Boss name
+                  ),
+                  const Gap(16),
                   Text(
                     boss.name,
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 22,
                       fontWeight: FontWeight.w800,
+                      letterSpacing: 1,
                     ),
                   ).animate().fadeIn(delay: 200.ms),
                   const Gap(8),
-                  // Lore
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 32),
                     child: Text(
                       boss.lore,
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.6),
+                        color: Colors.white.withValues(alpha: 0.5),
                         fontSize: 13,
                         height: 1.4,
                       ),
                     ),
                   ).animate().fadeIn(delay: 400.ms),
                   const Gap(32),
-                  // HP bar
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 32),
                     child: Column(
@@ -113,7 +140,11 @@ class BossScreen extends StatelessWidget {
                       children: [
                         Row(
                           children: [
-                            const Icon(Icons.favorite, color: Colors.red, size: 16),
+                            Icon(Icons.favorite,
+                                color: isDefeated
+                                    ? Colors.green
+                                    : Colors.red.shade400,
+                                size: 16),
                             const Gap(8),
                             Text(
                               'HP: $hpLeft / ${boss.hp}',
@@ -130,18 +161,17 @@ class BossScreen extends StatelessWidget {
                           borderRadius: BorderRadius.circular(8),
                           child: LinearProgressIndicator(
                             value: hpProgress,
-                            backgroundColor: Colors.white.withValues(alpha: 0.1),
+                            backgroundColor: Colors.white.withValues(alpha: 0.08),
                             valueColor: AlwaysStoppedAnimation<Color>(
-                              isDefeated ? AppColors.success : Colors.red,
+                              isDefeated ? Colors.green : Colors.red.shade400,
                             ),
-                            minHeight: 12,
+                            minHeight: 14,
                           ),
                         ),
                       ],
                     ),
                   ).animate().fadeIn(delay: 600.ms),
                   const Spacer(flex: 2),
-                  // Actions
                   Padding(
                     padding: const EdgeInsets.fromLTRB(24, 0, 24, 32),
                     child: Column(
@@ -154,7 +184,9 @@ class BossScreen extends StatelessWidget {
                                 ? null
                                 : () => context.read<GameCubit>().attackBoss(),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.red,
+                              backgroundColor: isDefeated
+                                  ? Colors.green.shade700
+                                  : Colors.red.shade700,
                               foregroundColor: Colors.white,
                               disabledBackgroundColor: Colors.grey.shade800,
                               disabledForegroundColor: Colors.grey,
@@ -176,7 +208,7 @@ class BossScreen extends StatelessWidget {
                           ),
                         ),
                         if (state.availableSupTechUses > 0) ...[
-                          const Gap(12),
+                          const Gap(16),
                           SupTechAvatar(
                             availableUses: state.availableSupTechUses,
                             isGlowing: true,
@@ -191,7 +223,7 @@ class BossScreen extends StatelessWidget {
               if (isDefeated)
                 Positioned.fill(
                   child: Container(
-                    color: Colors.black.withValues(alpha: 0.3),
+                    color: Colors.black.withValues(alpha: 0.4),
                     child: const Center(
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
@@ -199,19 +231,16 @@ class BossScreen extends StatelessWidget {
                           Text(
                             'VICTORY!',
                             style: TextStyle(
-                              color: AppColors.accent,
-                              fontSize: 32,
+                              color: Color(0xFFF59E0B),
+                              fontSize: 36,
                               fontWeight: FontWeight.w900,
-                              letterSpacing: 4,
+                              letterSpacing: 6,
                             ),
                           ),
                           SizedBox(height: 8),
                           Text(
                             'Awaiting your reward...',
-                            style: TextStyle(
-                              color: Colors.white70,
-                              fontSize: 14,
-                            ),
+                            style: TextStyle(color: Colors.white70, fontSize: 14),
                           ),
                         ],
                       ),
@@ -226,23 +255,512 @@ class BossScreen extends StatelessWidget {
   }
 }
 
-class _BossParticlePainter extends CustomPainter {
+class _MonsterPainter extends CustomPainter {
+  final int bossIndex;
+  final bool isDefeated;
+  final double glowIntensity;
+  final double phase;
+
+  _MonsterPainter({
+    required this.bossIndex,
+    required this.isDefeated,
+    required this.glowIntensity,
+    required this.phase,
+  });
+
   @override
   void paint(Canvas canvas, Size size) {
-    final rng = Random(42);
-    for (var i = 0; i < 30; i++) {
+    final cx = size.width / 2;
+    final cy = size.height / 2;
+    final s = size.width / 100;
+
+    if (isDefeated) {
+      _drawDefeatedMonster(canvas, cx, cy, s);
+      return;
+    }
+
+    switch (bossIndex) {
+      case 1:
+        _drawBootGuardian(canvas, cx, cy, s);
+      case 2:
+        _drawKernelPhantom(canvas, cx, cy, s);
+      case 3:
+        _drawIOGremlin(canvas, cx, cy, s);
+      case 4:
+        _drawPacketPirate(canvas, cx, cy, s);
+      case 5:
+        _drawVisualVoid(canvas, cx, cy, s);
+      default:
+        _drawBootGuardian(canvas, cx, cy, s);
+    }
+
+    if (glowIntensity > 0.5) {
+      _drawAura(canvas, cx, cy, s);
+    }
+  }
+
+  void _drawAura(Canvas canvas, double cx, double cy, double s) {
+    final auraPaint = Paint()
+      ..color = Colors.red.withValues(alpha: 0.08 * glowIntensity)
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 20);
+    canvas.drawCircle(Offset(cx, cy), 60 * s, auraPaint);
+  }
+
+  void _drawBootGuardian(Canvas canvas, double cx, double cy, double s) {
+    final paint = Paint()..isAntiAlias = true;
+
+    final bodyPath = Path()
+      ..moveTo(cx - 30 * s, cy + 30 * s)
+      ..lineTo(cx - 35 * s, cy - 10 * s)
+      ..quadraticBezierTo(cx - 30 * s, cy - 35 * s, cx, cy - 40 * s)
+      ..quadraticBezierTo(cx + 30 * s, cy - 35 * s, cx + 35 * s, cy - 10 * s)
+      ..lineTo(cx + 30 * s, cy + 30 * s)
+      ..close();
+
+    paint
+      ..color = const Color(0xFF1A1A2E)
+      ..style = PaintingStyle.fill;
+    canvas.drawPath(bodyPath, paint);
+
+    paint
+      ..color = const Color(0xFFE94560)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2 * s;
+    canvas.drawPath(bodyPath, paint);
+
+    for (var i = 0; i < 3; i++) {
+      final eyeX = cx - 10 * s + i * 10 * s;
+      paint
+        ..color = const Color(0xFFFF0000)
+        ..style = PaintingStyle.fill;
+      canvas.drawCircle(Offset(eyeX, cy - 15 * s), 4 * s, paint);
+      paint
+        ..color = Colors.black
+        ..style = PaintingStyle.fill;
+      canvas.drawCircle(Offset(eyeX, cy - 15 * s), 2 * s, paint);
+    }
+
+    final jawPath = Path()
+      ..moveTo(cx - 20 * s, cy + 5 * s)
+      ..lineTo(cx + 20 * s, cy + 5 * s)
+      ..lineTo(cx + 15 * s, cy + 25 * s)
+      ..lineTo(cx - 15 * s, cy + 25 * s)
+      ..close();
+    paint
+      ..color = const Color(0xFF16213E)
+      ..style = PaintingStyle.fill;
+    canvas.drawPath(jawPath, paint);
+
+    for (var i = 0; i < 4; i++) {
+      final tooth = Path()
+        ..moveTo(cx - 12 * s + i * 7 * s, cy + 10 * s)
+        ..lineTo(cx - 9 * s + i * 7 * s, cy + 5 * s)
+        ..lineTo(cx - 6 * s + i * 7 * s, cy + 10 * s)
+        ..close();
+      paint
+        ..color = const Color(0xFFE8E8E8)
+        ..style = PaintingStyle.fill;
+      canvas.drawPath(tooth, paint);
+    }
+
+    for (var i = 0; i < 4; i++) {
+      final angle = pi * 0.25 + i * pi * 0.5 + sin(phase * 4 + i.toDouble()) * 0.1;
+      final legPath = Path()
+        ..moveTo(cx - 20 * s + i * 12 * s, cy + 30 * s)
+        ..lineTo(cx - 22 * s + i * 12 * s + sin(angle) * 5 * s, cy + 50 * s);
+      paint
+        ..color = const Color(0xFF1A1A2E)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 6 * s;
+      canvas.drawPath(legPath, paint);
+    }
+  }
+
+  void _drawKernelPhantom(Canvas canvas, double cx, double cy, double s) {
+    final paint = Paint()..isAntiAlias = true;
+
+    for (var i = 5; i >= 0; i--) {
+      final alpha = (0.05 + i * 0.04).clamp(0.0, 1.0);
+      paint
+        ..color = Colors.deepPurple.withValues(alpha: alpha)
+        ..style = PaintingStyle.fill;
+      canvas.drawCircle(
+        Offset(
+          cx + sin(phase * 3 + i * 1.2) * 10 * s,
+          cy + cos(phase * 2 + i * 0.8) * 8 * s,
+        ),
+        (35 - i * 4) * s,
+        paint,
+      );
+    }
+
+    paint
+      ..color = const Color(0xFF7B2D8B)
+      ..style = PaintingStyle.fill;
+    final bodyPath = Path()
+      ..moveTo(cx - 25 * s, cy + 20 * s)
+      ..quadraticBezierTo(cx - 35 * s, cy - 10 * s, cx - 15 * s, cy - 35 * s)
+      ..quadraticBezierTo(cx, cy - 45 * s, cx + 15 * s, cy - 35 * s)
+      ..quadraticBezierTo(cx + 35 * s, cy - 10 * s, cx + 25 * s, cy + 20 * s)
+      ..quadraticBezierTo(cx, cy + 30 * s, cx - 25 * s, cy + 20 * s);
+    canvas.drawPath(bodyPath, paint);
+
+    paint
+      ..color = const Color(0xFF00FF88).withValues(alpha: 0.8)
+      ..style = PaintingStyle.fill;
+    canvas.drawCircle(Offset(cx - 8 * s, cy - 20 * s), 5 * s, paint);
+    canvas.drawCircle(Offset(cx + 8 * s, cy - 20 * s), 5 * s, paint);
+
+    paint
+      ..color = Colors.black
+      ..style = PaintingStyle.fill;
+    canvas.drawCircle(Offset(cx - 8 * s, cy - 20 * s), 2.5 * s, paint);
+    canvas.drawCircle(Offset(cx + 8 * s, cy - 20 * s), 2.5 * s, paint);
+
+    paint
+      ..color = const Color(0xFF00FF88).withValues(alpha: 0.6)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.5 * s;
+    canvas.drawCircle(Offset(cx - 8 * s, cy - 20 * s), 7 * s, paint);
+    canvas.drawCircle(Offset(cx + 8 * s, cy - 20 * s), 7 * s, paint);
+
+    for (var i = 0; i < 3; i++) {
+      final angle = phase * 3 + i * 2.1;
+      final tentaclePath = Path()
+        ..moveTo(cx - 20 * s + i * 20 * s, cy + 20 * s)
+        ..quadraticBezierTo(
+          cx - 25 * s + i * 20 * s + sin(angle) * 15 * s,
+          cy + 40 * s,
+          cx - 15 * s + i * 20 * s + sin(angle * 1.3) * 10 * s,
+          cy + 55 * s,
+        );
+      paint
+        ..color = const Color(0xFF7B2D8B).withValues(alpha: 0.6)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 5 * s;
+      canvas.drawPath(tentaclePath, paint);
+    }
+  }
+
+  void _drawIOGremlin(Canvas canvas, double cx, double cy, double s) {
+    final paint = Paint()..isAntiAlias = true;
+
+    paint
+      ..color = const Color(0xFF2D6A4F)
+      ..style = PaintingStyle.fill;
+    final bodyPath = Path()
+      ..moveTo(cx - 28 * s, cy + 25 * s)
+      ..lineTo(cx - 32 * s, cy - 5 * s)
+      ..quadraticBezierTo(cx - 25 * s, cy - 35 * s, cx, cy - 38 * s)
+      ..quadraticBezierTo(cx + 25 * s, cy - 35 * s, cx + 32 * s, cy - 5 * s)
+      ..lineTo(cx + 28 * s, cy + 25 * s)
+      ..close();
+    canvas.drawPath(bodyPath, paint);
+
+    paint
+      ..color = const Color(0xFF40916C)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2 * s;
+    canvas.drawPath(bodyPath, paint);
+
+    paint
+      ..color = const Color(0xFFFFD166)
+      ..style = PaintingStyle.fill;
+    canvas.drawCircle(Offset(cx - 10 * s, cy - 15 * s), 6 * s, paint);
+    canvas.drawCircle(Offset(cx + 10 * s, cy - 15 * s), 6 * s, paint);
+
+    paint
+      ..color = const Color(0xFF1A1A2E)
+      ..style = PaintingStyle.fill;
+    canvas.drawCircle(
+      Offset(cx - 10 * s + sin(phase * 2) * 1.5 * s, cy - 15 * s),
+      3 * s,
+      paint,
+    );
+    canvas.drawCircle(
+      Offset(cx + 10 * s + sin(phase * 2) * 1.5 * s, cy - 15 * s),
+      3 * s,
+      paint,
+    );
+
+    final earPath = Path()
+      ..moveTo(cx - 25 * s, cy - 25 * s)
+      ..lineTo(cx - 30 * s, cy - 45 * s)
+      ..lineTo(cx - 18 * s, cy - 30 * s)
+      ..close();
+    paint
+      ..color = const Color(0xFF2D6A4F)
+      ..style = PaintingStyle.fill;
+    canvas.drawPath(earPath, paint);
+
+    final earPath2 = Path()
+      ..moveTo(cx + 25 * s, cy - 25 * s)
+      ..lineTo(cx + 30 * s, cy - 45 * s)
+      ..lineTo(cx + 18 * s, cy - 30 * s)
+      ..close();
+    canvas.drawPath(earPath2, paint);
+
+    final grin = Path()
+      ..moveTo(cx - 15 * s, cy + 5 * s)
+      ..quadraticBezierTo(cx, cy + 15 * s, cx + 15 * s, cy + 5 * s);
+    paint
+      ..color = const Color(0xFF1A1A2E)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2 * s;
+    canvas.drawPath(grin, paint);
+
+    final armAngle = sin(phase * 3) * 0.2;
+    for (var sign in [-1.0, 1.0]) {
+      paint
+        ..color = const Color(0xFF2D6A4F)
+        ..style = PaintingStyle.fill;
+      canvas.drawCircle(
+        Offset(cx + sign * 35 * s, cy + 10 * s + armAngle * sign * 10 * s),
+        7 * s,
+        paint,
+      );
+      paint
+        ..color = const Color(0xFF40916C)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1.5 * s;
+      canvas.drawCircle(
+        Offset(cx + sign * 35 * s, cy + 10 * s + armAngle * sign * 10 * s),
+        7 * s,
+        paint,
+      );
+    }
+  }
+
+  void _drawPacketPirate(Canvas canvas, double cx, double cy, double s) {
+    final paint = Paint()..isAntiAlias = true;
+
+    paint
+      ..color = const Color(0xFF1B1B3A)
+      ..style = PaintingStyle.fill;
+    final bodyPath = Path()
+      ..moveTo(cx - 32 * s, cy + 25 * s)
+      ..lineTo(cx - 35 * s, cy - 5 * s)
+      ..quadraticBezierTo(cx - 28 * s, cy - 38 * s, cx, cy - 42 * s)
+      ..quadraticBezierTo(cx + 28 * s, cy - 38 * s, cx + 35 * s, cy - 5 * s)
+      ..lineTo(cx + 32 * s, cy + 25 * s)
+      ..close();
+    canvas.drawPath(bodyPath, paint);
+
+    paint
+      ..color = const Color(0xFF3A3A6A)
+      ..style = PaintingStyle.fill;
+    final hatPath = Path()
+      ..moveTo(cx - 40 * s, cy - 30 * s)
+      ..lineTo(cx + 40 * s, cy - 30 * s)
+      ..lineTo(cx + 30 * s, cy - 50 * s)
+      ..lineTo(cx - 30 * s, cy - 50 * s)
+      ..close();
+    canvas.drawPath(hatPath, paint);
+
+    paint
+      ..color = const Color(0xFFFFD700)
+      ..style = PaintingStyle.fill;
+    canvas.drawCircle(Offset(cx, cy - 42 * s), 3 * s, paint);
+
+    paint
+      ..color = const Color(0xFFFF4444)
+      ..style = PaintingStyle.fill;
+    canvas.drawCircle(Offset(cx - 10 * s, cy - 18 * s), 5 * s, paint);
+    canvas.drawCircle(Offset(cx + 10 * s, cy - 18 * s), 5 * s, paint);
+
+    paint
+      ..color = Colors.black
+      ..style = PaintingStyle.fill;
+    canvas.drawCircle(Offset(cx - 10 * s, cy - 18 * s), 2.5 * s, paint);
+    canvas.drawCircle(Offset(cx + 10 * s, cy - 18 * s), 2.5 * s, paint);
+
+    paint
+      ..color = const Color(0xFF1A1A2E)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2 * s;
+    final eyePatch = Path()
+      ..moveTo(cx + 10 * s, cy - 25 * s)
+      ..lineTo(cx + 10 * s, cy - 10 * s);
+    canvas.drawPath(eyePatch, paint);
+
+    paint
+      ..color = const Color(0xFF00B4D8)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.5 * s;
+    for (var i = 0; i < 3; i++) {
+      final angle = phase * 2 + i * 2.1;
+      canvas.drawLine(
+        Offset(cx - 35 * s, cy + 20 * s),
+        Offset(
+          cx - 42 * s + cos(angle) * 10 * s,
+          cy + 35 * s + sin(angle) * 8 * s,
+        ),
+        paint..strokeWidth = (3 - i * 0.5) * s,
+      );
+    }
+
+    paint
+      ..color = const Color(0xFF0A9396).withValues(alpha: 0.2 + 0.15 * sin(phase * 3))
+      ..style = PaintingStyle.fill;
+    for (var i = 0; i < 5; i++) {
+      canvas.drawCircle(
+        Offset(
+          cx - 20 * s + i * 10 * s + sin(phase * 4 + i.toDouble()) * 3 * s,
+          cy + 30 * s + cos(phase * 3 + i.toDouble()) * 2 * s,
+        ),
+        (2 + sin(phase * 2 + i.toDouble()) * 0.5) * s,
+        paint,
+      );
+    }
+  }
+
+  void _drawVisualVoid(Canvas canvas, double cx, double cy, double s) {
+    final paint = Paint()..isAntiAlias = true;
+
+    for (var i = 8; i >= 0; i--) {
+      final t = i / 8;
+      paint
+        ..color = Color.lerp(
+          const Color(0xFF0D0015),
+          const Color(0xFF2D004B),
+          t,
+        )!.withValues(alpha: 0.15 + t * 0.1)
+        ..style = PaintingStyle.fill;
+      canvas.drawCircle(
+        Offset(cx + sin(phase * 1.5 + i * 0.7) * 5 * s, cy + cos(phase * 1.2 + i * 0.5) * 5 * s),
+        (50 - i * 5) * s,
+        paint,
+      );
+    }
+
+    paint
+      ..color = const Color(0xFF9B30FF)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2 * s;
+    final eyePath = Path()
+      ..moveTo(cx - 20 * s, cy - 25 * s)
+      ..quadraticBezierTo(cx, cy - 35 * s, cx + 20 * s, cy - 25 * s)
+      ..quadraticBezierTo(cx + 5 * s, cy - 15 * s, cx, cy - 18 * s)
+      ..quadraticBezierTo(cx - 5 * s, cy - 15 * s, cx - 20 * s, cy - 25 * s);
+    canvas.drawPath(eyePath, paint);
+
+    paint
+      ..color = const Color(0xFFFFFFFF).withValues(alpha: 0.9)
+      ..style = PaintingStyle.fill;
+    canvas.drawCircle(Offset(cx, cy - 24 * s), 4 * s, paint);
+
+    paint
+      ..color = const Color(0xFFFF00FF)
+      ..style = PaintingStyle.fill;
+    canvas.drawCircle(Offset(cx, cy - 24 * s), 2 * s, paint);
+
+    paint
+      ..color = const Color(0xFFFF00FF).withValues(alpha: 0.3)
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 10);
+    canvas.drawCircle(Offset(cx, cy - 24 * s), 10 * s, paint);
+
+    paint
+      ..maskFilter = null
+      ..color = const Color(0xFF9B30FF).withValues(alpha: 0.4)
+      ..style = PaintingStyle.fill;
+    for (var i = 0; i < 3; i++) {
+      final angle = phase * 2.5 + i * 2.1;
+      final tentaclePath = Path()
+        ..moveTo(cx - 25 * s + i * 25 * s, cy + 25 * s)
+        ..cubicTo(
+          cx - 30 * s + i * 25 * s + cos(angle) * 15 * s,
+          cy + 40 * s,
+          cx - 20 * s + i * 25 * s + sin(angle * 1.5) * 20 * s,
+          cy + 50 * s,
+          cx - 25 * s + i * 25 * s + cos(angle * 0.8) * 10 * s,
+          cy + 60 * s,
+        );
+      paint
+        ..color = const Color(0xFF9B30FF).withValues(alpha: 0.3)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 6 * s;
+      canvas.drawPath(tentaclePath, paint);
+
+      paint
+        ..color = const Color(0xFF00FF88).withValues(alpha: 0.15 * glowIntensity)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2 * s;
+      canvas.drawPath(tentaclePath, paint);
+    }
+
+    paint
+      ..color = const Color(0xFF9B30FF).withValues(alpha: 0.15 * glowIntensity)
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 15);
+    canvas.drawCircle(Offset(cx, cy), 30 * s, paint);
+  }
+
+  void _drawDefeatedMonster(Canvas canvas, double cx, double cy, double s) {
+    final paint = Paint()
+      ..isAntiAlias = true
+      ..color = Colors.grey.withValues(alpha: 0.2)
+      ..style = PaintingStyle.fill;
+    canvas.drawCircle(Offset(cx, cy), 30 * s, paint);
+
+    paint
+      ..color = Colors.grey.withValues(alpha: 0.15)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2 * s;
+    canvas.drawCircle(Offset(cx, cy), 30 * s, paint);
+
+    paint
+      ..color = Colors.grey.withValues(alpha: 0.3)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 3 * s;
+    canvas.drawLine(
+      Offset(cx - 15 * s, cy - 15 * s),
+      Offset(cx + 15 * s, cy + 15 * s),
+      paint,
+    );
+    canvas.drawLine(
+      Offset(cx + 15 * s, cy - 15 * s),
+      Offset(cx - 15 * s, cy + 15 * s),
+      paint,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant _MonsterPainter old) =>
+      old.bossIndex != bossIndex ||
+      old.isDefeated != isDefeated ||
+      old.phase != phase;
+}
+
+class _ArenaParticlePainter extends CustomPainter {
+  final double phase;
+  final int bossIndex;
+
+  _ArenaParticlePainter({required this.phase, required this.bossIndex});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final rng = Random(42 + bossIndex);
+    final color = [
+      Colors.red,
+      Colors.deepPurple,
+      Colors.green,
+      Colors.cyan,
+      const Color(0xFF9B30FF),
+    ][(bossIndex - 1).clamp(0, 4)];
+
+    for (var i = 0; i < 40; i++) {
       final x = rng.nextDouble() * size.width;
-      final y = rng.nextDouble() * size.height;
-      final radius = rng.nextDouble() * 3 + 1;
-      final alpha = (rng.nextDouble() * 60 + 20).toInt();
+      final y = (rng.nextDouble() * size.height + phase * 50) % size.height;
+      final radius = rng.nextDouble() * 2.5 + 0.5;
+      final alpha = ((rng.nextDouble() * 40 + 10) * (0.5 + 0.5 * sin(phase * 3 + i))).toInt();
       canvas.drawCircle(
         Offset(x, y),
         radius,
-        Paint()..color = Colors.red.withValues(alpha: alpha / 255),
+        Paint()..color = color.withValues(alpha: alpha / 255),
       );
     }
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  bool shouldRepaint(covariant _ArenaParticlePainter old) =>
+      old.phase != phase;
 }

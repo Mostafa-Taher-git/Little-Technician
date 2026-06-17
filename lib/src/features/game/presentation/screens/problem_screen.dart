@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:gap/gap.dart';
-import 'package:littletech/src/core/constants/colors.dart';
+
 import 'package:littletech/src/core/navigation/nav.dart';
 import 'package:littletech/src/features/game/constants/game_data.dart';
 import 'package:littletech/src/features/game/domain/cubit/game_cubit.dart';
@@ -30,10 +30,13 @@ class _ProblemScreenState extends State<ProblemScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: scheme.surface,
       appBar: AppBar(
         title: Text(widget.level.title),
+        backgroundColor: Colors.transparent,
         actions: [
           BlocBuilder<GameCubit, GameState>(
             builder: (_, state) {
@@ -42,13 +45,14 @@ class _ProblemScreenState extends State<ProblemScreen> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.monetization_on, color: AppColors.accent, size: 16),
+                    Icon(Icons.monetization_on, color: scheme.secondary, size: 16),
                     const Gap(4),
                     Text(
                       '${state.totalPoints}',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontWeight: FontWeight.w700,
                         fontSize: 14,
+                        color: scheme.onSurface,
                       ),
                     ),
                   ],
@@ -80,10 +84,9 @@ class _ProblemScreenState extends State<ProblemScreen> {
 
           return Column(
             children: [
-              // Progress bar
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                color: AppColors.surface,
+                color: scheme.surface,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -91,18 +94,18 @@ class _ProblemScreenState extends State<ProblemScreen> {
                       children: [
                         Text(
                           'Step $solvedCount of ${steps.length}',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontWeight: FontWeight.w600,
                             fontSize: 13,
-                            color: AppColors.onSurfaceMuted,
+                            color: scheme.onSurface.withValues(alpha: 0.5),
                           ),
                         ),
                         const Spacer(),
                         Text(
                           '${widget.level.points}pts on completion',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12,
-                            color: AppColors.accent,
+                            color: scheme.secondary,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -113,36 +116,35 @@ class _ProblemScreenState extends State<ProblemScreen> {
                       borderRadius: BorderRadius.circular(6),
                       child: LinearProgressIndicator(
                         value: progress,
-                        backgroundColor: AppColors.border,
-                        valueColor: const AlwaysStoppedAnimation<Color>(AppColors.accent),
+                        backgroundColor: scheme.outline.withValues(alpha: 0.2),
+                        valueColor: AlwaysStoppedAnimation<Color>(scheme.secondary),
                         minHeight: 6,
                       ),
                     ),
                   ],
                 ),
               ),
-              // Hint text
               if (state.hintText != null)
                 Container(
                   width: double.infinity,
                   margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
                   padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
-                    color: AppColors.info.withValues(alpha: 0.08),
+                    color: scheme.tertiary.withValues(alpha: 0.08),
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: AppColors.info.withValues(alpha: 0.2)),
+                    border: Border.all(color: scheme.tertiary.withValues(alpha: 0.2)),
                   ),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Icon(Icons.lightbulb_outline, color: AppColors.info, size: 18),
+                      Icon(Icons.lightbulb_outline, color: scheme.tertiary, size: 18),
                       const Gap(10),
                       Expanded(
                         child: Text(
                           state.hintText!,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 13,
-                            color: AppColors.info,
+                            color: scheme.tertiary,
                             height: 1.4,
                           ),
                         ),
@@ -150,7 +152,6 @@ class _ProblemScreenState extends State<ProblemScreen> {
                     ],
                   ),
                 ).animate().fadeIn().slideX(begin: -0.1),
-              // Steps list
               Expanded(
                 child: ListView.builder(
                   padding: const EdgeInsets.all(16),
@@ -164,14 +165,13 @@ class _ProblemScreenState extends State<ProblemScreen> {
                   },
                 ),
               ),
-              // Bottom bar
               Container(
                 padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
                 decoration: BoxDecoration(
-                  color: AppColors.surface,
+                  color: scheme.surface,
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.04),
+                      color: scheme.shadow.withValues(alpha: 0.04),
                       blurRadius: 10,
                       offset: const Offset(0, -2),
                     ),
@@ -179,7 +179,6 @@ class _ProblemScreenState extends State<ProblemScreen> {
                 ),
                 child: Row(
                   children: [
-                    // SupTech button
                     SupTechAvatar(
                       availableUses: state.availableSupTechUses,
                       isGlowing: state.canUseSupTech,

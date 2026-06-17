@@ -106,25 +106,27 @@ class CategoryCard extends StatelessWidget {
   final String title;
   final IconData icon;
   final VoidCallback onTap;
+  final ColorScheme scheme;
 
   const CategoryCard({
     super.key,
     required this.title,
     required this.icon,
     required this.onTap,
+    required this.scheme,
   });
 
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: AppColors.surface,
+      color: scheme.surface,
       borderRadius: BorderRadius.circular(16),
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(16),
         child: Container(
           decoration: BoxDecoration(
-            border: Border.all(color: AppColors.border),
+            border: Border.all(color: scheme.outline),
             borderRadius: BorderRadius.circular(16),
           ),
           padding: const EdgeInsets.all(16),
@@ -134,19 +136,19 @@ class CategoryCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: AppColors.surfaceVariant,
+                  color: scheme.surface,
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Icon(icon, color: AppColors.primary, size: 24),
+                child: Icon(icon, color: scheme.primary, size: 24),
               ),
               const Gap(12),
               Text(
                 title,
                 textAlign: TextAlign.center,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.onSurface,
+                  color: scheme.onSurface,
                 ),
               ),
             ],
@@ -154,7 +156,7 @@ class CategoryCard extends StatelessWidget {
         ),
       ),
     );
-  }
+}
 }
 
 // ─── Problem Tile ────────────────────────────────────────────────────────────
@@ -162,13 +164,19 @@ class CategoryCard extends StatelessWidget {
 class ProblemTile extends StatelessWidget {
   final String title;
   final VoidCallback onTap;
+  final ColorScheme scheme;
 
-  const ProblemTile({super.key, required this.title, required this.onTap});
+  const ProblemTile({
+    super.key,
+    required this.title,
+    required this.onTap,
+    required this.scheme,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: AppColors.surface,
+      color: scheme.surface,
       borderRadius: BorderRadius.circular(14),
       child: InkWell(
         onTap: onTap,
@@ -176,7 +184,7 @@ class ProblemTile extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
           decoration: BoxDecoration(
-            border: Border.all(color: AppColors.border),
+            border: Border.all(color: scheme.outline),
             borderRadius: BorderRadius.circular(14),
           ),
           child: Row(
@@ -184,19 +192,19 @@ class ProblemTile extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: AppColors.surfaceVariant,
+                  color: scheme.surface,
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: const Icon(Icons.help_outline, size: 18, color: AppColors.primary),
+                child: const Icon(Icons.help_outline, size: 18, color: Colors.white70),
               ),
               const Gap(14),
               Expanded(
                 child: Text(
                   title,
-                  style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500, color: AppColors.onSurface),
+                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500, color: scheme.onSurface),
                 ),
               ),
-              const Icon(Icons.chevron_right, color: AppColors.onSurfaceMuted),
+              Icon(Icons.chevron_right, color: scheme.onSurface.withValues(alpha: 0.6)),
             ],
           ),
         ),
@@ -261,30 +269,33 @@ class EmptyState extends StatelessWidget {
   final IconData icon;
   final String title;
   final String subtitle;
+  final ColorScheme? scheme;
 
   const EmptyState({
     super.key,
     required this.icon,
     required this.title,
     required this.subtitle,
+    this.scheme,
   });
 
   @override
   Widget build(BuildContext context) {
+    final scheme = this.scheme ?? Theme.of(context).colorScheme;
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(40),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 64, color: AppColors.onSurfaceMuted.withValues(alpha: 0.3)),
+            Icon(icon, size: 64, color: scheme.onSurface.withValues(alpha: 0.3)),
             const Gap(16),
-            Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: AppColors.onSurface)),
+            Text(title, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: scheme.onSurface)),
             const Gap(8),
             Text(
               subtitle,
               textAlign: TextAlign.center,
-              style: const TextStyle(color: AppColors.onSurfaceMuted),
+              style: TextStyle(color: scheme.onSurface.withValues(alpha: 0.6)),
             ),
           ],
         ),

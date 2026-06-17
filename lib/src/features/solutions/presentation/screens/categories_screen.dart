@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:littletech/src/core/constants/colors.dart';
 import 'package:littletech/src/core/services/rule_engine.dart';
 import 'package:littletech/src/core/widgets/app_widgets.dart';
 import 'problems_list_screen.dart';
@@ -10,8 +9,9 @@ class CategoriesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: scheme.surface,
       appBar: AppBar(
         title: const Text('Categories'),
         actions: [
@@ -21,12 +21,12 @@ class CategoriesScreen extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
-                  color: AppColors.surfaceVariant,
+                  color: scheme.surface,
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Text(
                   '${RuleEngine.categories.length} categories',
-                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.onSurfaceMuted),
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: scheme.onSurface.withValues(alpha: 0.6)),
                 ),
               ),
             ),
@@ -48,6 +48,7 @@ class CategoriesScreen extends StatelessWidget {
             return CategoryCard(
               title: cat.name,
               icon: cat.icon,
+              scheme: scheme,
               onTap: () => Navigator.push(
                 context,
                 MaterialPageRoute(

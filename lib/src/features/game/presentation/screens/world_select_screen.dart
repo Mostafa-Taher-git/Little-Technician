@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
-import 'package:littletech/src/core/constants/colors.dart';
 import 'package:littletech/src/core/navigation/nav.dart';
 import 'package:littletech/src/features/game/constants/game_data.dart';
 import 'package:littletech/src/features/game/domain/cubit/game_cubit.dart';
@@ -14,10 +13,13 @@ class WorldSelectScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: scheme.surface,
       appBar: AppBar(
         title: const Text('Troubleshooting Worlds'),
+        backgroundColor: Colors.transparent,
         actions: [
           BlocBuilder<GameCubit, GameState>(
             builder: (_, state) {
@@ -26,14 +28,14 @@ class WorldSelectScreen extends StatelessWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.monetization_on, color: AppColors.accent, size: 18),
+                    Icon(Icons.monetization_on, color: scheme.secondary, size: 18),
                     const Gap(4),
                     Text(
                       '${state.totalPoints}',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontWeight: FontWeight.w700,
                         fontSize: 15,
-                        color: AppColors.onSurface,
+                        color: scheme.onSurface,
                       ),
                     ),
                     const Gap(8),

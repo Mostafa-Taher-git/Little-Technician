@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:gap/gap.dart';
-import 'package:littletech/src/core/constants/colors.dart';
 import 'package:littletech/src/core/services/rule_engine.dart';
 import 'package:littletech/src/core/widgets/app_widgets.dart';
 import 'solution_detail_screen.dart';
@@ -60,8 +59,9 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: scheme.surface,
       appBar: AppBar(title: const Text('Search Problems')),
       body: Column(
         children: [
@@ -86,15 +86,17 @@ class _SearchScreenState extends State<SearchScreen> {
           Expanded(
             child: _results.isEmpty
                 ? _searched
-                    ? const EmptyState(
+                    ? EmptyState(
                         icon: Icons.search_off,
                         title: 'No Results',
                         subtitle: 'Try different keywords or browse categories from the home screen.',
+                        scheme: scheme,
                       )
-                    : const EmptyState(
+                    : EmptyState(
                         icon: Icons.search,
                         title: 'Search Solutions',
                         subtitle: 'Type keywords to find solutions for computer problems.',
+                        scheme: scheme,
                       )
                 : ListView.separated(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -104,6 +106,7 @@ class _SearchScreenState extends State<SearchScreen> {
                       final r = _results[i];
                       return ProblemTile(
                         title: r.problem,
+                        scheme: scheme,
                         onTap: () => Navigator.push(
                           context,
                           MaterialPageRoute(

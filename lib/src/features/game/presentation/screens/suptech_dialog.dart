@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
-import 'package:littletech/src/core/constants/colors.dart';
 import 'package:littletech/src/features/game/domain/cubit/game_cubit.dart';
 
 class SupTechDialog extends StatelessWidget {
@@ -9,11 +8,13 @@ class SupTechDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+
     return Container(
       padding: const EdgeInsets.all(24),
-      decoration: const BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      decoration: BoxDecoration(
+        color: scheme.surface,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
       ),
       child: BlocBuilder<GameCubit, GameState>(
         builder: (_, state) {
@@ -26,7 +27,7 @@ class SupTechDialog extends StatelessWidget {
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: AppColors.border,
+                    color: scheme.outline.withValues(alpha: 0.3),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -34,38 +35,38 @@ class SupTechDialog extends StatelessWidget {
               const Gap(16),
               Row(
                 children: [
-                  const Text(
+                  Text(
                     'SupTech Companion',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
-                      color: AppColors.onSurface,
+                      color: scheme.onSurface,
                     ),
                   ),
                   const Spacer(),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
-                      color: AppColors.accent.withValues(alpha: 0.1),
+                      color: scheme.secondary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
                       '${state.availableSupTechUses} left',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w700,
-                        color: AppColors.accent,
+                        color: scheme.secondary,
                       ),
                     ),
                   ),
                 ],
               ),
               const Gap(4),
-              const Text(
+              Text(
                 'Pick an action to help with this step',
                 style: TextStyle(
                   fontSize: 13,
-                  color: AppColors.onSurfaceMuted,
+                  color: scheme.onSurface.withValues(alpha: 0.5),
                 ),
               ),
               const Gap(20),
@@ -73,7 +74,7 @@ class SupTechDialog extends StatelessWidget {
                 icon: Icons.lightbulb_outline,
                 label: 'Hint',
                 description: 'Get a helpful tip',
-                color: AppColors.info,
+                color: scheme.tertiary,
                 onTap: () => _useAction(context, 'hint'),
               ),
               const Gap(10),
@@ -81,7 +82,7 @@ class SupTechDialog extends StatelessWidget {
                 icon: Icons.skip_next,
                 label: 'Skip Step',
                 description: 'Auto-solve this step',
-                color: AppColors.warning,
+                color: scheme.error,
                 onTap: () => _useAction(context, 'skip'),
               ),
               const Gap(10),
@@ -89,7 +90,7 @@ class SupTechDialog extends StatelessWidget {
                 icon: Icons.quiz_outlined,
                 label: 'Diagnose',
                 description: 'Ask guided questions',
-                color: AppColors.success,
+                color: scheme.secondary,
                 onTap: () => _useAction(context, 'diagnose'),
               ),
               const Gap(10),
@@ -97,7 +98,7 @@ class SupTechDialog extends StatelessWidget {
                 icon: Icons.description_outlined,
                 label: 'Explain',
                 description: 'Simple explanation of this step',
-                color: AppColors.accent,
+                color: scheme.primary,
                 onTap: () => _useAction(context, 'explain'),
               ),
               const Gap(12),
@@ -131,6 +132,8 @@ class _ActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+
     return Material(
       color: color.withValues(alpha: 0.06),
       borderRadius: BorderRadius.circular(14),
@@ -160,17 +163,17 @@ class _ActionButton extends StatelessWidget {
                   children: [
                     Text(
                       label,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontWeight: FontWeight.w600,
                         fontSize: 15,
-                        color: AppColors.onSurface,
+                        color: scheme.onSurface,
                       ),
                     ),
                     Text(
                       description,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
-                        color: AppColors.onSurfaceMuted,
+                        color: scheme.onSurface.withValues(alpha: 0.5),
                       ),
                     ),
                   ],
