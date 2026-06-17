@@ -1,17 +1,7 @@
 {
-    
     "configurations": [
         {
-            "name": "Little Technician (Edge)",
-            "request": "launch",
-            "type": "dart",
-            "deviceId": "edge",
-            "args": [
-                "--web-browser-flag=--inprivate"
-            ]
-        },
-        {
-            "name": "Little Technician (Windows)",
+            "name": "LittleTech (Windows)",
             "request": "launch",
             "type": "dart",
             "deviceId": "windows"
