@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:littletech/src/core/constants/colors.dart';
-
-// ─── Toasts ─────────────────────────────────────────────────────────────────
 
 void showErrorToast(BuildContext context, String text) {
+  final scheme = Theme.of(context).colorScheme;
   ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(
-      backgroundColor: AppColors.error,
+      backgroundColor: scheme.error,
       behavior: SnackBarBehavior.floating,
       margin: const EdgeInsets.all(12),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -23,9 +21,10 @@ void showErrorToast(BuildContext context, String text) {
 }
 
 void showSuccessToast(BuildContext context, String text) {
+  final scheme = Theme.of(context).colorScheme;
   ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(
-      backgroundColor: AppColors.success,
+      backgroundColor: scheme.secondary,
       behavior: SnackBarBehavior.floating,
       margin: const EdgeInsets.all(12),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -41,16 +40,15 @@ void showSuccessToast(BuildContext context, String text) {
 }
 
 void showLoadingDialog(BuildContext context) {
+  final scheme = Theme.of(context).colorScheme;
   showDialog(
     context: context,
     barrierDismissible: false,
-    builder: (_) => const Center(
-      child: CircularProgressIndicator(color: AppColors.primary),
+    builder: (_) => Center(
+      child: CircularProgressIndicator(color: scheme.primary),
     ),
   );
 }
-
-// ─── Primary Button ─────────────────────────────────────────────────────────
 
 class AppButton extends StatelessWidget {
   final String label;
@@ -70,11 +68,12 @@ class AppButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     final child = isLoading
-        ? const SizedBox(
+        ? SizedBox(
             height: 20,
             width: 20,
-            child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.onPrimary),
+            child: CircularProgressIndicator(strokeWidth: 2, color: scheme.onPrimary),
           )
         : Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -99,8 +98,6 @@ class AppButton extends StatelessWidget {
     );
   }
 }
-
-// ─── Category Chip ──────────────────────────────────────────────────────────
 
 class CategoryCard extends StatelessWidget {
   final String title;
@@ -156,10 +153,8 @@ class CategoryCard extends StatelessWidget {
         ),
       ),
     );
+  }
 }
-}
-
-// ─── Problem Tile ────────────────────────────────────────────────────────────
 
 class ProblemTile extends StatelessWidget {
   final String title;
@@ -213,8 +208,6 @@ class ProblemTile extends StatelessWidget {
   }
 }
 
-// ─── Solution Step Card ──────────────────────────────────────────────────────
-
 class SolutionStepCard extends StatelessWidget {
   final int stepNumber;
   final String text;
@@ -223,13 +216,14 @@ class SolutionStepCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: scheme.surface,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: scheme.outline),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -239,12 +233,12 @@ class SolutionStepCard extends StatelessWidget {
             height: 32,
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              color: AppColors.primary,
+              color: scheme.primary,
               borderRadius: BorderRadius.circular(10),
             ),
             child: Text(
               '$stepNumber',
-              style: const TextStyle(color: AppColors.onPrimary, fontWeight: FontWeight.w700, fontSize: 14),
+              style: TextStyle(color: scheme.onPrimary, fontWeight: FontWeight.w700, fontSize: 14),
             ),
           ),
           const Gap(14),
@@ -253,7 +247,7 @@ class SolutionStepCard extends StatelessWidget {
               padding: const EdgeInsets.only(top: 5),
               child: Text(
                 text,
-                style: const TextStyle(fontSize: 15, color: AppColors.onSurface, height: 1.5),
+                style: TextStyle(fontSize: 15, color: scheme.onSurface, height: 1.5),
               ),
             ),
           ),
@@ -262,8 +256,6 @@ class SolutionStepCard extends StatelessWidget {
     );
   }
 }
-
-// ─── Empty State ─────────────────────────────────────────────────────────────
 
 class EmptyState extends StatelessWidget {
   final IconData icon;

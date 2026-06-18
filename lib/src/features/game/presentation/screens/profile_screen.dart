@@ -94,7 +94,7 @@ class ProfileScreen extends StatelessWidget {
                       children: [
                         _StatCard(
                           icon: Icons.emoji_events,
-                          label: 'Levels',
+                          label: 'Dungeons',
                           value: '${progress.levelsCleared}',
                           scheme: scheme,
                         ),
@@ -163,6 +163,34 @@ class ProfileScreen extends StatelessWidget {
                           onTap: () => _applyTheme(context, 'neon'),
                           scheme: scheme,
                         ),
+                        _ThemeChip(
+                          label: 'Medieval',
+                          icon: Icons.castle,
+                          isActive: progress.themeId == 'medieval',
+                          onTap: () => _applyTheme(context, 'medieval'),
+                          scheme: scheme,
+                        ),
+                        _ThemeChip(
+                          label: 'Dungeon',
+                          icon: Icons.door_front_door,
+                          isActive: progress.themeId == 'dungeon',
+                          onTap: () => _applyTheme(context, 'dungeon'),
+                          scheme: scheme,
+                        ),
+                        _ThemeChip(
+                          label: 'Arcane',
+                          icon: Icons.auto_awesome,
+                          isActive: progress.themeId == 'arcane',
+                          onTap: () => _applyTheme(context, 'arcane'),
+                          scheme: scheme,
+                        ),
+                        _ThemeChip(
+                          label: 'Dragon Fire',
+                          icon: Icons.local_fire_department,
+                          isActive: progress.themeId == 'dragon_fire',
+                          onTap: () => _applyTheme(context, 'dragon_fire'),
+                          scheme: scheme,
+                        ),
                       ],
                     ),
                     const Gap(24),
@@ -192,7 +220,7 @@ class ProfileScreen extends StatelessWidget {
                       ),
                     const Gap(24),
                     Text(
-                      'SupTech Skins',
+                      'Familiar Skins',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
@@ -213,7 +241,7 @@ class ProfileScreen extends StatelessWidget {
                         runSpacing: 8,
                         children: progress.unlockedSkinIds.map((skinId) {
                           return Chip(
-                            avatar: const Icon(Icons.terminal, size: 16),
+                            avatar: const Icon(Icons.auto_awesome, size: 16),
                             label: Text(skinId),
                             backgroundColor: scheme.secondary.withValues(alpha: 0.1),
                           );

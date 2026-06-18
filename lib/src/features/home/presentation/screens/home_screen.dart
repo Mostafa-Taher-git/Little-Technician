@@ -186,22 +186,6 @@ class HomeScreen extends StatelessWidget {
               ),
               const Gap(28),
 
-              // Browse categories preview
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text('Browse Categories', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: scheme.onSurface)),
-                  TextButton(
-                    onPressed: () => Nav.push(context, const CategoriesScreen()),
-                    child: Text('See All', style: TextStyle(color: scheme.secondary, fontWeight: FontWeight.w600)),
-                  ),
-                ],
-              ),
-              const Gap(12),
-              // Show first 4 categories as preview
-              ..._buildCategoryPreview(context),
-              const Gap(12),
-
               // CTA
               Row(
                 children: [
@@ -221,8 +205,8 @@ class HomeScreen extends StatelessWidget {
                             context.read<GameCubit>().loadGame();
                             Nav.push(context, const WorldSelectScreen());
                           },
-                          icon: const Icon(Icons.rocket_launch_rounded, size: 18),
-                          label: const Text('Play Troubleshooting'),
+                          icon: const Icon(Icons.castle_rounded, size: 18),
+                          label: const Text('Enter the Dungeon'),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: scheme.secondary,
                             foregroundColor: scheme.onSecondary,
@@ -239,50 +223,6 @@ class HomeScreen extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  List<Widget> _buildCategoryPreview(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final previewCategories = [
-      {'name': 'CPU', 'icon': Icons.memory, 'count': '6'},
-      {'name': 'Internet', 'icon': Icons.wifi, 'count': '5'},
-      {'name': 'Display', 'icon': Icons.monitor, 'count': '5'},
-    ];
-
-    return previewCategories.map((c) {
-      return Container(
-        margin: const EdgeInsets.only(bottom: 10),
-        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
-        decoration: BoxDecoration(
-          color: scheme.surface,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: scheme.outline),
-        ),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: scheme.surface,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Icon(c['icon'] as IconData, color: scheme.primary, size: 20),
-            ),
-            const Gap(14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(c['name'] as String, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15, color: scheme.onSurface)),
-                  Text('${c['count']} solutions', style: TextStyle(color: scheme.onSurface.withValues(alpha: 0.6), fontSize: 12)),
-                ],
-              ),
-            ),
-            Icon(Icons.chevron_right, color: scheme.onSurface.withValues(alpha: 0.6), size: 20),
-          ],
-        ),
-      );
-    }).toList();
   }
 }
 

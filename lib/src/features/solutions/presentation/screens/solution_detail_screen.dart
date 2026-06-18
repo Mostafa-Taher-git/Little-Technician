@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
-import 'package:littletech/src/core/constants/colors.dart';
 import 'package:littletech/src/core/services/rule_engine.dart';
 import 'package:littletech/src/core/widgets/app_widgets.dart';
 import 'package:littletech/src/features/home/presentation/bloc/counter_cubit.dart';
 import 'package:littletech/src/features/solutions/data/models/problem_solution_model.dart';
 import 'package:littletech/src/features/solutions/data/models/saved_solution_model.dart';
 import 'package:littletech/src/features/solutions/data/services/saved_solutions_service.dart';
+import 'package:littletech/src/features/solutions/data/services/solved_problems_service.dart';
 
 class SolutionDetailScreen extends StatefulWidget {
   final String problemName;
@@ -30,6 +30,12 @@ class _SolutionDetailScreenState extends State<SolutionDetailScreen> {
     super.initState();
     _solution = RuleEngine.solve(widget.problemName);
     _checkSaved();
+    _checkSolved();
+  }
+
+  Future<void> _checkSolved() async {
+    final solved = await SolvedProblemsService.isSolved(widget.problemName);
+    if (mounted) setState(() => _isSolved = solved);
   }
 
   Future<void> _checkSaved() async {
@@ -55,8 +61,9 @@ class _SolutionDetailScreenState extends State<SolutionDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: scheme.surface,
       appBar: AppBar(
         title: Text(widget.problemName, overflow: TextOverflow.ellipsis),
         actions: [
@@ -64,7 +71,7 @@ class _SolutionDetailScreenState extends State<SolutionDetailScreen> {
             onPressed: _toggleSave,
             icon: Icon(
               _isSaved ? Icons.bookmark : Icons.bookmark_outline,
-              color: _isSaved ? AppColors.accent : AppColors.onSurfaceMuted,
+              color: _isSaved ? scheme.secondary : scheme.onSurface.withValues(alpha: 0.6),
             ),
           ),
         ],
@@ -78,12 +85,18 @@ class _SolutionDetailScreenState extends State<SolutionDetailScreen> {
           : ListView(
               padding: const EdgeInsets.all(20),
               children: [
-                // Problem title card
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    gradient: AppColors.darkGradient,
+                    gradient: LinearGradient(
+                      colors: [
+                        scheme.primary.withValues(alpha: 0.8),
+                        scheme.primary.withValues(alpha: 0.4),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Column(
@@ -106,15 +119,11 @@ class _SolutionDetailScreenState extends State<SolutionDetailScreen> {
                   ),
                 ).animate().fadeIn(duration: 400.ms),
                 const Gap(24),
-
-                // Steps header
                 const Text(
                   'Solution Steps',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.onSurface),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
                 ),
                 const Gap(14),
-
-                // Solution steps
                 ..._solution!.steps.asMap().entries.map((e) {
                   return SolutionStepCard(
                     stepNumber: e.key + 1,
@@ -122,20 +131,18 @@ class _SolutionDetailScreenState extends State<SolutionDetailScreen> {
                   ).animate(delay: Duration(milliseconds: 100 * e.key)).fadeIn().slideX(begin: 0.05);
                 }),
                 const Gap(28),
-
-                // Did this help?
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: AppColors.surface,
+                    color: scheme.surface,
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: AppColors.border),
+                    border: Border.all(color: scheme.outline),
                   ),
                   child: Column(
                     children: [
-                      const Text(
+                      Text(
                         'Did this solve your problem?',
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.onSurface),
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: scheme.onSurface),
                       ),
                       const Gap(16),
                       Row(
@@ -145,16 +152,18 @@ class _SolutionDetailScreenState extends State<SolutionDetailScreen> {
                             child: OutlinedButton.icon(
                               onPressed: _isSolved
                                   ? null
-                                  : () {
+                                  : () async {
                                       setState(() => _isSolved = true);
+                                      await SolvedProblemsService.markSolved(widget.problemName);
+                                      if (!context.mounted) return;
                                       context.read<CounterCubit>().increment();
                                       showSuccessToast(context, 'Great! Problem solved.');
                                     },
                               icon: Icon(_isSolved ? Icons.check_circle : Icons.check_circle_outline, size: 18),
                               label: Text(_isSolved ? 'Solved!' : 'Yes, Fixed'),
                               style: OutlinedButton.styleFrom(
-                                foregroundColor: AppColors.success,
-                                side: BorderSide(color: _isSolved ? AppColors.success : AppColors.border),
+                                foregroundColor: Colors.green.shade600,
+                                side: BorderSide(color: _isSolved ? Colors.green.shade600 : scheme.outline),
                                 padding: const EdgeInsets.symmetric(vertical: 14),
                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                               ),
@@ -163,11 +172,19 @@ class _SolutionDetailScreenState extends State<SolutionDetailScreen> {
                           const Gap(12),
                           Expanded(
                             child: OutlinedButton.icon(
-                              onPressed: null,
+                              onPressed: _isSolved
+                                  ? () async {
+                                      setState(() => _isSolved = false);
+                                      await SolvedProblemsService.unmarkSolved(widget.problemName);
+                                      if (!context.mounted) return;
+                                      context.read<CounterCubit>().decrement();
+                                      showSuccessToast(context, 'Problem marked as unsolved.');
+                                    }
+                                  : null,
                               icon: const Icon(Icons.cancel_outlined, size: 18),
                               label: const Text('Not Yet'),
                               style: OutlinedButton.styleFrom(
-                                foregroundColor: AppColors.onSurfaceMuted,
+                                foregroundColor: scheme.onSurface.withValues(alpha: 0.6),
                                 padding: const EdgeInsets.symmetric(vertical: 14),
                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                               ),

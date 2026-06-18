@@ -1,4 +1,6 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:gap/gap.dart';
 import 'package:littletech/src/features/game/constants/game_data.dart';
 
@@ -6,7 +8,6 @@ class LevelCard extends StatelessWidget {
   final LevelDef level;
   final bool isCompleted;
   final bool isLocked;
-  final int completedSteps;
   final int totalSteps;
   final VoidCallback onTap;
 
@@ -15,7 +16,6 @@ class LevelCard extends StatelessWidget {
     required this.level,
     this.isCompleted = false,
     this.isLocked = false,
-    this.completedSteps = 0,
     this.totalSteps = 1,
     required this.onTap,
   });
@@ -81,9 +81,7 @@ class LevelCard extends StatelessWidget {
                               Flexible(
                                 child: Text(
                                   level.title,
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600,
+                                  style: theme.textTheme.titleSmall?.copyWith(
                                     color: isLocked
                                         ? scheme.onSurface.withValues(alpha: 0.3)
                                         : scheme.onSurface,
@@ -121,20 +119,31 @@ class LevelCard extends StatelessWidget {
                     _DungeonTorch(isLit: !isLocked && !isCompleted),
                     const Gap(4),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      width: 28,
+                      height: 28,
                       decoration: BoxDecoration(
-                        color: scheme.secondary.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(6),
-                        border: Border.all(
-                          color: scheme.secondary.withValues(alpha: 0.2),
+                        shape: BoxShape.circle,
+                        gradient: const RadialGradient(
+                          colors: [Color(0xFFFFD700), Color(0xFFB8860B)],
                         ),
+                        border: Border.all(
+                          color: const Color(0xFFDAA520),
+                          width: 1.5,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: scheme.secondary.withValues(alpha: 0.3),
+                            blurRadius: 4,
+                          ),
+                        ],
                       ),
+                      alignment: Alignment.center,
                       child: Text(
                         '${level.points}',
-                        style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w700,
-                          color: scheme.secondary,
+                        style: const TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w800,
+                          color: Color(0xFF3E2723),
                         ),
                       ),
                     ),
@@ -144,6 +153,8 @@ class LevelCard extends StatelessWidget {
               ),
             ),
           ),
+          if (!isLocked)
+            ..._buildRivets(scheme.outline),
           if (isLocked)
             Positioned.fill(
               child: Container(
@@ -157,6 +168,34 @@ class LevelCard extends StatelessWidget {
               ),
             ),
         ],
+      ),
+    );
+  }
+
+  List<Widget> _buildRivets(Color color) {
+    final rivetColor = color.withValues(alpha: 0.3);
+    return [
+      Positioned(top: 6, left: 6, child: _Rivet(color: rivetColor)),
+      Positioned(top: 6, right: 6, child: _Rivet(color: rivetColor)),
+      Positioned(bottom: 6, left: 6, child: _Rivet(color: rivetColor)),
+      Positioned(bottom: 6, right: 6, child: _Rivet(color: rivetColor)),
+    ];
+  }
+}
+
+class _Rivet extends StatelessWidget {
+  final Color color;
+  const _Rivet({required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 6,
+      height: 6,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: color,
+        border: Border.all(color: color.withValues(alpha: 0.5), width: 0.5),
       ),
     );
   }
@@ -197,6 +236,7 @@ class _DungeonDoor extends StatelessWidget {
           doorColor: doorColor,
           isCompleted: isCompleted,
           isLocked: isLocked,
+          scheme: scheme,
         ),
       ),
     );
@@ -207,15 +247,20 @@ class _DoorArchPainter extends CustomPainter {
   final Color doorColor;
   final bool isCompleted;
   final bool isLocked;
+  final ColorScheme scheme;
 
   _DoorArchPainter({
     required this.doorColor,
     required this.isCompleted,
     required this.isLocked,
+    required this.scheme,
   });
 
   @override
   void paint(Canvas canvas, Size size) {
+    _drawStoneTexture(canvas, size);
+    _drawIronHinges(canvas, size);
+
     final paint = Paint()
       ..color = doorColor.withValues(alpha: isLocked ? 0.2 : 0.5)
       ..style = PaintingStyle.stroke
@@ -246,29 +291,132 @@ class _DoorArchPainter extends CustomPainter {
     }
   }
 
+  void _drawStoneTexture(Canvas canvas, Size size) {
+    final rng = Random(doorColor.hashCode);
+    for (var i = 0; i < 8; i++) {
+      final x = rng.nextDouble() * size.width;
+      final y = rng.nextDouble() * size.height;
+      final w = 4 + rng.nextDouble() * 8;
+      final h = 2 + rng.nextDouble() * 3;
+      final stonePaint = Paint()
+        ..color = scheme.primary.withValues(alpha: 0.04 + rng.nextDouble() * 0.04);
+      canvas.drawRRect(
+        RRect.fromRectAndRadius(
+          Rect.fromLTWH(x, y, w, h),
+          const Radius.circular(1),
+        ),
+        stonePaint,
+      );
+    }
+  }
+
+  void _drawIronHinges(Canvas canvas, Size size) {
+    final hingePaint = Paint()
+      ..color = scheme.outline.withValues(alpha: 0.4)
+      ..style = PaintingStyle.fill;
+    const hingeW = 4.0;
+    const hingeH = 3.0;
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        Rect.fromLTWH(size.width * 0.15, size.height * 0.35, hingeW, hingeH),
+        const Radius.circular(1),
+      ),
+      hingePaint,
+    );
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        Rect.fromLTWH(size.width * 0.15, size.height * 0.65, hingeW, hingeH),
+        const Radius.circular(1),
+      ),
+      hingePaint,
+    );
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        Rect.fromLTWH(size.width * 0.7, size.height * 0.35, hingeW, hingeH),
+        const Radius.circular(1),
+      ),
+      hingePaint,
+    );
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        Rect.fromLTWH(size.width * 0.7, size.height * 0.65, hingeW, hingeH),
+        const Radius.circular(1),
+      ),
+      hingePaint,
+    );
+  }
+
   @override
   bool shouldRepaint(covariant _DoorArchPainter old) =>
       old.doorColor != doorColor || old.isCompleted != isCompleted;
 }
 
-class _DungeonTorch extends StatelessWidget {
+class _DungeonTorch extends StatefulWidget {
   final bool isLit;
 
   const _DungeonTorch({required this.isLit});
 
   @override
+  State<_DungeonTorch> createState() => _DungeonTorchState();
+}
+
+class _DungeonTorchState extends State<_DungeonTorch>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _flickerController;
+  late Animation<double> _flickerAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _flickerController = AnimationController(
+      vsync: this,
+      duration: 150.ms,
+    )..repeat(reverse: true);
+    _flickerAnimation = Tween<double>(begin: 0.8, end: 1.2).animate(
+      CurvedAnimation(parent: _flickerController, curve: Curves.easeInOutSine),
+    );
+  }
+
+  @override
+  void dispose() {
+    _flickerController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final color = isLit ? scheme.secondary : scheme.outline.withValues(alpha: 0.2);
+    final color = widget.isLit ? scheme.secondary : scheme.outline.withValues(alpha: 0.2);
+    final stickColor = Color.lerp(scheme.primary, const Color(0xFF3E2723), 0.4) ?? const Color(0xFF3E2723);
 
     return Container(
       width: 20,
       height: 48,
       alignment: Alignment.center,
-      child: CustomPaint(
-        painter: _TorchPainter(isLit: isLit, color: color),
-        size: const Size(20, 48),
-      ),
+      child: widget.isLit
+          ? AnimatedBuilder(
+              animation: _flickerAnimation,
+              builder: (_, child) {
+                return CustomPaint(
+                  painter: _TorchPainter(
+                    isLit: widget.isLit,
+                    color: color,
+                    stickColor: stickColor,
+                    flicker: _flickerAnimation.value,
+                  ),
+                  size: const Size(20, 48),
+                );
+              },
+            )
+          : CustomPaint(
+              painter: _TorchPainter(
+                isLit: widget.isLit,
+                color: color,
+                stickColor: stickColor,
+                flicker: 1.0,
+              ),
+              size: const Size(20, 48),
+            ),
     );
   }
 }
@@ -276,13 +424,20 @@ class _DungeonTorch extends StatelessWidget {
 class _TorchPainter extends CustomPainter {
   final bool isLit;
   final Color color;
+  final Color stickColor;
+  final double flicker;
 
-  _TorchPainter({required this.isLit, required this.color});
+  _TorchPainter({
+    required this.isLit,
+    required this.color,
+    required this.stickColor,
+    required this.flicker,
+  });
 
   @override
   void paint(Canvas canvas, Size size) {
     final stickPaint = Paint()
-      ..color = const Color(0xFF8B4513).withValues(alpha: isLit ? 0.8 : 0.3)
+      ..color = stickColor.withValues(alpha: isLit ? 0.8 : 0.3)
       ..strokeWidth = 2
       ..strokeCap = StrokeCap.round;
 
@@ -294,29 +449,29 @@ class _TorchPainter extends CustomPainter {
 
     if (isLit) {
       final flamePaint = Paint()
-        ..color = color.withValues(alpha: 0.6)
+        ..color = color.withValues(alpha: 0.6 * flicker)
         ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4);
 
       final flamePath = Path()
-        ..moveTo(size.width / 2 - 4, size.height * 0.55)
+        ..moveTo(size.width / 2 - 4 * flicker, size.height * 0.55)
         ..quadraticBezierTo(
-          size.width / 2 - 2, size.height * 0.3,
-          size.width / 2, size.height * 0.15,
+          size.width / 2 - 2 * flicker, size.height * 0.3,
+          size.width / 2, size.height * 0.15 * (1 / flicker),
         )
         ..quadraticBezierTo(
-          size.width / 2 + 2, size.height * 0.3,
-          size.width / 2 + 4, size.height * 0.55,
+          size.width / 2 + 2 * flicker, size.height * 0.3,
+          size.width / 2 + 4 * flicker, size.height * 0.55,
         )
         ..close();
 
       canvas.drawPath(flamePath, flamePaint);
 
       final glowPaint = Paint()
-        ..color = color.withValues(alpha: 0.15)
+        ..color = color.withValues(alpha: 0.15 * flicker)
         ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 8);
       canvas.drawCircle(
         Offset(size.width / 2, size.height * 0.35),
-        8,
+        8 * flicker,
         glowPaint,
       );
     } else {
@@ -332,5 +487,6 @@ class _TorchPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant _TorchPainter old) => old.isLit != isLit;
+  bool shouldRepaint(covariant _TorchPainter old) =>
+      old.isLit != isLit || old.flicker != flicker;
 }

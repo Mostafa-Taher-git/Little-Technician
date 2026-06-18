@@ -170,7 +170,7 @@ class _DungeonHeader extends StatelessWidget {
                 ),
                 const Gap(4),
                 Text(
-                  '$levelsCleared / $totalLevels chambers cleared',
+                  '$levelsCleared / $totalLevels dungeon rooms cleared',
                   style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
@@ -218,22 +218,31 @@ class _ConnectorLinePainter extends CustomPainter {
     final paint = Paint()
       ..color = color
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.5;
+      ..strokeWidth = 2.0
+      ..strokeCap = StrokeCap.round;
 
-    final path = Path()
-      ..moveTo(size.width / 2, 0)
-      ..lineTo(size.width / 2, size.height * 0.5)
-      ..lineTo(size.width / 2 + 20, size.height * 0.5)
-      ..lineTo(size.width / 2 + 20, size.height);
+    canvas.drawLine(
+      Offset(size.width / 2, 0),
+      Offset(size.width / 2, size.height),
+      paint,
+    );
 
-    canvas.drawPath(path, paint);
-
-    for (var i = 0; i < 3; i++) {
-      final dashY = size.height * 0.15 + i * size.height * 0.3;
-      canvas.drawCircle(
-        Offset(size.width / 2, dashY),
-        1.5,
-        Paint()..color = color.withValues(alpha: 0.3),
+    for (var i = 0; i < 4; i++) {
+      final linkY = size.height * 0.15 + i * size.height * 0.2;
+      final linkPaint = Paint()
+        ..color = color
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1.5;
+      canvas.drawRRect(
+        RRect.fromRectAndRadius(
+          Rect.fromCenter(
+            center: Offset(size.width / 2, linkY),
+            width: 6,
+            height: 4,
+          ),
+          const Radius.circular(2),
+        ),
+        linkPaint,
       );
     }
   }
@@ -265,11 +274,11 @@ class _BossDungeonDoor extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
         gradient: isUnlocked
-            ? LinearGradient(
+            ? const LinearGradient(
                 colors: [
-                  Colors.red.shade900,
-                  Colors.red.shade700,
-                  Colors.red.shade800,
+                  Color(0xFF1A1A2E),
+                  Color(0xFF2D2D44),
+                  Color(0xFF1A1A2E),
                 ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
@@ -286,14 +295,14 @@ class _BossDungeonDoor extends StatelessWidget {
             ? [
                 BoxShadow(
                   color: Colors.red.withValues(alpha: 0.3),
-                  blurRadius: 16,
-                  spreadRadius: 2,
+                  blurRadius: 20,
+                  spreadRadius: 3,
                 ),
               ]
             : null,
         border: Border.all(
           color: isUnlocked
-              ? Colors.red.shade400.withValues(alpha: 0.5)
+              ? const Color(0xFF4A4A6A).withValues(alpha: 0.6)
               : scheme.outline.withValues(alpha: 0.15),
           width: 2,
         ),
@@ -308,26 +317,12 @@ class _BossDungeonDoor extends StatelessWidget {
             padding: const EdgeInsets.all(20),
             child: Row(
               children: [
-                Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    Container(
-                      width: 56,
-                      height: 56,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: isUnlocked
-                            ? Colors.white.withValues(alpha: 0.1)
-                            : scheme.outline.withValues(alpha: 0.05),
-                      ),
-                    ),
-                    CustomPaint(
-                      size: const Size(40, 40),
-                      painter: _MiniBossSkullPainter(
-                        color: isUnlocked ? Colors.red.shade300 : scheme.outline.withValues(alpha: 0.2),
-                      ),
-                    ),
-                  ],
+                CustomPaint(
+                  size: const Size(56, 56),
+                  painter: _IronGatePainter(
+                    isUnlocked: isUnlocked,
+                    scheme: scheme,
+                  ),
                 ),
                 const Gap(16),
                 Expanded(
@@ -340,7 +335,7 @@ class _BossDungeonDoor extends StatelessWidget {
                             'BOSS',
                             style: TextStyle(
                               color: isUnlocked
-                                  ? Colors.red.shade200
+                                  ? const Color(0xFFDC143C)
                                   : scheme.onSurface.withValues(alpha: 0.2),
                               fontSize: 11,
                               fontWeight: FontWeight.w800,
@@ -385,11 +380,11 @@ class _BossDungeonDoor extends StatelessWidget {
                     height: 40,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: Colors.white.withValues(alpha: 0.15),
+                      color: const Color(0xFFDC143C).withValues(alpha: 0.2),
                     ),
                     child: const Icon(
                       Icons.arrow_forward,
-                      color: Colors.white,
+                      color: Color(0xFFDC143C),
                       size: 20,
                     ),
                   ),
@@ -402,50 +397,50 @@ class _BossDungeonDoor extends StatelessWidget {
   }
 }
 
-class _MiniBossSkullPainter extends CustomPainter {
-  final Color color;
+class _IronGatePainter extends CustomPainter {
+  final bool isUnlocked;
+  final ColorScheme scheme;
 
-  _MiniBossSkullPainter({required this.color});
+  _IronGatePainter({required this.isUnlocked, required this.scheme});
 
   @override
   void paint(Canvas canvas, Size size) {
+    final color = isUnlocked
+        ? const Color(0xFF4A4A6A)
+        : scheme.outline.withValues(alpha: 0.2);
     final paint = Paint()
       ..color = color
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2;
 
-    final path = Path()
-      ..moveTo(size.width * 0.3, size.height * 0.7)
-      ..lineTo(size.width * 0.3, size.height * 0.35)
-      ..quadraticBezierTo(
-        size.width * 0.5, size.height * 0.1,
-        size.width * 0.7, size.height * 0.35,
-      )
-      ..lineTo(size.width * 0.7, size.height * 0.7)
-      ..close();
-
-    canvas.drawPath(path, paint);
-
-    canvas.drawCircle(
-      Offset(size.width * 0.4, size.height * 0.45),
-      size.width * 0.06,
-      paint..style = PaintingStyle.fill,
-    );
-    canvas.drawCircle(
-      Offset(size.width * 0.6, size.height * 0.45),
-      size.width * 0.06,
+    canvas.drawRect(
+      Rect.fromLTWH(3, 3, size.width - 6, size.height - 6),
       paint,
     );
-
-    paint.style = PaintingStyle.stroke;
     canvas.drawLine(
-      Offset(size.width * 0.4, size.height * 0.65),
-      Offset(size.width * 0.6, size.height * 0.65),
+      Offset(size.width / 2, 3),
+      Offset(size.width / 2, size.height - 3),
       paint,
+    );
+    canvas.drawLine(
+      Offset(3, size.height / 2),
+      Offset(size.width - 3, size.height / 2),
+      paint,
+    );
+
+    final skullColor = isUnlocked
+        ? const Color(0xFFDC143C).withValues(alpha: 0.6)
+        : scheme.outline.withValues(alpha: 0.15);
+    canvas.drawCircle(
+      Offset(size.width / 2, size.height * 0.35),
+      6,
+      Paint()..color = skullColor,
     );
   }
 
   @override
-  bool shouldRepaint(covariant _MiniBossSkullPainter old) =>
-      old.color != color;
+  bool shouldRepaint(covariant _IronGatePainter old) =>
+      old.isUnlocked != isUnlocked;
 }
+
+

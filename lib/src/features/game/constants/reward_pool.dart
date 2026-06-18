@@ -48,7 +48,7 @@ class RewardPool {
       type: RewardType.icon,
       value: '🔧',
       rarity: Rarity.common,
-      displayName: 'Wrench Icon',
+      displayName: 'Dagger Icon',
       icon: Icons.build,
     ),
     RewardDef(
@@ -56,7 +56,7 @@ class RewardPool {
       type: RewardType.icon,
       value: '🪛',
       rarity: Rarity.common,
-      displayName: 'Screwdriver Icon',
+      displayName: 'Wand Icon',
       icon: Icons.build_circle,
     ),
     RewardDef(
@@ -64,15 +64,15 @@ class RewardPool {
       type: RewardType.icon,
       value: '⚙️',
       rarity: Rarity.common,
-      displayName: 'Gear Icon',
+      displayName: 'Shield Icon',
       icon: Icons.settings,
     ),
     RewardDef(
       id: 'title_tech_novice',
       type: RewardType.title,
-      value: 'Tech Novice',
+      value: 'Squire',
       rarity: Rarity.common,
-      displayName: 'Title: Tech Novice',
+      displayName: 'Title: Squire',
       icon: Icons.badge,
     ),
     RewardDef(
@@ -106,7 +106,7 @@ class RewardPool {
       type: RewardType.icon,
       value: '💻',
       rarity: Rarity.rare,
-      displayName: 'Laptop Icon',
+      displayName: 'Tome Icon',
       icon: Icons.computer,
     ),
     RewardDef(
@@ -114,15 +114,15 @@ class RewardPool {
       type: RewardType.icon,
       value: '🖥️',
       rarity: Rarity.rare,
-      displayName: 'Server Icon',
+      displayName: 'Castle Icon',
       icon: Icons.dns,
     ),
     RewardDef(
       id: 'title_engineer',
       type: RewardType.title,
-      value: 'System Engineer',
+      value: 'Battle Mage',
       rarity: Rarity.rare,
-      displayName: 'Title: System Engineer',
+      displayName: 'Title: Battle Mage',
       icon: Icons.badge,
     ),
     RewardDef(
@@ -130,7 +130,7 @@ class RewardPool {
       type: RewardType.nicknameFrame,
       value: 'tech_frame',
       rarity: Rarity.rare,
-      displayName: 'Tech Frame',
+      displayName: 'Rune Frame',
       icon: Icons.border_style,
     ),
     RewardDef(
@@ -138,7 +138,7 @@ class RewardPool {
       type: RewardType.skin,
       value: 'hacker',
       rarity: Rarity.rare,
-      displayName: 'SupTech: Hacker',
+      displayName: 'Familiar: Imp',
       icon: Icons.terminal,
     ),
     RewardDef(
@@ -156,15 +156,15 @@ class RewardPool {
       type: RewardType.icon,
       value: '🤖',
       rarity: Rarity.epic,
-      displayName: 'Robot Icon',
+      displayName: 'Golem Icon',
       icon: Icons.smart_toy,
     ),
     RewardDef(
       id: 'title_architect',
       type: RewardType.title,
-      value: 'Solution Architect',
+      value: 'Dungeon Master',
       rarity: Rarity.epic,
-      displayName: 'Title: Solution Architect',
+      displayName: 'Title: Dungeon Master',
       icon: Icons.badge,
     ),
     RewardDef(
@@ -172,7 +172,7 @@ class RewardPool {
       type: RewardType.skin,
       value: 'engineer',
       rarity: Rarity.epic,
-      displayName: 'SupTech: Engineer',
+      displayName: 'Familiar: Sprite',
       icon: Icons.engineering,
     ),
     RewardDef(
@@ -180,7 +180,7 @@ class RewardPool {
       type: RewardType.nicknameFrame,
       value: 'cyber_frame',
       rarity: Rarity.epic,
-      displayName: 'Cyber Frame',
+      displayName: 'Enchanted Frame',
       icon: Icons.border_all,
     ),
     RewardDef(
@@ -214,7 +214,7 @@ class RewardPool {
       type: RewardType.skin,
       value: 'grandmaster',
       rarity: Rarity.legendary,
-      displayName: 'SupTech: Grand Master',
+      displayName: 'Familiar: Archmage',
       icon: Icons.auto_awesome,
     ),
     RewardDef(

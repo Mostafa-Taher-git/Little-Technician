@@ -15,6 +15,14 @@ class ThemeCubit extends Cubit<ThemeData> {
         emit(_buildOcean());
       case 'neon':
         emit(_buildNeon());
+      case 'medieval':
+        emit(_buildMedieval());
+      case 'dungeon':
+        emit(_buildDungeon());
+      case 'arcane':
+        emit(_buildArcane());
+      case 'dragon_fire':
+        emit(_buildDragonFire());
       default:
         emit(_buildDefault());
     }
@@ -25,17 +33,17 @@ class ThemeCubit extends Cubit<ThemeData> {
   static ThemeData _buildDefault() => ThemeData(
         useMaterial3: true,
         brightness: Brightness.light,
-        colorScheme: ColorScheme.light(
-          primary: const Color(0xFF000000),
-          onPrimary: const Color(0xFFFFFFFF),
-          secondary: const Color(0xFFF59E0B),
-          onSecondary: const Color(0xFF1A1A1A),
-          tertiary: const Color(0xFF3B82F6),
-          surface: const Color(0xFFFFFFFF),
-          onSurface: const Color(0xFF1A1A1A),
-          error: const Color(0xFFEF4444),
-          outline: const Color(0xFFE5E7EB),
-          shadow: const Color(0xFF000000),
+        colorScheme: const ColorScheme.light(
+          primary: Color(0xFF000000),
+          onPrimary: Color(0xFFFFFFFF),
+          secondary: Color(0xFFF59E0B),
+          onSecondary: Color(0xFF1A1A1A),
+          tertiary: Color(0xFF3B82F6),
+          surface: Color(0xFFFFFFFF),
+          onSurface: Color(0xFF1A1A1A),
+          error: Color(0xFFEF4444),
+          outline: Color(0xFFE5E7EB),
+          shadow: Color(0xFF000000),
         ),
         textTheme: GoogleFonts.interTextTheme(),
         scaffoldBackgroundColor: const Color(0xFFF5F5F5),
@@ -110,17 +118,17 @@ class ThemeCubit extends Cubit<ThemeData> {
   static ThemeData _buildDark() => ThemeData(
         useMaterial3: true,
         brightness: Brightness.dark,
-        colorScheme: ColorScheme.dark(
-          primary: const Color(0xFF1A1A2E),
-          onPrimary: const Color(0xFFE0E0E0),
-          secondary: const Color(0xFFF59E0B),
-          onSecondary: const Color(0xFF1A1A1A),
-          tertiary: const Color(0xFF60A5FA),
-          surface: const Color(0xFF1E1E1E),
-          onSurface: const Color(0xFFE0E0E0),
-          error: const Color(0xFFEF4444),
-          outline: const Color(0xFF3A3A3A),
-          shadow: const Color(0xFF000000),
+        colorScheme: const ColorScheme.dark(
+          primary: Color(0xFF1A1A2E),
+          onPrimary: Color(0xFFE0E0E0),
+          secondary: Color(0xFFF59E0B),
+          onSecondary: Color(0xFF1A1A1A),
+          tertiary: Color(0xFF60A5FA),
+          surface: Color(0xFF1E1E1E),
+          onSurface: Color(0xFFE0E0E0),
+          error: Color(0xFFEF4444),
+          outline: Color(0xFF3A3A3A),
+          shadow: Color(0xFF000000),
         ),
         textTheme: GoogleFonts.interTextTheme(ThemeData.dark().textTheme),
         scaffoldBackgroundColor: const Color(0xFF121212),
@@ -356,6 +364,271 @@ class ThemeCubit extends Cubit<ThemeData> {
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(14),
             borderSide: const BorderSide(color: Color(0xFF00FF88), width: 2),
+          ),
+        ),
+      );
+
+  static ThemeData _buildMedieval() => ThemeData(
+        useMaterial3: true,
+        brightness: Brightness.light,
+        colorScheme: const ColorScheme.light(
+          primary: Color(0xFF5D4E37),
+          onPrimary: Color(0xFFFFF8E1),
+          secondary: Color(0xFFCFB53B),
+          onSecondary: Color(0xFF1A1A1A),
+          tertiary: Color(0xFF8B4513),
+          surface: Color(0xFFF5E6C8),
+          onSurface: Color(0xFF2C1810),
+          error: Color(0xFF8B0000),
+          outline: Color(0xFFC4A97D),
+          shadow: Color(0xFF000000),
+        ),
+        textTheme: GoogleFonts.cinzelTextTheme(),
+        scaffoldBackgroundColor: const Color(0xFFEED9B7),
+        appBarTheme: AppBarTheme(
+          backgroundColor: const Color(0xFFEED9B7),
+          foregroundColor: const Color(0xFF2C1810),
+          elevation: 0,
+          centerTitle: false,
+          titleTextStyle: GoogleFonts.cinzel(
+            fontSize: 20,
+            fontWeight: FontWeight.w700,
+            color: const Color(0xFF2C1810),
+          ),
+        ),
+        cardTheme: CardThemeData(
+          color: const Color(0xFFF5E6C8),
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+            side: const BorderSide(color: Color(0xFFC4A97D)),
+          ),
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color(0xFF5D4E37),
+            foregroundColor: const Color(0xFFFFF8E1),
+            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 32),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(14),
+            ),
+            textStyle: GoogleFonts.cinzel(
+              fontWeight: FontWeight.w600,
+              fontSize: 15,
+            ),
+          ),
+        ),
+        snackBarTheme: SnackBarThemeData(
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        ),
+        inputDecorationTheme: InputDecorationTheme(
+          filled: true,
+          fillColor: const Color(0xFFFFF8E1),
+          contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 20),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(14),
+            borderSide: const BorderSide(color: Color(0xFFC4A97D)),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(14),
+            borderSide: const BorderSide(color: Color(0xFFC4A97D)),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(14),
+            borderSide: const BorderSide(color: Color(0xFF5D4E37), width: 2),
+          ),
+        ),
+      );
+
+  static ThemeData _buildDungeon() => ThemeData(
+        useMaterial3: true,
+        brightness: Brightness.dark,
+        colorScheme: const ColorScheme.dark(
+          primary: Color(0xFF1A1A2E),
+          onPrimary: Color(0xFFE0E0E0),
+          secondary: Color(0xFFDC143C),
+          onSecondary: Color(0xFFFFF8E1),
+          tertiary: Color(0xFF8B0000),
+          surface: Color(0xFF2D2D44),
+          onSurface: Color(0xFFE0D8C8),
+          error: Color(0xFFFF4444),
+          outline: Color(0xFF4A4A6A),
+          shadow: Color(0xFF000000),
+        ),
+        textTheme: GoogleFonts.interTextTheme(ThemeData.dark().textTheme),
+        scaffoldBackgroundColor: const Color(0xFF16162A),
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Color(0xFF16162A),
+          foregroundColor: Color(0xFFDC143C),
+          elevation: 0,
+          centerTitle: false,
+        ),
+        cardTheme: CardThemeData(
+          color: const Color(0xFF2D2D44),
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+            side: const BorderSide(color: Color(0xFF4A4A6A)),
+          ),
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color(0xFFDC143C),
+            foregroundColor: const Color(0xFFFFF8E1),
+            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 32),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(14),
+            ),
+          ),
+        ),
+        snackBarTheme: SnackBarThemeData(
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        ),
+        inputDecorationTheme: InputDecorationTheme(
+          filled: true,
+          fillColor: const Color(0xFF2D2D44),
+          contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 20),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(14),
+            borderSide: const BorderSide(color: Color(0xFF4A4A6A)),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(14),
+            borderSide: const BorderSide(color: Color(0xFF4A4A6A)),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(14),
+            borderSide: const BorderSide(color: Color(0xFFDC143C), width: 2),
+          ),
+        ),
+      );
+
+  static ThemeData _buildArcane() => ThemeData(
+        useMaterial3: true,
+        brightness: Brightness.dark,
+        colorScheme: const ColorScheme.dark(
+          primary: Color(0xFF4A0E8F),
+          onPrimary: Color(0xFFE0E0FF),
+          secondary: Color(0xFF00E5FF),
+          onSecondary: Color(0xFF000000),
+          tertiary: Color(0xFF9B30FF),
+          surface: Color(0xFF1A0A2E),
+          onSurface: Color(0xFFE0D0FF),
+          error: Color(0xFFFF4444),
+          outline: Color(0xFF3A1A6A),
+          shadow: Color(0xFF000000),
+        ),
+        textTheme: GoogleFonts.interTextTheme(ThemeData.dark().textTheme),
+        scaffoldBackgroundColor: const Color(0xFF0D0519),
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Color(0xFF0D0519),
+          foregroundColor: Color(0xFF00E5FF),
+          elevation: 0,
+          centerTitle: false,
+        ),
+        cardTheme: CardThemeData(
+          color: const Color(0xFF1A0A2E),
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+            side: const BorderSide(color: Color(0xFF3A1A6A)),
+          ),
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color(0xFF4A0E8F),
+            foregroundColor: const Color(0xFFE0E0FF),
+            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 32),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(14),
+            ),
+          ),
+        ),
+        snackBarTheme: SnackBarThemeData(
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        ),
+        inputDecorationTheme: InputDecorationTheme(
+          filled: true,
+          fillColor: const Color(0xFF1A0A2E),
+          contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 20),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(14),
+            borderSide: const BorderSide(color: Color(0xFF3A1A6A)),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(14),
+            borderSide: const BorderSide(color: Color(0xFF3A1A6A)),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(14),
+            borderSide: const BorderSide(color: Color(0xFF00E5FF), width: 2),
+          ),
+        ),
+      );
+
+  static ThemeData _buildDragonFire() => ThemeData(
+        useMaterial3: true,
+        brightness: Brightness.dark,
+        colorScheme: const ColorScheme.dark(
+          primary: Color(0xFF8B0000),
+          onPrimary: Color(0xFFFFF8E1),
+          secondary: Color(0xFFFFD700),
+          onSecondary: Color(0xFF1A1A1A),
+          tertiary: Color(0xFFFF4500),
+          surface: Color(0xFF1A0A0A),
+          onSurface: Color(0xFFFFF0E0),
+          error: Color(0xFFFF4444),
+          outline: Color(0xFF3A1A1A),
+          shadow: Color(0xFF000000),
+        ),
+        textTheme: GoogleFonts.interTextTheme(ThemeData.dark().textTheme),
+        scaffoldBackgroundColor: const Color(0xFF0D0505),
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Color(0xFF0D0505),
+          foregroundColor: Color(0xFFFFD700),
+          elevation: 0,
+          centerTitle: false,
+        ),
+        cardTheme: CardThemeData(
+          color: const Color(0xFF1A0A0A),
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+            side: const BorderSide(color: Color(0xFF3A1A1A)),
+          ),
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color(0xFF8B0000),
+            foregroundColor: const Color(0xFFFFF8E1),
+            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 32),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(14),
+            ),
+          ),
+        ),
+        snackBarTheme: SnackBarThemeData(
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        ),
+        inputDecorationTheme: InputDecorationTheme(
+          filled: true,
+          fillColor: const Color(0xFF1A0A0A),
+          contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 20),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(14),
+            borderSide: const BorderSide(color: Color(0xFF3A1A1A)),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(14),
+            borderSide: const BorderSide(color: Color(0xFF3A1A1A)),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(14),
+            borderSide: const BorderSide(color: Color(0xFFFFD700), width: 2),
           ),
         ),
       );

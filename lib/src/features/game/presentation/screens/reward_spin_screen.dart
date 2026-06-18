@@ -55,7 +55,7 @@ class _RewardSpinScreenState extends State<RewardSpinScreen>
     final rarityColor = reward.color;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0A0A1A),
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: SafeArea(
         child: Column(
           children: [
@@ -128,8 +128,8 @@ class _RewardSpinScreenState extends State<RewardSpinScreen>
             const Gap(16),
             Text(
               reward.displayName,
-              style: const TextStyle(
-                color: Colors.white,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurface,
                 fontSize: 24,
                 fontWeight: FontWeight.w700,
               ),

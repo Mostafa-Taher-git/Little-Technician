@@ -199,7 +199,7 @@ class _ProblemScreenState extends State<ProblemScreen> {
                           label: Text(
                             solvedCount >= steps.length
                                 ? 'Completed!'
-                                : 'Solve Step $solvedCount',
+                                : 'Complete Quest Step $solvedCount',
                           ),
                         ),
                       ),

@@ -18,25 +18,28 @@ class SupTechDialog extends StatelessWidget {
       ),
       child: BlocBuilder<GameCubit, GameState>(
         builder: (_, state) {
-          return Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: scheme.outline.withValues(alpha: 0.3),
-                    borderRadius: BorderRadius.circular(2),
+           return ConstrainedBox(
+            constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.6),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: scheme.outline.withValues(alpha: 0.3),
+                      borderRadius: BorderRadius.circular(2),
+                    ),
                   ),
                 ),
-              ),
               const Gap(16),
               Row(
                 children: [
                   Text(
-                    'SupTech Companion',
+                    'Magical Companion',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
@@ -103,6 +106,8 @@ class SupTechDialog extends StatelessWidget {
               ),
               const Gap(12),
             ],
+              ),
+            ),
           );
         },
       ),

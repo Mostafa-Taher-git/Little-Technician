@@ -18,7 +18,7 @@ class WorldSelectScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: scheme.surface,
       appBar: AppBar(
-        title: const Text('Troubleshooting Worlds'),
+        title: const Text('Campaign Map'),
         backgroundColor: Colors.transparent,
         actions: [
           BlocBuilder<GameCubit, GameState>(

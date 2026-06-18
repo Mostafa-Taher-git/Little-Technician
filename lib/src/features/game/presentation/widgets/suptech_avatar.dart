@@ -6,6 +6,8 @@ class SupTechAvatar extends StatefulWidget {
   final int availableUses;
   final bool isGlowing;
   final double size;
+  final bool showWizardHat;
+  final bool isCasting;
   final VoidCallback? onTap;
 
   const SupTechAvatar({
@@ -13,6 +15,8 @@ class SupTechAvatar extends StatefulWidget {
     this.availableUses = 0,
     this.isGlowing = false,
     this.size = 40,
+    this.showWizardHat = false,
+    this.isCasting = false,
     this.onTap,
   });
 
@@ -24,8 +28,10 @@ class _SupTechAvatarState extends State<SupTechAvatar>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _floatAnimation;
-  late Animation<double> _armSwingAnimation;
+  late Animation<double> _wandSwingAnimation;
   late Animation<double> _antennaBobAnimation;
+  late Animation<double> _castAnimation;
+  late Animation<double> _robeFlutter;
 
   @override
   void initState() {
@@ -39,11 +45,19 @@ class _SupTechAvatarState extends State<SupTechAvatar>
       CurvedAnimation(parent: _controller, curve: Curves.easeInOutSine),
     );
 
-    _armSwingAnimation = Tween<double>(begin: -0.08, end: 0.08).animate(
+    _wandSwingAnimation = Tween<double>(begin: -0.08, end: 0.08).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeInOutSine),
     );
 
     _antennaBobAnimation = Tween<double>(begin: -0.05, end: 0.12).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOutSine),
+    );
+
+    _castAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOutSine),
+    );
+
+    _robeFlutter = Tween<double>(begin: 0.0, end: 4.0).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeInOutSine),
     );
   }
@@ -58,6 +72,7 @@ class _SupTechAvatarState extends State<SupTechAvatar>
   Widget build(BuildContext context) {
     final size = widget.size;
     final isGlowing = widget.isGlowing;
+    final scheme = Theme.of(context).colorScheme;
 
     final avatar = AnimatedBuilder(
       animation: _controller,
@@ -67,15 +82,37 @@ class _SupTechAvatarState extends State<SupTechAvatar>
           child: CustomPaint(
             size: Size(size, size),
             painter: _SupTechBodyPainter(
+              scheme: scheme,
               isGlowing: isGlowing,
-              armAngle: _armSwingAnimation.value,
-              antennaBob: _antennaBobAnimation.value,
-              blinkPhase: _controller.value,
+              showWizardHat: widget.showWizardHat,
+              isCasting: widget.isCasting,
+              anim: _AnimationState(
+                wandSwing: _wandSwingAnimation.value,
+                antennaBob: _antennaBobAnimation.value,
+                blinkPhase: _controller.value,
+                castPhase: _castAnimation.value,
+                robeFlutter: _robeFlutter.value,
+              ),
             ),
           ),
         );
       },
     );
+
+    final particles = isGlowing || widget.isCasting
+        ? Positioned.fill(
+            child: IgnorePointer(
+              child: CustomPaint(
+                size: Size(size, size),
+                painter: _SparklePainter(
+                  phase: _controller.value,
+                  color: scheme.secondary,
+                  intensity: widget.isCasting ? 1.0 : 0.5,
+                ),
+              ),
+            ),
+          )
+        : null;
 
     final glowOverlay = isGlowing
         ? IgnorePointer(
@@ -86,12 +123,12 @@ class _SupTechAvatarState extends State<SupTechAvatar>
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.amber.withValues(alpha: 0.3),
+                    color: scheme.secondary.withValues(alpha: 0.3),
                     blurRadius: size * 0.5,
                     spreadRadius: size * 0.15,
                   ),
                   BoxShadow(
-                    color: Colors.cyan.withValues(alpha: 0.15),
+                    color: scheme.tertiary.withValues(alpha: 0.15),
                     blurRadius: size * 0.8,
                     spreadRadius: size * 0.1,
                   ),
@@ -107,8 +144,8 @@ class _SupTechAvatarState extends State<SupTechAvatar>
             top: -2,
             child: Container(
               padding: const EdgeInsets.all(3),
-              decoration: const BoxDecoration(
-                color: Color(0xFFF59E0B),
+              decoration: BoxDecoration(
+                color: scheme.secondary,
                 shape: BoxShape.circle,
               ),
               child: Text(
@@ -116,7 +153,7 @@ class _SupTechAvatarState extends State<SupTechAvatar>
                 style: TextStyle(
                   fontSize: size * 0.22,
                   fontWeight: FontWeight.w700,
-                  color: const Color(0xFF1A1A1A),
+                  color: scheme.onSecondary,
                 ),
               ),
             ),
@@ -128,6 +165,7 @@ class _SupTechAvatarState extends State<SupTechAvatar>
       children: [
         if (glowOverlay != null)
           Center(child: glowOverlay),
+        if (particles != null) particles,
         avatar,
         if (badge != null) badge,
       ],
@@ -146,182 +184,222 @@ class _SupTechAvatarState extends State<SupTechAvatar>
   }
 }
 
-class _SupTechBodyPainter extends CustomPainter {
-  final bool isGlowing;
-  final double armAngle;
+class _AnimationState {
+  final double wandSwing;
   final double antennaBob;
   final double blinkPhase;
+  final double castPhase;
+  final double robeFlutter;
+
+  const _AnimationState({
+    this.wandSwing = 0.0,
+    this.antennaBob = 0.0,
+    this.blinkPhase = 0.0,
+    this.castPhase = 0.0,
+    this.robeFlutter = 0.0,
+  });
+}
+
+class _SupTechBodyPainter extends CustomPainter {
+  final ColorScheme scheme;
+  final bool isGlowing;
+  final bool showWizardHat;
+  final bool isCasting;
+  final _AnimationState anim;
 
   _SupTechBodyPainter({
+    required this.scheme,
     required this.isGlowing,
-    required this.armAngle,
-    required this.antennaBob,
-    required this.blinkPhase,
-  });
+    this.showWizardHat = false,
+    this.isCasting = false,
+    _AnimationState? anim,
+  }) : anim = anim ?? const _AnimationState();
+
+  Color get _robeColor => isGlowing ? scheme.primary : scheme.onSurface.withValues(alpha: 0.8);
+  Color get _trimColor => isGlowing ? scheme.secondary : scheme.outline;
 
   @override
   void paint(Canvas canvas, Size size) {
-    final center = Offset(size.width / 2, size.height / 2);
-    final scale = size.width / 60;
-
-    final bodyColor = isGlowing
-        ? const Color(0xFF4A90D9)
-        : const Color(0xFF2D3748);
-    final accentColor = isGlowing
-        ? const Color(0xFFF59E0B)
-        : const Color(0xFF718096);
-    final highlightColor = isGlowing
-        ? const Color(0xFF63B3ED)
-        : const Color(0xFFA0AEC0);
+    final cx = size.width / 2;
+    final cy = size.height / 2;
+    final s = size.width / 60;
 
     canvas.save();
-    canvas.translate(center.dx, center.dy);
+    canvas.translate(cx, cy);
 
-    _drawAntenna(canvas, scale, accentColor, antennaBob);
-    _drawLeftArm(canvas, scale, bodyColor, armAngle);
-    _drawRightArm(canvas, scale, bodyColor, armAngle);
-    _drawBody(canvas, scale, bodyColor, accentColor);
-    _drawEyes(canvas, scale, highlightColor, blinkPhase);
+    _drawRobe(canvas, s);
+    _drawWandArm(canvas, s);
+    _drawHead(canvas, s);
+    _drawEyes(canvas, s);
+    if (showWizardHat) _drawHat(canvas, s);
+    if (isCasting) _drawSpellCharge(canvas, s);
 
-    canvas.restore();
-
-    if (isGlowing) {
-      _drawParticles(canvas, scale, size);
-    }
-  }
-
-  void _drawAntenna(Canvas canvas, double s, Color color, double bob) {
-    final paint = Paint()
-      ..color = color
-      ..strokeWidth = 2 * s
-      ..style = PaintingStyle.stroke;
-
-    final top = Offset(0, -20 * s + bob * s * 5);
-    final base = Offset(0, -16 * s);
-    canvas.drawLine(top, base, paint);
-
-    final ballPaint = Paint()
-      ..color = isGlowing ? const Color(0xFFF59E0B) : const Color(0xFF48BB78);
-    canvas.drawCircle(top, 3 * s, ballPaint);
-  }
-
-  void _drawLeftArm(Canvas canvas, double s, Color color, double angle) {
-    canvas.save();
-    canvas.translate(-14 * s, -4 * s);
-    canvas.rotate(-0.3 + angle);
-    final paint = Paint()
-      ..color = color
-      ..strokeWidth = 5 * s
-      ..strokeCap = StrokeCap.round;
-    canvas.drawLine(Offset.zero, Offset(0, 12 * s), paint);
-
-    final handPaint = Paint()..color = color.withValues(alpha: 0.7);
-    canvas.drawCircle(Offset(0, 13 * s), 3 * s, handPaint);
     canvas.restore();
   }
 
-  void _drawRightArm(Canvas canvas, double s, Color color, double angle) {
-    canvas.save();
-    canvas.translate(14 * s, -4 * s);
-    canvas.rotate(0.3 - angle);
-    final paint = Paint()
-      ..color = color
-      ..strokeWidth = 5 * s
-      ..strokeCap = StrokeCap.round;
-    canvas.drawLine(Offset.zero, Offset(0, 12 * s), paint);
-
-    final handPaint = Paint()..color = color.withValues(alpha: 0.7);
-    canvas.drawCircle(Offset(0, 13 * s), 3 * s, handPaint);
-    canvas.restore();
-  }
-
-  void _drawBody(Canvas canvas, double s, Color bodyColor, Color accentColor) {
-    final bodyPaint = Paint()
-      ..color = bodyColor
+  void _drawRobe(Canvas canvas, double s) {
+    final robePaint = Paint()
+      ..color = _robeColor
       ..style = PaintingStyle.fill;
 
-    final bodyPath = Path()
-      ..moveTo(-12 * s, -16 * s)
-      ..lineTo(12 * s, -16 * s)
-      ..lineTo(13 * s, -12 * s)
-      ..lineTo(15 * s, 4 * s)
-      ..quadraticBezierTo(15 * s, 12 * s, 12 * s, 14 * s)
-      ..lineTo(-12 * s, 14 * s)
-      ..quadraticBezierTo(-15 * s, 12 * s, -15 * s, 4 * s)
-      ..lineTo(-13 * s, -12 * s)
+    final robePath = Path()
+      ..moveTo(-14 * s, -10 * s)
+      ..lineTo(14 * s, -10 * s)
+      ..lineTo(16 * s, 6 * s)
+      ..quadraticBezierTo(18 * s, 12 * s, 14 * s, 18 * s + anim.robeFlutter * 0.5 * s)
+      ..lineTo(10 * s, 18 * s + anim.robeFlutter * s)
+      ..lineTo(6 * s, 16 * s)
+      ..lineTo(0, 20 * s + anim.robeFlutter * 0.5 * s)
+      ..lineTo(-6 * s, 16 * s)
+      ..lineTo(-10 * s, 18 * s - anim.robeFlutter * s)
+      ..quadraticBezierTo(-18 * s, 12 * s, -16 * s, 6 * s)
       ..close();
 
-    canvas.drawPath(bodyPath, bodyPaint);
+    canvas.drawPath(robePath, robePaint);
 
-    final borderPaint = Paint()
-      ..color = accentColor.withValues(alpha: 0.5)
+    final trimPaint = Paint()
+      ..color = _trimColor.withValues(alpha: 0.4)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.5 * s;
-    canvas.drawPath(bodyPath, borderPaint);
+    canvas.drawPath(robePath, trimPaint);
 
-    final chestPaint = Paint()
-      ..color = isGlowing
-          ? const Color(0xFFF59E0B).withValues(alpha: 0.3)
-          : const Color(0xFF4A5568);
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(
-        Rect.fromCenter(center: Offset(0, -2 * s), width: 10 * s, height: 8 * s),
-        Radius.circular(3 * s),
-      ),
-      chestPaint,
-    );
-
-    if (isGlowing) {
-      final pulsePaint = Paint()
-        ..color = const Color(0xFFF59E0B).withValues(alpha: 0.15 + 0.1 * sin(blinkPhase * pi * 2));
-      canvas.drawCircle(Offset(0, -2 * s), 4 * s, pulsePaint);
-    }
+    final beltPaint = Paint()
+      ..color = _trimColor.withValues(alpha: 0.6)
+      ..style = PaintingStyle.fill;
+    canvas.drawRect(Rect.fromLTWH(-6 * s, -2 * s, 12 * s, 2 * s), beltPaint);
   }
 
-  void _drawEyes(Canvas canvas, double s, Color highlightColor, double phase) {
-    final isBlinking = (phase * 10).floor() % 10 == 0;
-    final eyeSize = isBlinking ? 1.0 * s : 3.5 * s;
+  void _drawWandArm(Canvas canvas, double s) {
+    canvas.save();
+    canvas.translate(14 * s, -6 * s);
+    canvas.rotate(0.4 - anim.wandSwing);
 
-    for (final dx in [-4.5 * s, 4.5 * s]) {
-      final eyePaint = Paint()
-        ..color = isGlowing
-            ? const Color(0xFF63B3ED)
-            : Colors.white;
-      canvas.drawCircle(Offset(dx, -10 * s), eyeSize, eyePaint);
+    final armPaint = Paint()
+      ..color = _robeColor
+      ..strokeWidth = 5 * s
+      ..strokeCap = StrokeCap.round;
+    canvas.drawLine(Offset.zero, Offset(0, 10 * s), armPaint);
 
-      if (!isBlinking) {
+    canvas.translate(0, 11 * s);
+    final wandPaint = Paint()
+      ..color = _trimColor
+      ..strokeWidth = 2.5 * s
+      ..strokeCap = StrokeCap.round;
+    canvas.drawLine(Offset.zero, Offset(0, 10 * s), wandPaint);
+
+    if (isGlowing || isCasting) {
+      final tipPaint = Paint()
+        ..color = scheme.secondary.withValues(alpha: 0.6 + 0.3 * anim.castPhase)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4);
+      canvas.drawCircle(Offset(0, 11 * s), 2.5 * s, tipPaint);
+    }
+
+    canvas.restore();
+  }
+
+  void _drawHead(Canvas canvas, double s) {
+    final headPaint = Paint()
+      ..color = const Color(0xFFFFE0BD)
+      ..style = PaintingStyle.fill;
+    canvas.drawCircle(Offset(0, -16 * s), 8 * s, headPaint);
+  }
+
+  void _drawEyes(Canvas canvas, double s) {
+    final isBlinking = (anim.blinkPhase * 10).floor() % 10 == 0;
+    final eyeSize = isBlinking ? 1.0 * s : 3.0 * s;
+
+    for (final dx in [-3.5 * s, 3.5 * s]) {
+      final color = isGlowing
+          ? (isCasting ? scheme.secondary : scheme.tertiary)
+          : const Color(0xFF1A202C);
+      final eyePaint = Paint()..color = color;
+      canvas.drawCircle(Offset(dx, -17 * s), eyeSize, eyePaint);
+
+      if (!isBlinking && !isGlowing) {
         final pupilPaint = Paint()
-          ..color = const Color(0xFF1A202C);
-        canvas.drawCircle(Offset(dx + 1 * s, -10 * s), 1.8 * s, pupilPaint);
-
-        final glowPaint = Paint()
-          ..color = highlightColor.withValues(alpha: 0.3);
-        canvas.drawCircle(Offset(dx - 0.5 * s, -11 * s), 1 * s, glowPaint);
+          ..color = const Color(0xFF0A0A0A);
+        canvas.drawCircle(Offset(dx + 0.5 * s, -17 * s), 1.5 * s, pupilPaint);
       }
     }
   }
 
-  void _drawParticles(Canvas canvas, double s, Size size) {
-    final rng = Random(42);
-    for (var i = 0; i < 8; i++) {
-      final angle = rng.nextDouble() * pi * 2 + blinkPhase * 2;
-      final dist = 18 * s + rng.nextDouble() * 8 * s;
-      final x = cos(angle) * dist;
-      final y = sin(angle) * dist - 2 * s;
-      final r = 1.5 * s + rng.nextDouble() * 2 * s;
+  void _drawHat(Canvas canvas, double s) {
+    final hatPaint = Paint()
+      ..color = scheme.primary.withValues(alpha: 0.9)
+      ..style = PaintingStyle.fill;
 
-      final particlePaint = Paint()
-        ..color = const Color(0xFFF59E0B)
-            .withValues(alpha: 0.3 + 0.3 * sin(blinkPhase * pi + i.toDouble()))
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3);
-      canvas.drawCircle(Offset(x, y), r, particlePaint);
+    final hatPath = Path()
+      ..moveTo(-16 * s, -18 * s)
+      ..lineTo(16 * s, -18 * s)
+      ..lineTo(5 * s, -38 * s)
+      ..quadraticBezierTo(2 * s, -42 * s, -3 * s, -38 * s)
+      ..close();
+    canvas.drawPath(hatPath, hatPaint);
+
+    final bandPaint = Paint()
+      ..color = scheme.secondary
+      ..style = PaintingStyle.fill;
+    canvas.drawRect(Rect.fromLTWH(-15 * s, -19 * s, 30 * s, 2.5 * s), bandPaint);
+  }
+
+  void _drawSpellCharge(Canvas canvas, double s) {
+    final chargePaint = Paint()
+      ..color = scheme.secondary.withValues(alpha: 0.2 * anim.castPhase)
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 8);
+    canvas.drawCircle(Offset.zero, 14 * s * anim.castPhase, chargePaint);
+
+    final runePaint = Paint()
+      ..color = scheme.secondary.withValues(alpha: 0.4 * anim.castPhase)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.5 * s;
+    for (var i = 0; i < 4; i++) {
+      final angle = i * pi / 2 + anim.castPhase * 2;
+      final rx = cos(angle) * 10 * s * anim.castPhase;
+      final ry = sin(angle) * 10 * s * anim.castPhase;
+      canvas.drawCircle(Offset(rx, ry), 2 * s, runePaint);
     }
   }
 
   @override
   bool shouldRepaint(covariant _SupTechBodyPainter oldDelegate) {
     return oldDelegate.isGlowing != isGlowing ||
-        oldDelegate.armAngle != armAngle ||
-        oldDelegate.blinkPhase != blinkPhase;
+        oldDelegate.showWizardHat != showWizardHat ||
+        oldDelegate.isCasting != isCasting ||
+        oldDelegate.anim.castPhase != anim.castPhase ||
+        oldDelegate.anim.blinkPhase != anim.blinkPhase;
   }
+}
+
+class _SparklePainter extends CustomPainter {
+  final double phase;
+  final Color color;
+  final double intensity;
+
+  _SparklePainter({
+    required this.phase,
+    required this.color,
+    this.intensity = 0.5,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final rng = Random(42);
+    for (var i = 0; i < (12 * intensity).round(); i++) {
+      final angle = phase * 2 + i * pi / 6;
+      final dist = 14 + 6 * sin(phase * 3 + i.toDouble());
+      final x = size.width / 2 + cos(angle) * dist;
+      final y = size.height / 2 + sin(angle) * dist;
+      final alpha = (0.2 * intensity + 0.3 * sin(phase * 4 + i.toDouble())).clamp(0.0, 1.0);
+      final r = 1.0 + rng.nextDouble() * 1.5 * intensity;
+      canvas.drawCircle(
+        Offset(x, y),
+        r,
+        Paint()..color = color.withValues(alpha: alpha),
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _SparklePainter old) =>
+      old.phase != phase || old.intensity != intensity;
 }

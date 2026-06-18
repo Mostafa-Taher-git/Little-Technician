@@ -23,27 +23,27 @@ class LevelCompleteScreen extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0A1A0A),
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: SafeArea(
         child: BlocBuilder<GameCubit, GameState>(
           builder: (_, state) {
             return Column(
               children: [
                 const Spacer(),
-                const Icon(
+                Icon(
                   Icons.celebration_outlined,
                   size: 80,
-                  color: Color(0xFFF59E0B),
+                  color: scheme.secondary,
                 ).animate().scale(
                   begin: const Offset(0, 0),
                   duration: 600.ms,
                   curve: Curves.elasticOut,
                 ),
                 const Gap(24),
-                const Text(
+                Text(
                   'LEVEL COMPLETE!',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: scheme.onSurface,
                     fontSize: 28,
                     fontWeight: FontWeight.w900,
                     letterSpacing: 2,
@@ -53,7 +53,7 @@ class LevelCompleteScreen extends StatelessWidget {
                 Text(
                   level.title,
                   style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.7),
+                    color: scheme.onSurface.withValues(alpha: 0.7),
                     fontSize: 16,
                   ),
                 ).animate().fadeIn(delay: 500.ms),
@@ -62,9 +62,9 @@ class LevelCompleteScreen extends StatelessWidget {
                   margin: const EdgeInsets.symmetric(horizontal: 32),
                   padding: const EdgeInsets.all(24),
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.05),
+                    color: scheme.onSurface.withValues(alpha: 0.05),
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+                    border: Border.all(color: scheme.onSurface.withValues(alpha: 0.1)),
                   ),
                   child: Column(
                     children: [
@@ -78,7 +78,7 @@ class LevelCompleteScreen extends StatelessWidget {
                         points: level.points,
                         accentColor: scheme.secondary,
                       ),
-                      const Divider(color: Colors.white12, height: 24),
+                      Divider(color: scheme.outline.withValues(alpha: 0.2), height: 24),
                       _PointRow(
                         label: 'Total earned',
                         points: 10 * level.steps.length + level.points,
@@ -99,9 +99,9 @@ class LevelCompleteScreen extends StatelessWidget {
                     ),
                     const Gap(10),
                     Text(
-                      'SupTech uses remaining: ${state.availableSupTechUses}',
+                      'Familiar uses remaining: ${state.availableSupTechUses}',
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.5),
+                        color: scheme.onSurface.withValues(alpha: 0.5),
                         fontSize: 13,
                       ),
                     ),
@@ -159,6 +159,7 @@ class _PointRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
@@ -166,9 +167,9 @@ class _PointRow extends StatelessWidget {
           Text(
             label,
             style: TextStyle(
-              color: isTotal
-                  ? accentColor
-                  : Colors.white.withValues(alpha: 0.7),
+                  color: isTotal
+                    ? accentColor
+                    : scheme.onSurface.withValues(alpha: 0.7),
               fontWeight: isTotal ? FontWeight.w700 : FontWeight.w400,
               fontSize: isTotal ? 16 : 14,
             ),
@@ -177,7 +178,7 @@ class _PointRow extends StatelessWidget {
           Text(
             '+$points',
             style: TextStyle(
-              color: isTotal ? accentColor : Colors.white,
+              color: isTotal ? accentColor : scheme.onSurface,
               fontWeight: isTotal ? FontWeight.w800 : FontWeight.w600,
               fontSize: isTotal ? 18 : 15,
             ),
