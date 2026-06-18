@@ -135,6 +135,39 @@ class RuleEngine {
         'Dead pixels',
       ],
     ),
+    CategoryData(
+      name: 'Mobile',
+      icon: Icons.phone_android,
+      problems: [
+        'Battery draining too fast',
+        'Phone overheating',
+        'Apps crashing on phone',
+        'Phone not charging',
+        'Slow phone performance',
+      ],
+    ),
+    CategoryData(
+      name: 'Gaming',
+      icon: Icons.sports_esports,
+      problems: [
+        'Game crashing on startup',
+        'Low FPS in games',
+        'Controller not connecting',
+        'Game audio stuttering',
+        'Graphics driver crash',
+      ],
+    ),
+    CategoryData(
+      name: 'Smart Home',
+      icon: Icons.home_max,
+      problems: [
+        'Smart device offline',
+        'Voice assistant not responding',
+        'Smart light not connecting',
+        'Home hub setup failed',
+        'Automation not triggering',
+      ],
+    ),
   ];
 
   /// Maps a problem string → list of solution steps.
@@ -510,11 +543,122 @@ class RuleEngine {
       'If the correct resolution is missing, reinstall the monitor driver.',
       'Check the monitor\'s native resolution in its manual.',
     ],
-    'dead pixels': [
-      'Use a stuck pixel fixer tool (JScreenFix) for stuck pixels.',
-      'Apply gentle pressure with a soft cloth on the dead pixel area.',
-      'Check the monitor warranty — many manufacturers cover dead pixels.',
-      'True dead pixels (black) usually cannot be fixed and may require replacement.',
+      'dead pixels': [
+        'Use a stuck pixel fixer tool (JScreenFix) for stuck pixels.',
+        'Apply gentle pressure with a soft cloth on the dead pixel area.',
+        'Check the monitor warranty — many manufacturers cover dead pixels.',
+        'True dead pixels (black) usually cannot be fixed and may require replacement.',
+      ],
+
+    // ── Mobile ────────────────────────────────────────────────────────────────
+    'battery draining too fast': [
+      'Check for power-hungry apps in Settings → Battery → Battery usage.',
+      'Reduce screen brightness and set a shorter screen timeout.',
+      'Disable background app refresh for non-essential apps.',
+      'Turn off GPS, Bluetooth, and Wi-Fi when not in use.',
+      'Replace the battery if health is degraded (check via Settings → Battery → Battery health).',
+    ],
+    'phone overheating': [
+      'Remove the phone case while charging or gaming.',
+      'Close background apps that may be overloading the processor.',
+      'Avoid direct sunlight and hot environments.',
+      'Update apps and the OS to the latest version.',
+      'If persistent, check battery health and consider replacement.',
+    ],
+    'apps crashing on phone': [
+      'Restart the phone to clear temporary glitches.',
+      'Clear the app cache in Settings → Apps → select app → Storage → Clear cache.',
+      'Update the app from Google Play / App Store.',
+      'Uninstall and reinstall the problematic app.',
+      'Reset app preferences if multiple apps crash (Settings → Apps → Reset app preferences).',
+    ],
+    'phone not charging': [
+      'Try a different charging cable and power adapter.',
+      'Clean the charging port gently with a toothpick or compressed air.',
+      'Check for debris or lint stuck inside the port.',
+      'Restart the phone while connected to the charger.',
+      'If the issue persists, the charging port may need professional repair.',
+    ],
+    'slow phone performance': [
+      'Restart the phone to clear temporary system files.',
+      'Clear cached data in Settings → Storage → Cached data.',
+      'Uninstall unused apps to free up storage.',
+      'Reduce animations in Developer options (Settings → Developer options → Window animation scale → 0.5x).',
+      'Keep at least 10% of storage free for smooth operation.',
+    ],
+
+    // ── Gaming ────────────────────────────────────────────────────────────────
+    'game crashing on startup': [
+      'Update your graphics driver to the latest version.',
+      'Verify game files through Steam/launcher (Properties → Local files → Verify integrity).',
+      'Disable overlays (Discord, Steam, GeForce Experience) and try again.',
+      'Run the game as Administrator.',
+      'Lower game graphics settings temporarily to reduce strain.',
+    ],
+    'low fps in games': [
+      'Lower in-game graphics settings (shadows, reflections, anti-aliasing).',
+      'Update graphics drivers from the manufacturer website.',
+      'Close background applications consuming CPU/GPU resources.',
+      'Disable V-Sync in the game or GPU control panel.',
+      'Check for thermal throttling — monitor CPU and GPU temperatures with MSI Afterburner.',
+    ],
+    'controller not connecting': [
+      'Check that the controller has fresh batteries or is charged.',
+      'Re-pair the controller via Bluetooth (remove and re-add in Windows Bluetooth settings).',
+      'Update controller firmware using the manufacturer app.',
+      'Try a different USB cable for wired controllers.',
+      'Test the controller on another device to confirm it works.',
+    ],
+    'game audio stuttering': [
+      'Set audio sample rate to 44100 or 48000 Hz in Sound → Properties → Advanced.',
+      'Update audio and chipset drivers.',
+      'Disable audio enhancements in Sound → Properties → Enhancements.',
+      'Reduce audio buffer size in the game settings.',
+      'Switch from wireless to wired headphones to rule out Bluetooth latency.',
+    ],
+    'graphics driver crash': [
+      'Perform a clean reinstall of graphics drivers using DDU (Display Driver Uninstaller) in Safe Mode.',
+      'Lower GPU clock speeds using MSI Afterburner or similar.',
+      'Check GPU temperatures and ensure fans are spinning properly.',
+      'Verify your power supply can handle the GPU under load.',
+      'Disable any GPU overclocking and revert to stock speeds.',
+    ],
+
+    // ── Smart Home ────────────────────────────────────────────────────────────
+    'smart device offline': [
+      'Verify the device is powered on (check power cable or batteries).',
+      'Restart your router and the smart device.',
+      'Ensure the device is connected to the correct 2.4 GHz Wi-Fi network.',
+      'Move the device closer to the router to improve signal strength.',
+      'Re-pair the device using the manufacturer app.',
+    ],
+    'voice assistant not responding': [
+      'Check that the microphone is not muted on the device.',
+      'Restart the voice assistant device.',
+      'Verify the internet connection is working.',
+      'Update the voice assistant firmware through the app.',
+      'Re-link the device in the voice assistant app settings.',
+    ],
+    'smart light not connecting': [
+      'Ensure the light bulb is screwed in and the switch is on.',
+      'Toggle the wall switch off and on to reset the bulb.',
+      'Check that the bulb is compatible with your smart home hub.',
+      'Reset the bulb (usually by turning the switch on/off 5 times quickly).',
+      'Re-pair the bulb through the manufacturer app.',
+    ],
+    'home hub setup failed': [
+      'Ensure the hub is connected via Ethernet (if required) and powered on.',
+      'Use the latest version of the manufacturer app.',
+      'Restart the hub and router before retrying setup.',
+      'Check firewall settings on your network that may block the hub.',
+      'Contact manufacturer support if setup continues to fail.',
+    ],
+    'automation not triggering': [
+      'Verify all devices in the automation are online and responsive.',
+      'Check that conditions and triggers are configured correctly.',
+      'Update the hub firmware and the manufacturer app.',
+      'Delete and recreate the automation from scratch.',
+      'Ensure all devices support the automation action type (on/off, dim, etc.).',
     ],
   };
 

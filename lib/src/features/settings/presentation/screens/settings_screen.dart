@@ -180,7 +180,7 @@ class _SettingsTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final effectiveIconColor = iconColor ?? scheme.primary;
+    final effectiveIconColor = iconColor ?? scheme.onSurface;
     final effectiveTextColor = textColor ?? scheme.onSurface;
 
     return Material(

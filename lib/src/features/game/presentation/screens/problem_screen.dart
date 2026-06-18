@@ -8,8 +8,10 @@ import 'package:littletech/src/features/game/constants/game_data.dart';
 import 'package:littletech/src/features/game/domain/cubit/game_cubit.dart';
 import 'package:littletech/src/features/game/presentation/screens/reward_spin_screen.dart';
 import 'package:littletech/src/features/game/presentation/screens/suptech_dialog.dart';
+import 'package:littletech/src/features/game/presentation/widgets/alt_solution_banner.dart';
 import 'package:littletech/src/features/game/presentation/widgets/step_tile.dart';
 import 'package:littletech/src/features/game/presentation/widgets/suptech_avatar.dart';
+import 'package:littletech/src/features/game/presentation/widgets/visual_aid.dart';
 
 class ProblemScreen extends StatefulWidget {
   final WorldDef world;
@@ -152,6 +154,10 @@ class _ProblemScreenState extends State<ProblemScreen> {
                     ],
                   ),
                 ).animate().fadeIn().slideX(begin: -0.1),
+              if (!allSolved)
+                VisualAid(level: widget.level, stepIndex: solvedCount.clamp(0, widget.level.steps.length - 1)),
+              if (allSolved && state.lastDrawnReward == null)
+                AltSolutionBanner(world: widget.world, level: widget.level),
               Expanded(
                 child: ListView.builder(
                   padding: const EdgeInsets.all(16),

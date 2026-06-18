@@ -68,7 +68,7 @@ class _SavedSolutionsScreenState extends State<SavedSolutionsScreen> {
                             color: scheme.surface,
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          child: Icon(Icons.article_outlined, color: scheme.primary, size: 20),
+                          child: Icon(Icons.article_outlined, color: scheme.onSurface, size: 20),
                         ),
                         title: Text(item.problemTitle, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14, color: scheme.onSurface)),
                         subtitle: Column(

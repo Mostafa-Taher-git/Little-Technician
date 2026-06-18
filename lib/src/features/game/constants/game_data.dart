@@ -6,6 +6,7 @@ class LevelDef {
   final String description;
   final List<String> steps;
   final int points;
+  final String? imageUrl;
 
   const LevelDef({
     required this.id,
@@ -13,6 +14,7 @@ class LevelDef {
     required this.description,
     required this.steps,
     this.points = 100,
+    this.imageUrl,
   });
 }
 
@@ -445,6 +447,232 @@ class GameData {
         points: 1000,
       ),
     ),
+    WorldDef(
+      id: 6,
+      name: 'Mobile Troubleshooting',
+      description: 'Phone, tablet, and mobile device issues',
+      icon: Icons.phone_android,
+      levels: [
+        LevelDef(
+          id: 'battery_draining',
+          title: 'Battery Draining Fast',
+          description: 'Phone battery dies in hours',
+          steps: [
+            'Check battery usage stats in Settings to find power-hungry apps.',
+            'Reduce screen brightness and set a short screen timeout.',
+            'Disable background app refresh for non-essential apps.',
+            'Turn off Bluetooth, GPS, and Wi-Fi when not in use.',
+          ],
+          points: 100,
+        ),
+        LevelDef(
+          id: 'phone_overheating',
+          title: 'Phone Overheating',
+          description: 'Device gets uncomfortably hot',
+          steps: [
+            'Remove the phone case and avoid direct sunlight.',
+            'Close all background apps and games.',
+            'Stop charging the phone until it cools down.',
+            'Check for stuck apps using excessive CPU in battery stats.',
+          ],
+          points: 100,
+        ),
+        LevelDef(
+          id: 'phone_apps_crashing',
+          title: 'Apps Crashing on Phone',
+          description: 'Apps close unexpectedly',
+          steps: [
+            'Clear the app cache from Settings > Apps.',
+            'Update the app from the Play Store or App Store.',
+            'Restart the phone to clear temporary glitches.',
+            'Uninstall and reinstall the problematic app.',
+          ],
+          points: 100,
+        ),
+        LevelDef(
+          id: 'phone_not_charging',
+          title: 'Phone Not Charging',
+          description: 'No charging indicator when plugged in',
+          steps: [
+            'Check the charging cable and brick for damage.',
+            'Try a different power outlet and cable.',
+            'Clean the charging port gently with a toothpick.',
+            'Restart the phone while plugged in.',
+            'Check for moisture in the port (if water damage suspected).',
+          ],
+          points: 150,
+        ),
+        LevelDef(
+          id: 'slow_phone',
+          title: 'Slow Phone Performance',
+          description: 'Phone is sluggish and laggy',
+          steps: [
+            'Clear cached data from all apps in Settings.',
+            'Uninstall unused apps to free up storage space.',
+            'Restart the phone to clear memory leaks.',
+            'Check for software updates in system settings.',
+          ],
+          points: 100,
+        ),
+      ],
+      boss: BossDef(
+        name: 'The Phantom Battery',
+        lore: 'A ghostly energy-draining entity that latches onto your phone like a spectral leech. It feeds on battery life and vanishes into the background process list.',
+        hp: 5,
+        points: 500,
+      ),
+    ),
+    WorldDef(
+      id: 7,
+      name: 'Gaming Rig',
+      description: 'Gaming PC and console troubleshooting',
+      icon: Icons.sports_esports,
+      levels: [
+        LevelDef(
+          id: 'game_crashing',
+          title: 'Game Crashing on Startup',
+          description: 'Game closes immediately',
+          steps: [
+            'Verify game file integrity via Steam or launcher.',
+            'Update GPU drivers to the latest version.',
+            'Disable overlays (Discord, Steam, GeForce Experience).',
+            'Run the game as Administrator.',
+          ],
+          points: 100,
+        ),
+        LevelDef(
+          id: 'low_fps',
+          title: 'Low FPS in Games',
+          description: 'Unplayably low frame rates',
+          steps: [
+            'Lower in-game graphics settings (shadows, textures, AA).',
+            'Close background apps (browser, streaming, Discord).',
+            'Update GPU drivers and check for thermal throttling.',
+            'Reduce render resolution to 1080p or lower.',
+            'Enable GPU scheduling in Windows Graphics settings.',
+          ],
+          points: 150,
+        ),
+        LevelDef(
+          id: 'controller_not_connecting',
+          title: 'Controller Not Connecting',
+          description: 'Wireless controller won\'t pair',
+          steps: [
+            'Put the controller into pairing mode (hold pair button).',
+            'Remove the device from Bluetooth settings and re-pair.',
+            'Replace controller batteries or charge fully.',
+            'Connect via USB cable to test if it works wired.',
+          ],
+          points: 100,
+        ),
+        LevelDef(
+          id: 'game_audio_stutter',
+          title: 'Game Audio Stuttering',
+          description: 'Audio cuts out during gameplay',
+          steps: [
+            'Reduce audio quality to 16-bit 44100Hz in Sound settings.',
+            'Disable audio enhancements in speaker properties.',
+            'Update audio and GPU drivers.',
+            'Close browser tabs that use hardware acceleration.',
+          ],
+          points: 100,
+        ),
+        LevelDef(
+          id: 'gpu_driver_crash',
+          title: 'Graphics Driver Crash',
+          description: 'Driver stops responding during games',
+          steps: [
+            'Use DDU (Display Driver Uninstaller) in Safe Mode to clean drivers.',
+            'Install the latest stable driver (avoid beta drivers).',
+            'Underclock GPU using MSI Afterburner if overclocked.',
+            'Check GPU temperatures; repaste if over 85°C under load.',
+            'Lower in-game graphics settings to reduce GPU load.',
+          ],
+          points: 150,
+        ),
+      ],
+      boss: BossDef(
+        name: 'The Lag Spikes',
+        lore: 'A corrupted game entity that spawns frame drops like barbed vines. It injects stutter into every animation and laughs as your FPS counter plummets.',
+        hp: 6,
+        points: 600,
+      ),
+    ),
+    WorldDef(
+      id: 8,
+      name: 'Smart Home',
+      description: 'IoT device and smart home setup',
+      icon: Icons.home_max,
+      levels: [
+        LevelDef(
+          id: 'smart_device_offline',
+          title: 'Smart Device Offline',
+          description: 'Device shows as offline in app',
+          steps: [
+            'Check that the device is powered on and within Wi-Fi range.',
+            'Restart the device by unplugging it for 30 seconds.',
+            'Reboot your Wi-Fi router to refresh the network.',
+            'Re-add the device in the manufacturer\'s app.',
+          ],
+          points: 100,
+        ),
+        LevelDef(
+          id: 'voice_assistant_not_responding',
+          title: 'Voice Assistant Not Responding',
+          description: 'Smart speaker doesn\'t answer',
+          steps: [
+            'Check the microphone is not muted (physical switch).',
+            'Restart the smart speaker by unplugging it.',
+            'Ensure the speaker is connected to Wi-Fi.',
+            'Update the speaker firmware in its companion app.',
+          ],
+          points: 100,
+        ),
+        LevelDef(
+          id: 'smart_light_not_connecting',
+          title: 'Smart Light Not Connecting',
+          description: 'Bulb won\'t pair with hub',
+          steps: [
+            'Turn the light switch off and on three times to reset the bulb.',
+            'Move the bulb closer to the hub during pairing.',
+            'Check that the hub firmware is up to date.',
+            'Use the manufacturer\'s app in pairing mode only.',
+          ],
+          points: 100,
+        ),
+        LevelDef(
+          id: 'home_hub_setup_failed',
+          title: 'Home Hub Setup Failed',
+          description: 'Hub gets stuck during setup',
+          steps: [
+            'Factory reset the hub using the pinhole button.',
+            'Ensure your phone and hub are on the same 2.4GHz network.',
+            'Temporarily disable mobile data and VPN during setup.',
+            'Update the hub firmware via a wired Ethernet connection.',
+            'Contact manufacturer support if the hub remains bricked.',
+          ],
+          points: 150,
+        ),
+        LevelDef(
+          id: 'automation_not_triggering',
+          title: 'Automation Not Triggering',
+          description: 'Routines don\'t execute automatically',
+          steps: [
+            'Check that all devices in the routine respond manually.',
+            'Verify the automation conditions (time, sensor, location) are met.',
+            'Re-save the routine to refresh it on the hub.',
+            'Reboot the smart home hub to clear stale state.',
+          ],
+          points: 100,
+        ),
+      ],
+      boss: BossDef(
+        name: 'The Rogue Hub',
+        lore: 'A possessed smart home hub that rewrites its own firmware. It turns lights on at 3 AM, locks doors unpredictably, and ignores every voice command you throw at it.',
+        hp: 5,
+        points: 600,
+      ),
+    ),
   ];
 
   static const Map<String, List<String>> levelHints = {
@@ -473,5 +701,69 @@ class GameData {
     'no_display_output': ['Try the motherboard video port first', 'A loose GPU can cause no display'],
     'flickering_screen': ['Bad HDMI cables are the easiest fix', 'Try lowering the refresh rate to 60Hz'],
     'dead_pixels': ['Stuck pixels (colored) are fixable; dead pixels (black) usually aren\'t'],
+    'battery_draining': ['Background app refresh is a hidden battery hog', 'Screen brightness is often the biggest drain'],
+    'phone_overheating': ['Direct sunlight can overheat a phone in minutes', 'Thick cases trap heat inside the device'],
+    'phone_apps_crashing': ['An outdated app version is the most common cause', 'Clearing the cache fixes most temporary crashes'],
+    'phone_not_charging': ['Lint in the charging port is more common than a broken port', 'Try a different cable before replacing the phone'],
+    'slow_phone': ['A phone that hasn\'t restarted in weeks accumulates memory leaks', 'Low storage space directly causes lag'],
+    'game_crashing': ['Verify game files before reinstalling', 'GPU driver updates often list game crash fixes'],
+    'low_fps': ['Ray tracing and shadows are the biggest FPS killers', 'Thermal throttling is common in gaming laptops'],
+    'controller_not_connecting': ['Remove the controller from Bluetooth list and re-pair fresh', 'A dead battery looks like a pairing failure'],
+    'game_audio_stutter': ['Set audio quality to 16-bit 44100Hz as the universal fix', 'Hardware acceleration in browsers can conflict with game audio'],
+    'gpu_driver_crash': ['DDU in Safe Mode removes every trace of old drivers', 'An unstable overclock is the #1 cause of driver crashes'],
+    'smart_device_offline': ['Power cycling the device fixes 90% of offline issues', 'A recent router reboot can resolve IP conflicts'],
+    'voice_assistant_not_responding': ['Check the physical mute switch before anything else', 'A Wi-Fi disconnect can make the speaker appear broken'],
+    'smart_light_not_connecting': ['Most bulbs need to be reset by flipping the switch 3 times', '2.4GHz network is required — 5GHz won\'t work'],
+    'home_hub_setup_failed': ['Factory reset via the pinhole button clears all bad config', 'Both devices must be on the same 2.4GHz band'],
+    'automation_not_triggering': ['Check if location permissions are granted to the hub app', 'Re-saving the routine forces a refresh on the hub'],
   };
+
+  static const Map<String, String> solutionIdMap = {
+    'cpu_high_usage': 'High CPU usage',
+    'cpu_overheating': 'CPU overheating',
+    'computer_not_turning_on': 'Computer not turning on',
+    'beep_codes': 'Beep codes on startup',
+    'ram_not_detected': 'RAM not detected',
+    'pc_wont_boot': "PC won't boot",
+    'boot_loop': 'Boot loop',
+    'bsod': 'Blue screen of death (BSOD)',
+    'os_running_slow': 'OS running slow',
+    'no_sound': 'No sound output',
+    'mouse_not_responding': 'Mouse not responding',
+    'cursor_lagging': 'Cursor lagging',
+    'keyboard_not_responding': 'Keyboard not responding',
+    'printer_offline': 'Printer offline',
+    'paper_jam': 'Paper jam',
+    'program_crashes': 'Program crashes on launch',
+    'no_internet': 'No internet connection',
+    'slow_internet': 'Slow internet speed',
+    'dns_issues': 'DNS server not responding',
+    'vpn_not_connecting': 'VPN not connecting',
+    'hard_drive_not_detected': 'Hard drive not detected',
+    'disk_full': 'Disk full — no space',
+    'no_display_output': 'No display output',
+    'flickering_screen': 'Flickering screen',
+    'dead_pixels': 'Dead pixels',
+    'battery_draining': 'Battery draining fast',
+    'phone_overheating': 'Phone overheating',
+    'phone_apps_crashing': 'Apps crashing on phone',
+    'phone_not_charging': 'Phone not charging',
+    'slow_phone': 'Slow phone performance',
+    'game_crashing': 'Game crashing on startup',
+    'low_fps': 'Low FPS in games',
+    'controller_not_connecting': 'Controller not connecting',
+    'game_audio_stutter': 'Game audio stuttering',
+    'gpu_driver_crash': 'Graphics driver crash',
+    'smart_device_offline': 'Smart device offline',
+    'voice_assistant_not_responding': 'Voice assistant not responding',
+    'smart_light_not_connecting': 'Smart light not connecting',
+    'home_hub_setup_failed': 'Home hub setup failed',
+    'automation_not_triggering': 'Automation not triggering',
+  };
+
+  static String? solutionForLevel(String levelId) => solutionIdMap[levelId];
+
+  static bool isWorldComplete(WorldDef world, List<String> completedLevelIds) {
+    return world.levels.every((level) => completedLevelIds.contains(level.id));
+  }
 }

@@ -37,7 +37,7 @@ class ProblemsListScreen extends StatelessWidget {
                     color: scheme.surface,
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Icon(category.icon, color: scheme.primary, size: 28),
+                  child: Icon(category.icon, color: scheme.onSurface, size: 28),
                 ),
                 const Gap(16),
                 Column(

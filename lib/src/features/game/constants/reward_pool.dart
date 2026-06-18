@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 
 enum RewardType { icon, title, nicknameFrame, theme, skin }
@@ -255,7 +256,7 @@ class RewardPool {
   static RewardDef draw() {
     _ensureInit();
     final total = _cumulativeWeights.last;
-    final roll = total * (DateTime.now().microsecondsSinceEpoch % 1000) / 1000;
+    final roll = Random().nextDouble() * total;
     for (var i = 0; i < _cumulativeWeights.length; i++) {
       if (roll <= _cumulativeWeights[i]) return _weightedList[i];
     }

@@ -8,6 +8,10 @@ import 'package:littletech/src/features/game/domain/cubit/game_cubit.dart';
 import 'package:littletech/src/features/game/domain/cubit/theme_cubit.dart';
 import 'package:littletech/src/features/game/presentation/widgets/reward_chip.dart';
 import 'package:littletech/src/features/game/presentation/widgets/suptech_avatar.dart';
+import 'package:littletech/src/core/navigation/nav.dart';
+import 'package:littletech/src/features/game/presentation/screens/achievements_screen.dart';
+import 'package:littletech/src/features/game/presentation/screens/challenge_screen.dart';
+import 'package:littletech/src/features/game/presentation/screens/stats_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -111,6 +115,37 @@ class ProfileScreen extends StatelessWidget {
                           label: 'Rewards',
                           value: '${earnedRewards.length}',
                           scheme: scheme,
+                        ),
+                      ],
+                    ),
+                    const Gap(24),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _ProfileAction(
+                            icon: Icons.emoji_events,
+                            label: 'Honors',
+                            onTap: () => Nav.push(context, const AchievementsScreen()),
+                            scheme: scheme,
+                          ),
+                        ),
+                        const Gap(10),
+                        Expanded(
+                          child: _ProfileAction(
+                            icon: Icons.bar_chart,
+                            label: 'Stats',
+                            onTap: () => Nav.push(context, const StatsScreen()),
+                            scheme: scheme,
+                          ),
+                        ),
+                        const Gap(10),
+                        Expanded(
+                          child: _ProfileAction(
+                            icon: Icons.wb_sunny,
+                            label: 'Quests',
+                            onTap: () => Nav.push(context, const ChallengeScreen()),
+                            scheme: scheme,
+                          ),
                         ),
                       ],
                     ),
@@ -306,6 +341,54 @@ class _StatCard extends StatelessWidget {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ProfileAction extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+  final ColorScheme scheme;
+
+  const _ProfileAction({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+    required this.scheme,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      borderRadius: BorderRadius.circular(14),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(14),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 14),
+          decoration: BoxDecoration(
+            color: scheme.surface,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: scheme.outline.withValues(alpha: 0.3)),
+          ),
+          child: Column(
+            children: [
+              Icon(icon, color: scheme.secondary, size: 24),
+              const SizedBox(height: 6),
+              Text(
+                label,
+                style: TextStyle(
+                  color: scheme.onSurface,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

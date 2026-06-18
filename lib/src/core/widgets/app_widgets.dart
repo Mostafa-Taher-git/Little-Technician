@@ -136,7 +136,7 @@ class CategoryCard extends StatelessWidget {
                   color: scheme.surface,
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Icon(icon, color: scheme.primary, size: 24),
+                child: Icon(icon, color: scheme.onSurface, size: 24),
               ),
               const Gap(12),
               Text(

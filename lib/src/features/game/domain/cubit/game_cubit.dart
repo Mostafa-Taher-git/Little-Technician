@@ -10,6 +10,7 @@ class GameState {
   final LevelDef? currentLevel;
   final int currentStepIndex;
   final int currentBossHp;
+  final int bossHpMultiplier;
   final RewardDef? lastDrawnReward;
   final bool isBossMode;
   final String? hintText;
@@ -20,6 +21,7 @@ class GameState {
     this.currentLevel,
     this.currentStepIndex = 0,
     this.currentBossHp = 0,
+    this.bossHpMultiplier = 1,
     this.lastDrawnReward,
     this.isBossMode = false,
     this.hintText,
@@ -31,6 +33,7 @@ class GameState {
     LevelDef? currentLevel,
     int? currentStepIndex,
     int? currentBossHp,
+    int? bossHpMultiplier,
     RewardDef? lastDrawnReward,
     bool? isBossMode,
     String? hintText,
@@ -41,6 +44,7 @@ class GameState {
       currentLevel: currentLevel ?? this.currentLevel,
       currentStepIndex: currentStepIndex ?? this.currentStepIndex,
       currentBossHp: currentBossHp ?? this.currentBossHp,
+      bossHpMultiplier: bossHpMultiplier ?? this.bossHpMultiplier,
       lastDrawnReward: lastDrawnReward ?? this.lastDrawnReward,
       isBossMode: isBossMode ?? this.isBossMode,
       hintText: hintText ?? this.hintText,
@@ -75,7 +79,11 @@ class GameCubit extends Cubit<GameState> {
   void selectWorld(WorldDef world) {
     final progress = state.progress;
     _repository.setCurrentLevel(progress, world.id, null);
-    emit(state.copyWith(progress: progress, currentWorld: world));
+    emit(state.copyWith(progress: progress, currentWorld: world, bossHpMultiplier: 1));
+  }
+
+  void setBossMultiplier(int multiplier) {
+    emit(state.copyWith(bossHpMultiplier: multiplier));
   }
 
   void selectLevel(LevelDef level) {
@@ -95,7 +103,7 @@ class GameCubit extends Cubit<GameState> {
     final boss = state.currentWorld!.boss;
     emit(state.copyWith(
       isBossMode: true,
-      currentBossHp: boss.hp,
+      currentBossHp: boss.hp * state.bossHpMultiplier,
       hintText: null,
     ));
   }
@@ -127,9 +135,9 @@ class GameCubit extends Cubit<GameState> {
     emit(state.copyWith(progress: progress, hintText: null));
   }
 
-  void attackBoss() {
+  void attackBoss({int damage = 1}) {
     if (!state.isBossMode) return;
-    final hpLeft = state.currentBossHp - 1;
+    final hpLeft = state.currentBossHp - damage;
     final progress = state.progress;
 
     _repository.addPoints(progress, 10);
@@ -197,6 +205,12 @@ class GameCubit extends Cubit<GameState> {
 
   void refreshProgress() {
     emit(state.copyWith(progress: state.progress));
+  }
+
+  void addPoints(int amount) {
+    final p = state.progress;
+    p.points += amount;
+    emit(state.copyWith(progress: p));
   }
 
   Future<void> setThemeId(String? themeId) async {

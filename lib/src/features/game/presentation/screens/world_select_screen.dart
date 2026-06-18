@@ -6,6 +6,7 @@ import 'package:littletech/src/features/game/constants/game_data.dart';
 import 'package:littletech/src/features/game/domain/cubit/game_cubit.dart';
 import 'package:littletech/src/features/game/presentation/screens/level_select_screen.dart';
 import 'package:littletech/src/features/game/presentation/widgets/suptech_avatar.dart';
+import 'package:littletech/src/features/game/presentation/widgets/device_selector.dart';
 import 'package:littletech/src/features/game/presentation/widgets/world_card.dart';
 
 class WorldSelectScreen extends StatelessWidget {
@@ -43,6 +44,20 @@ class WorldSelectScreen extends StatelessWidget {
                       availableUses: state.availableSupTechUses,
                       isGlowing: state.canUseSupTech,
                       size: 34,
+                    ),
+                    const Gap(4),
+                    IconButton(
+                      icon: Icon(Icons.devices, color: scheme.onSurface.withValues(alpha: 0.6), size: 20),
+                      onPressed: () => DeviceSelector.show(context, onSelected: (device) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Showing ${device.name} tips...'),
+                            behavior: SnackBarBehavior.floating,
+                            duration: const Duration(seconds: 1),
+                          ),
+                        );
+                      }),
+                      tooltip: 'Filter by device',
                     ),
                   ],
                 ),

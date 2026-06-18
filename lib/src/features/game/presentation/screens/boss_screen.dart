@@ -25,6 +25,9 @@ class _BossScreenState extends State<BossScreen>
   late Animation<double> _glowPulse;
   late Animation<double> _entranceAnimation;
 
+  int _currentPhase = 0;
+  String? _lastOutcome;
+
   static const _bossAbilities = {
     1: ['Crushing Charge', 'Bone Wall', 'Rotting Aura'],
     2: ['Soul Drain', 'Life Sap', 'Death Gaze'],
@@ -34,6 +37,34 @@ class _BossScreenState extends State<BossScreen>
   };
 
   static const _bossArmor = {1: 14, 2: 16, 3: 12, 4: 15, 5: 18};
+
+  static const Map<int, List<Map<String, dynamic>>> _strategies = {
+    1: [
+      {'name': 'Aim for the joints', 'success': 70, 'damage': 2, 'flavor': 'You strike the bone joints! The colossus stumbles!', 'failFlavor': 'Your attack clangs harmlessly off the thick bone.'},
+      {'name': 'Target the eye cores', 'success': 50, 'damage': 3, 'flavor': 'You shatter a glowing eye core! The colossus roars!', 'failFlavor': 'The eyes are too well-guarded — your attack misses.'},
+      {'name': 'Defensive stance', 'success': 90, 'damage': 1, 'flavor': 'You find a small opening and strike.', 'failFlavor': 'The colossus anticipated your move.'},
+    ],
+    2: [
+      {'name': 'Dispel the aura', 'success': 60, 'damage': 2, 'flavor': 'Your strike disrupts the lich\'s dark aura!', 'failFlavor': 'The lich\'s shield deflects your magic.'},
+      {'name': 'Attack the phylactery', 'success': 40, 'damage': 4, 'flavor': 'You crack the phylactery! The lich screams!', 'failFlavor': 'The phylactery is heavily warded.'},
+      {'name': 'Holy infusion', 'success': 80, 'damage': 1, 'flavor': 'Your blade glows with holy light and connects!', 'failFlavor': 'The lich\'s darkness extinguishes your light.'},
+    ],
+    3: [
+      {'name': 'Sever the cables', 'success': 65, 'damage': 2, 'flavor': 'You cut through the tangled cables!', 'failFlavor': 'More cables spring up to replace them.'},
+      {'name': 'Trap the goblin', 'success': 45, 'damage': 3, 'flavor': 'The goblin king is caught! You land a solid hit!', 'failFlavor': 'He dodges into a side tunnel.'},
+      {'name': 'Rush attack', 'success': 85, 'damage': 1, 'flavor': 'Your aggressive push lands a blow!', 'failFlavor': 'He parries and counterattacks.'},
+    ],
+    4: [
+      {'name': 'Aim for the wings', 'success': 55, 'damage': 2, 'flavor': 'You clip the dragon\'s wing!', 'failFlavor': 'The dragon\'s scales deflect your blade.'},
+      {'name': 'Throw a net', 'success': 35, 'damage': 4, 'flavor': 'The net tangles the whelp! Massive opening!', 'failFlavor': 'The dragon breathes fire, burning the net.'},
+      {'name': 'Guard and wait', 'success': 80, 'damage': 1, 'flavor': 'You find an opening as the dragon tires.', 'failFlavor': 'The dragon\'s tail catches you off guard.'},
+    ],
+    5: [
+      {'name': 'Close the eye', 'success': 50, 'damage': 3, 'flavor': 'You seal one of the beholder\'s eyes!', 'failFlavor': 'The eye ray forces you back.'},
+      {'name': 'Reflective shield', 'success': 30, 'damage': 5, 'flavor': 'The beholder\'s own ray reflects back! Critical hit!', 'failFlavor': 'The shield shatters under the magical assault.'},
+      {'name': 'Hit the central eye', 'success': 70, 'damage': 1, 'flavor': 'You land a quick strike on the main eye!', 'failFlavor': 'The beholder blinks and your attack misses.'},
+    ],
+  };
 
   @override
   void initState() {
@@ -63,6 +94,208 @@ class _BossScreenState extends State<BossScreen>
   void dispose() {
     _bossController.dispose();
     super.dispose();
+  }
+
+  void _executeStrategy(Map<String, dynamic> strategy) {
+    final cubit = context.read<GameCubit>();
+    final rng = Random();
+    final roll = rng.nextInt(100) + 1;
+    final success = strategy['success'] as int;
+    final damage = strategy['damage'] as int;
+
+    if (roll <= success) {
+      cubit.attackBoss(damage: damage);
+      setState(() {
+        _lastOutcome = strategy['flavor'] as String;
+        _currentPhase = 2;
+      });
+    } else {
+      setState(() {
+        _lastOutcome = strategy['failFlavor'] as String;
+        _currentPhase = 2;
+      });
+    }
+  }
+
+  Widget _buildDefeatedButton() {
+    return SizedBox(
+      width: double.infinity,
+      height: 56,
+      child: ElevatedButton.icon(
+        onPressed: null,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.green.shade700,
+          foregroundColor: Colors.white,
+          disabledBackgroundColor: Colors.grey.shade800,
+          disabledForegroundColor: Colors.grey,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+        ),
+        icon: const Icon(Icons.check, size: 22),
+        label: const Text(
+          'Defeated!',
+          style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPhaseStart() {
+    return SizedBox(
+      width: double.infinity,
+      height: 56,
+      child: ElevatedButton.icon(
+        onPressed: () => setState(() => _currentPhase = 1),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.red.shade700,
+          foregroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+        ),
+        icon: const Icon(Icons.flash_on, size: 22),
+        label: const Text(
+          'Begin Battle!',
+          style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPhaseStrategy(int bossIndex) {
+    final strategies = _strategies[bossIndex] ?? _strategies[1]!;
+    return Column(
+      children: [
+        Text(
+          'Choose your strategy:',
+          style: TextStyle(
+            color: Colors.white.withValues(alpha: 0.6),
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        const Gap(12),
+        ...strategies.map((s) => Padding(
+          padding: const EdgeInsets.only(bottom: 10),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () => _executeStrategy(s),
+              borderRadius: BorderRadius.circular(14),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.05),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            s['name'] as String,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const Gap(4),
+                          Text(
+                            '${s['damage']} dmg · ${s['success']}% success',
+                            style: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.5),
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.red.shade700.withValues(alpha: 0.3),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        '${s['success']}%',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        )),
+      ],
+    );
+  }
+
+  Widget _buildPhaseResolve() {
+    return Column(
+      children: [
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.05),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Icon(
+                _lastOutcome?.contains('!') ?? false ? Icons.whatshot : Icons.block,
+                color: _lastOutcome?.contains('!') ?? false
+                    ? Colors.orange.shade400
+                    : Colors.red.shade300,
+                size: 18,
+              ),
+              const Gap(10),
+              Expanded(
+                child: Text(
+                  _lastOutcome ?? '',
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.8),
+                    fontSize: 13,
+                    height: 1.4,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const Gap(16),
+        SizedBox(
+          width: double.infinity,
+          height: 48,
+          child: ElevatedButton(
+            onPressed: () => setState(() => _currentPhase = 1),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.white.withValues(alpha: 0.1),
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            child: const Text(
+              'Next Turn',
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+            ),
+          ),
+        ),
+      ],
+    );
   }
 
   @override
@@ -173,38 +406,15 @@ class _BossScreenState extends State<BossScreen>
                       padding: const EdgeInsets.fromLTRB(24, 0, 24, 32),
                       child: Column(
                         children: [
-                          SizedBox(
-                            width: double.infinity,
-                            height: 56,
-                            child: ElevatedButton.icon(
-                              onPressed: isDefeated
-                                  ? null
-                                  : () => context.read<GameCubit>().attackBoss(),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: isDefeated
-                                    ? Colors.green.shade700
-                                    : Colors.red.shade700,
-                                foregroundColor: Colors.white,
-                                disabledBackgroundColor: Colors.grey.shade800,
-                                disabledForegroundColor: Colors.grey,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                ),
-                              ),
-                              icon: Icon(
-                                isDefeated ? Icons.check : Icons.flash_on,
-                                size: 22,
-                              ),
-                              label: Text(
-                                isDefeated ? 'Defeated!' : 'Attack!',
-                                style: const TextStyle(
-                                  fontSize: 17,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                            ),
-                          ),
-                          if (state.availableSupTechUses > 0) ...[
+                          if (isDefeated)
+                            _buildDefeatedButton()
+                          else if (_currentPhase == 0)
+                            _buildPhaseStart()
+                          else if (_currentPhase == 1)
+                            _buildPhaseStrategy(bossIndex)
+                          else
+                            _buildPhaseResolve(),
+                          if (state.availableSupTechUses > 0 && !isDefeated) ...[
                             const Gap(16),
                             SupTechAvatar(
                               availableUses: state.availableSupTechUses,

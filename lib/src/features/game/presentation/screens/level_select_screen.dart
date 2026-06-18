@@ -5,6 +5,9 @@ import 'package:littletech/src/core/navigation/nav.dart';
 import 'package:littletech/src/features/game/constants/game_data.dart';
 import 'package:littletech/src/features/game/domain/cubit/game_cubit.dart';
 import 'package:littletech/src/features/game/presentation/screens/problem_screen.dart';
+import 'package:littletech/src/features/game/presentation/screens/quiz_screen.dart';
+import 'package:littletech/src/features/game/presentation/screens/ordering_screen.dart';
+import 'package:littletech/src/features/game/presentation/screens/traps_screen.dart';
 import 'package:littletech/src/features/game/presentation/screens/boss_screen.dart';
 import 'package:littletech/src/features/game/presentation/widgets/level_card.dart';
 
@@ -92,10 +95,7 @@ class LevelSelectScreen extends StatelessWidget {
                         totalSteps: level.steps.length,
                         onTap: () {
                           context.read<GameCubit>().selectLevel(level);
-                          Nav.push(
-                            context,
-                            ProblemScreen(world: world, level: level),
-                          );
+                          _showPreparationOptions(context, world, level);
                         },
                       ),
                     ),
@@ -117,6 +117,96 @@ class LevelSelectScreen extends StatelessWidget {
           );
           return listView;
         },
+      ),
+    );
+  }
+
+  void _showPreparationOptions(BuildContext context, WorldDef world, LevelDef level) {
+    final scheme = Theme.of(context).colorScheme;
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (_) => Container(
+        padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
+        decoration: BoxDecoration(
+          color: scheme.surface,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 36,
+              height: 4,
+              decoration: BoxDecoration(
+                color: scheme.outline.withValues(alpha: 0.3),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Prepare for Quest',
+              style: TextStyle(
+                color: scheme.onSurface,
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'Choose optional preparation before attempting "${level.title}"',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: scheme.onSurface.withValues(alpha: 0.5),
+                fontSize: 13,
+              ),
+            ),
+            const SizedBox(height: 20),
+            _PrepOption(
+              icon: Icons.quiz_outlined,
+              title: 'Sage\'s Trial',
+              subtitle: 'Answer questions to earn bonus XP',
+              color: scheme.secondary,
+              onTap: () {
+                Navigator.pop(context);
+                Nav.push(context, QuizScreen(world: world, level: level));
+              },
+            ),
+            const SizedBox(height: 10),
+            _PrepOption(
+              icon: Icons.swap_vert,
+              title: 'Rite of Order',
+              subtitle: 'Order the solution steps correctly',
+              color: scheme.tertiary,
+              onTap: () {
+                Navigator.pop(context);
+                Nav.push(context, OrderingScreen(world: world, level: level));
+              },
+            ),
+            const SizedBox(height: 10),
+            _PrepOption(
+              icon: Icons.psychology_outlined,
+              title: 'Detect Deception',
+              subtitle: 'Identify true vs false statements',
+              color: Colors.orange,
+              onTap: () {
+                Navigator.pop(context);
+                Nav.push(context, TrapsScreen(world: world, level: level));
+              },
+            ),
+            const SizedBox(height: 10),
+            _PrepOption(
+              icon: Icons.arrow_forward,
+              title: 'Start Quest Directly',
+              subtitle: 'Jump straight into the troubleshooting',
+              color: scheme.onSurface.withValues(alpha: 0.5),
+              onTap: () {
+                Navigator.pop(context);
+                Nav.push(context, ProblemScreen(world: world, level: level));
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -390,6 +480,66 @@ class _BossDungeonDoor extends StatelessWidget {
                   ),
               ],
             ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _PrepOption extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final Color color;
+  final VoidCallback onTap;
+
+  const _PrepOption({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.color,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Material(
+      color: Colors.transparent,
+      borderRadius: BorderRadius.circular(14),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(14),
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: scheme.outline.withValues(alpha: 0.2)),
+          ),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(icon, color: color, size: 20),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(title, style: TextStyle(color: scheme.onSurface, fontWeight: FontWeight.w600, fontSize: 14)),
+                    Text(subtitle, style: TextStyle(color: scheme.onSurface.withValues(alpha: 0.5), fontSize: 12)),
+                  ],
+                ),
+              ),
+              Icon(Icons.chevron_right, color: scheme.onSurface.withValues(alpha: 0.3), size: 18),
+            ],
           ),
         ),
       ),

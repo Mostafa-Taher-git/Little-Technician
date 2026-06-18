@@ -47,6 +47,10 @@ class WorldCard extends StatelessWidget {
                 color: scheme.surface,
                 accent: scheme.secondary.withValues(alpha: 0.05),
               ),
+              foregroundPainter: _ScrollEdgePainter(
+                color: scheme.outline.withValues(alpha: 0.15),
+                shadow: scheme.shadow.withValues(alpha: 0.06),
+              ),
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
@@ -210,4 +214,52 @@ class _CompassRosePainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant _CompassRosePainter old) =>
       old.primary != primary;
+}
+
+class _ScrollEdgePainter extends CustomPainter {
+  final Color color;
+  final Color shadow;
+
+  _ScrollEdgePainter({required this.color, required this.shadow});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 0.5;
+
+    final shadowPaint = Paint()
+      ..color = shadow
+      ..style = PaintingStyle.fill;
+
+    final s = size.width / 100;
+
+    for (final corner in [
+      const Offset(0, 0),
+      Offset(size.width, 0),
+      Offset(0, size.height),
+      Offset(size.width, size.height),
+    ]) {
+      final dx = corner.dx == 0 ? 1.0 : -1.0;
+      final dy = corner.dy == 0 ? 1.0 : -1.0;
+
+      final path = Path()
+        ..moveTo(corner.dx + dx * 4 * s, corner.dy)
+        ..lineTo(corner.dx, corner.dy)
+        ..lineTo(corner.dx, corner.dy + dy * 4 * s);
+      canvas.drawPath(path, paint);
+
+      final shadowPath = Path()
+        ..moveTo(corner.dx + dx * 2 * s, corner.dy + dy * 2 * s)
+        ..lineTo(corner.dx + dx * 6 * s, corner.dy + dy * 2 * s)
+        ..lineTo(corner.dx + dx * 2 * s, corner.dy + dy * 6 * s)
+        ..close();
+      canvas.drawPath(shadowPath, shadowPaint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _ScrollEdgePainter old) =>
+      old.color != color || old.shadow != shadow;
 }
