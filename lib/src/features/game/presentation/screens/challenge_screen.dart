@@ -41,8 +41,9 @@ class ChallengeScreen extends StatelessWidget {
                   .firstWhere((l) => l.id == daily.levelId);
               final world = GameData.worlds.firstWhere((w) => w.levels.contains(level));
               context.read<GameCubit>()
-                ..selectLevel(level)
-                ..setPointsMultiplier(daily.pointsMultiplier);
+                ..selectLevel(level, worldOverride: world)
+                ..setPointsMultiplier(daily.pointsMultiplier)
+                ..addChallengeBonus(daily.bonusPoints);
               Nav.push(context, ProblemScreen(world: world, level: level));
             },
           ),
@@ -60,7 +61,8 @@ class ChallengeScreen extends StatelessWidget {
               context.read<GameCubit>()
                 ..selectWorld(world)
                 ..setBossMultiplier(2)
-                ..setPointsMultiplier(weekly.pointsMultiplier);
+                ..setPointsMultiplier(weekly.pointsMultiplier)
+                ..addChallengeBonus(weekly.bonusPoints);
               Nav.push(context, LevelSelectScreen(world: world));
             },
           ),

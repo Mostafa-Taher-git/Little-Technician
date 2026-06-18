@@ -69,21 +69,26 @@ class GameState {
 class GameCubit extends Cubit<GameState> {
   final GameRepository _repository;
   final int _userId;
+  DateTime? _levelStartTime;
 
   GameCubit(this._repository, this._userId)
       : super(GameState(progress: PlayerProgress()..userId = _userId));
 
   Future<void> loadGame() async {
-    final progress = await _repository.getOrCreateProgress(_userId);
-    final world = GameData.worlds.isNotEmpty
-        ? GameData.worlds[progress.currentWorldId]
-        : null;
-    emit(GameState(progress: progress, currentWorld: world));
+    try {
+      final progress = await _repository.getOrCreateProgress(_userId);
+      final world = GameData.worlds.isNotEmpty &&
+              progress.currentWorldId < GameData.worlds.length
+          ? GameData.worlds[progress.currentWorldId]
+          : null;
+      emit(GameState(progress: progress, currentWorld: world));
+    } catch (_) {}
   }
 
   void selectWorld(WorldDef world) {
     final progress = state.progress;
-    _repository.setCurrentLevel(progress, world.id, null);
+    progress.currentWorldId = world.id;
+    _safePersist(() => _repository.setCurrentLevel(progress, world.id, null));
     emit(state.copyWith(progress: progress, currentWorld: world, bossHpMultiplier: 1));
   }
 
@@ -95,12 +100,15 @@ class GameCubit extends Cubit<GameState> {
     emit(state.copyWith(pointsMultiplier: multiplier));
   }
 
-  void selectLevel(LevelDef level) {
+  void selectLevel(LevelDef level, {WorldDef? worldOverride}) {
     final progress = state.progress;
+    final world = worldOverride ?? state.currentWorld;
     progress.currentLevelId = level.id;
-    _repository.setCurrentLevel(progress, state.currentWorld!.id, level.id);
+    _levelStartTime = DateTime.now();
+    _safePersist(() => _repository.setCurrentLevel(progress, world?.id ?? 0, level.id));
     emit(state.copyWith(
       progress: progress,
+      currentWorld: world ?? state.currentWorld,
       currentLevel: level,
       currentStepIndex: 0,
       isBossMode: false,
@@ -108,8 +116,28 @@ class GameCubit extends Cubit<GameState> {
     ));
   }
 
+  void saveFeedback(String levelId, bool wasHelpful) {
+    final p = state.progress;
+    final raw = p.getPrepResult(levelId);
+    final data = raw != null
+        ? json.decode(raw) as Map<String, dynamic>
+        : <String, dynamic>{};
+    data['feedback'] = {'helpful': wasHelpful, 'timestamp': DateTime.now().toIso8601String()};
+    p.setPrepResult(levelId, json.encode(data));
+    _safePersist(() => _repository.saveProgress(p));
+    emit(state.copyWith(progress: p));
+  }
+
+  void addChallengeBonus(int bonusPoints) {
+    final p = state.progress;
+    _safePersist(() => _repository.addPoints(p, bonusPoints));
+    emit(state.copyWith(progress: p));
+  }
+
   void startBoss() {
-    final boss = state.currentWorld!.boss;
+    final world = state.currentWorld;
+    if (world == null) return;
+    final boss = world.boss;
     emit(state.copyWith(
       isBossMode: true,
       currentBossHp: boss.hp * state.bossHpMultiplier,
@@ -123,7 +151,7 @@ class GameCubit extends Cubit<GameState> {
     final nextIndex = state.currentStepIndex + 1;
     final progress = state.progress;
 
-    _repository.addPoints(progress, 10);
+    _safePersist(() => _repository.addPoints(progress, 10));
     if (nextIndex >= steps.length) {
       _completeLevel(progress);
     } else {
@@ -135,16 +163,40 @@ class GameCubit extends Cubit<GameState> {
     }
   }
 
+  void _safePersist(Future<void> Function() op) {
+    op().catchError((_) {});
+  }
+
   void _completeLevel(PlayerProgress progress) {
-    final basePoints = state.currentLevel!.points * state.pointsMultiplier;
-    _repository.addPoints(progress, basePoints);
-    _repository.completeLevel(progress, state.currentLevel!.id);
-    _repository.resetLevelUses(progress);
+    final level = state.currentLevel!;
+    final basePoints = level.points * state.pointsMultiplier;
+
+    int bonusPoints = 0;
+    if (progress.supTechUsesThisLevel >= 1) {
+      bonusPoints += 25;
+    }
+
+    final elapsed = _levelStartTime != null
+        ? DateTime.now().difference(_levelStartTime!).inSeconds
+        : 999;
+    if (elapsed <= 30) {
+      bonusPoints += 50;
+    } else if (elapsed <= 60) {
+      bonusPoints += 30;
+    } else if (elapsed <= 120) {
+      bonusPoints += 15;
+    }
+
+    final totalPoints = basePoints + bonusPoints;
+    _safePersist(() => _repository.addPoints(progress, totalPoints));
+    _safePersist(() => _repository.completeLevel(progress, level.id));
+    _safePersist(() => _repository.resetLevelUses(progress));
     final world = state.currentWorld;
     if (world != null && GameData.isWorldComplete(world, progress.completedLevelIds)) {
-      _repository.completeWorld(progress, world.id);
+      _safePersist(() => _repository.completeWorld(progress, world.id));
     }
     _drawReward(progress);
+    _safePersist(() => _repository.recordPlayDate(progress));
     emit(state.copyWith(progress: progress, hintText: null, pointsMultiplier: 1));
   }
 
@@ -153,7 +205,7 @@ class GameCubit extends Cubit<GameState> {
     final hpLeft = state.currentBossHp - damage;
     final progress = state.progress;
 
-    _repository.addPoints(progress, 10);
+    _safePersist(() => _repository.addPoints(progress, 10));
     if (hpLeft <= 0) {
       _defeatBoss(progress);
     } else {
@@ -162,18 +214,21 @@ class GameCubit extends Cubit<GameState> {
   }
 
   void _defeatBoss(PlayerProgress progress) {
-    final boss = state.currentWorld!.boss;
-    _repository.addPoints(progress, boss.points * state.pointsMultiplier);
-    _repository.defeatBoss(progress);
+    final world = state.currentWorld;
+    if (world == null) return;
+    final boss = world.boss;
+    _safePersist(() => _repository.addPoints(progress, boss.points * state.pointsMultiplier));
+    _safePersist(() => _repository.defeatBoss(progress));
+    _safePersist(() => _repository.recordPlayDate(progress));
     _drawReward(progress);
     emit(state.copyWith(progress: progress, currentBossHp: 0, pointsMultiplier: 1));
   }
 
   void _drawReward(PlayerProgress progress) {
     final rewardDef = RewardPool.draw();
-    _repository.addReward(progress, rewardDef.id);
+    _safePersist(() => _repository.addReward(progress, rewardDef.id));
     if (rewardDef.type == RewardType.skin) {
-      _repository.unlockSkin(progress, rewardDef.value);
+      _safePersist(() => _repository.unlockSkin(progress, rewardDef.value));
     }
     emit(state.copyWith(progress: progress, lastDrawnReward: rewardDef));
   }
@@ -186,20 +241,22 @@ class GameCubit extends Cubit<GameState> {
     final progress = state.progress;
     if (state.availableSupTechUses <= 0) return;
 
-    _repository.useSupTech(progress);
-
     switch (action) {
       case 'hint':
         final hints = GameData.levelHints[state.currentLevel?.id];
         if (hints != null && hints.isNotEmpty) {
+          _safePersist(() => _repository.useSupTech(progress));
           emit(state.copyWith(
             progress: progress,
             hintText: hints[state.currentStepIndex % hints.length],
           ));
         }
       case 'skip':
+        if (state.currentLevel == null) return;
+        _safePersist(() => _repository.useSupTech(progress));
         solveStep();
       case 'diagnose':
+        _safePersist(() => _repository.useSupTech(progress));
         emit(state.copyWith(
           progress: progress,
           hintText: 'Try checking the most common causes first. '
@@ -208,6 +265,7 @@ class GameCubit extends Cubit<GameState> {
       case 'explain':
         if (state.currentLevel != null &&
             state.currentStepIndex < state.currentLevel!.steps.length) {
+          _safePersist(() => _repository.useSupTech(progress));
           emit(state.copyWith(
             progress: progress,
             hintText: state.currentLevel!.steps[state.currentStepIndex],
@@ -222,7 +280,7 @@ class GameCubit extends Cubit<GameState> {
 
   void addPoints(int amount) {
     final p = state.progress;
-    _repository.addPoints(p, amount);
+    _safePersist(() => _repository.addPoints(p, amount));
     emit(state.copyWith(progress: p));
   }
 
@@ -234,7 +292,7 @@ class GameCubit extends Cubit<GameState> {
         : <String, dynamic>{};
     data['quiz'] = {'correct': correct, 'total': total, 'hearts': hearts};
     p.setPrepResult(levelId, json.encode(data));
-    _repository.saveProgress(p);
+    _safePersist(() => _repository.saveProgress(p));
     emit(state.copyWith(progress: p));
   }
 
@@ -246,7 +304,7 @@ class GameCubit extends Cubit<GameState> {
         : <String, dynamic>{};
     data['ordering'] = {'attempts': attempts, 'passed': passed};
     p.setPrepResult(levelId, json.encode(data));
-    _repository.saveProgress(p);
+    _safePersist(() => _repository.saveProgress(p));
     emit(state.copyWith(progress: p));
   }
 
@@ -258,14 +316,38 @@ class GameCubit extends Cubit<GameState> {
         : <String, dynamic>{};
     data['traps'] = {'correct': correct, 'total': total, 'passed': passed};
     p.setPrepResult(levelId, json.encode(data));
-    _repository.saveProgress(p);
+    _safePersist(() => _repository.saveProgress(p));
+    emit(state.copyWith(progress: p));
+  }
+
+  void saveScenariosResult(String levelId, int correct, int total, bool passed) {
+    final p = state.progress;
+    final raw = p.getPrepResult(levelId);
+    final data = raw != null
+        ? json.decode(raw) as Map<String, dynamic>
+        : <String, dynamic>{};
+    data['scenarios'] = {'correct': correct, 'total': total, 'passed': passed};
+    p.setPrepResult(levelId, json.encode(data));
+    _safePersist(() => _repository.saveProgress(p));
+    emit(state.copyWith(progress: p));
+  }
+
+  void saveMistakeResult(String levelId, bool passed) {
+    final p = state.progress;
+    final raw = p.getPrepResult(levelId);
+    final data = raw != null
+        ? json.decode(raw) as Map<String, dynamic>
+        : <String, dynamic>{};
+    data['mistakes'] = {'passed': passed};
+    p.setPrepResult(levelId, json.encode(data));
+    _safePersist(() => _repository.saveProgress(p));
     emit(state.copyWith(progress: p));
   }
 
   Future<void> setThemeId(String? themeId) async {
     final progress = state.progress;
     progress.themeId = themeId;
-    await _repository.saveProgress(progress);
+    _safePersist(() => _repository.saveProgress(progress));
     emit(state.copyWith(progress: progress));
   }
 

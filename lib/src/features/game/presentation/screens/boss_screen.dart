@@ -27,6 +27,9 @@ class _BossScreenState extends State<BossScreen>
 
   int _currentPhase = 0;
   String? _lastOutcome;
+  bool _navigatedToReward = false;
+  bool _showDiagnosis = false;
+  String? _diagnosisResult;
 
   static const _bossAbilities = {
     1: ['Crushing Charge', 'Bone Wall', 'Rotting Aura'],
@@ -34,6 +37,44 @@ class _BossScreenState extends State<BossScreen>
     3: ['Goblin Frenzy', 'Tangle Trap', 'Sneak Attack'],
     4: ['Dragon Breath', 'Wing Gust', 'Tail Slam'],
     5: ['Death Ray', 'Disintegrate', 'Anti-Magic Cone'],
+  };
+
+  static const Map<int, Map<String, dynamic>> _bossDiagnoses = {
+    1: {
+      'symptoms': 'A towering construct of broken parts. It crushes everything with raw force and absorbs damage from broken hardware.',
+      'options': ['It feeds on corrupted drivers', 'It is assembled from failed hardware components', 'It is a software virus'],
+      'correct': 1,
+      'flavor': 'You identify it as a hardware abomination! Your attacks deal bonus damage!',
+      'failFlavor': 'Wrong diagnosis. The colossus gains extra armor.',
+    },
+    2: {
+      'symptoms': 'An undead sorcerer that resurrects from crashes and drains system resources through dark processes.',
+      'options': ['It is a network worm', 'It feeds on corrupted system files and process memory', 'It is a physical hardware issue'],
+      'correct': 1,
+      'flavor': 'Correct! You target the corrupted kernel files! Bonus damage!',
+      'failFlavor': 'Wrong diagnosis. The lich heals itself.',
+    },
+    3: {
+      'symptoms': 'A cunning creature that sabotages connected devices and traps you in tangled connections.',
+      'options': ['It attacks through Wi-Fi signals', 'It is a virus spreading through USB drives', 'It traps and corrupts peripheral connections'],
+      'correct': 2,
+      'flavor': 'Brilliant! You identify the peripheral trap! Bonus damage!',
+      'failFlavor': 'Wrong! The goblin strengthens his cable traps.',
+    },
+    4: {
+      'symptoms': 'A dragon that hoards data packets and breathes fire through network connections, growing stronger with stolen bandwidth.',
+      'options': ['It is a hardware overheating issue', 'It corrupts data through the network pipeline', 'It is a display driver problem'],
+      'correct': 1,
+      'flavor': 'Spot on! You target the data pipeline! Bonus damage!',
+      'failFlavor': 'Wrong! The dragon floods the network.',
+    },
+    5: {
+      'symptoms': 'A many-eyed creature that casts visual curses, corrupts display output, and sees through every camera and sensor.',
+      'options': ['It is a simple monitor malfunction', 'It uses multiple surveillance vectors to cast display and security curses', 'It is a CPU bottleneck'],
+      'correct': 1,
+      'flavor': 'Perfect diagnosis! You counter its gaze abilities! Bonus damage!',
+      'failFlavor': 'Wrong! The beholder unleashes all eye rays.',
+    },
   };
 
   static const _bossArmor = {1: 14, 2: 16, 3: 12, 4: 15, 5: 18};
@@ -44,26 +85,36 @@ class _BossScreenState extends State<BossScreen>
       {'name': 'Aim for the joints', 'success': 70, 'damage': 2, 'flavor': 'You strike the bone joints! The colossus stumbles!', 'failFlavor': 'Your attack clangs harmlessly off the thick bone.'},
       {'name': 'Target the eye cores', 'success': 50, 'damage': 3, 'flavor': 'You shatter a glowing eye core! The colossus roars!', 'failFlavor': 'The eyes are too well-guarded — your attack misses.'},
       {'name': 'Defensive stance', 'success': 90, 'damage': 1, 'flavor': 'You find a small opening and strike.', 'failFlavor': 'The colossus anticipated your move.'},
+      {'name': 'Target the core', 'success': 35, 'damage': 5, 'flavor': 'You pierce the colossus core! It cracks apart!', 'failFlavor': 'The core is shielded by thick bone plating.'},
+      {'name': 'Rattle the ribcage', 'success': 60, 'damage': 2, 'flavor': 'The ribs vibrate and a bone chip breaks off!', 'failFlavor': 'The ribcage holds firm against your strike.'},
     ],
     2: [
       {'name': 'Dispel the aura', 'success': 60, 'damage': 2, 'flavor': 'Your strike disrupts the lich\'s dark aura!', 'failFlavor': 'The lich\'s shield deflects your magic.'},
       {'name': 'Attack the phylactery', 'success': 40, 'damage': 4, 'flavor': 'You crack the phylactery! The lich screams!', 'failFlavor': 'The phylactery is heavily warded.'},
       {'name': 'Holy infusion', 'success': 80, 'damage': 1, 'flavor': 'Your blade glows with holy light and connects!', 'failFlavor': 'The lich\'s darkness extinguishes your light.'},
+      {'name': 'Purify the kernel', 'success': 45, 'damage': 3, 'flavor': 'Holy energy sears the corrupted kernel!', 'failFlavor': 'The lich shields the kernel with dark magic.'},
+      {'name': 'Seal the resurrection', 'success': 55, 'damage': 2, 'flavor': 'You block the resurrection path! The lich weakens!', 'failFlavor': 'The phylactery redirects the energy flow.'},
     ],
     3: [
       {'name': 'Sever the cables', 'success': 65, 'damage': 2, 'flavor': 'You cut through the tangled cables!', 'failFlavor': 'More cables spring up to replace them.'},
       {'name': 'Trap the goblin', 'success': 45, 'damage': 3, 'flavor': 'The goblin king is caught! You land a solid hit!', 'failFlavor': 'He dodges into a side tunnel.'},
       {'name': 'Rush attack', 'success': 85, 'damage': 1, 'flavor': 'Your aggressive push lands a blow!', 'failFlavor': 'He parries and counterattacks.'},
+      {'name': 'Burn the cables', 'success': 50, 'damage': 3, 'flavor': 'Flames consume the tangled cable trap!', 'failFlavor': 'The goblin repairs the cables with a snap.'},
+      {'name': 'Stealth approach', 'success': 40, 'damage': 4, 'flavor': 'You sneak behind the king and strike!', 'failFlavor': 'Trip wires alert the goblin to your presence.'},
     ],
     4: [
       {'name': 'Aim for the wings', 'success': 55, 'damage': 2, 'flavor': 'You clip the dragon\'s wing!', 'failFlavor': 'The dragon\'s scales deflect your blade.'},
       {'name': 'Throw a net', 'success': 35, 'damage': 4, 'flavor': 'The net tangles the whelp! Massive opening!', 'failFlavor': 'The dragon breathes fire, burning the net.'},
       {'name': 'Guard and wait', 'success': 80, 'damage': 1, 'flavor': 'You find an opening as the dragon tires.', 'failFlavor': 'The dragon\'s tail catches you off guard.'},
+      {'name': 'Cut the data stream', 'success': 50, 'damage': 3, 'flavor': 'You sever the dragon\'s packet hoard!', 'failFlavor': 'The dragon redirects through another channel.'},
+      {'name': 'Fire resistance', 'success': 65, 'damage': 2, 'flavor': 'Your shield absorbs the fire breath! Counter-attack!', 'failFlavor': 'The fire is too intense even with resistance.'},
     ],
     5: [
       {'name': 'Close the eye', 'success': 50, 'damage': 3, 'flavor': 'You seal one of the beholder\'s eyes!', 'failFlavor': 'The eye ray forces you back.'},
       {'name': 'Reflective shield', 'success': 30, 'damage': 5, 'flavor': 'The beholder\'s own ray reflects back! Critical hit!', 'failFlavor': 'The shield shatters under the magical assault.'},
       {'name': 'Hit the central eye', 'success': 70, 'damage': 1, 'flavor': 'You land a quick strike on the main eye!', 'failFlavor': 'The beholder blinks and your attack misses.'},
+      {'name': 'Dispel all eyes', 'success': 40, 'damage': 4, 'flavor': 'You seal three eyes at once! The beholder flails!', 'failFlavor': 'The beholder counters with a concentrated gaze.'},
+      {'name': 'Anti-magic field', 'success': 55, 'damage': 2, 'flavor': 'Magic nullifies around you! The beholder is vulnerable!', 'failFlavor': 'The beholder\'s raw power breaks through your field.'},
     ],
   };
 
@@ -95,6 +146,36 @@ class _BossScreenState extends State<BossScreen>
   void dispose() {
     _bossController.dispose();
     super.dispose();
+  }
+
+  void _selectedDiagnosis(int selectedIndex) {
+    final bossIndex = widget.world.id;
+    final diagnosis = _bossDiagnoses[bossIndex];
+    if (diagnosis == null) return;
+
+    final correct = diagnosis['correct'] as int;
+    final cubit = context.read<GameCubit>();
+
+    if (selectedIndex == correct) {
+      cubit.attackBoss(damage: 3);
+      setState(() {
+        _diagnosisResult = diagnosis['flavor'] as String;
+      });
+    } else {
+      setState(() {
+        _diagnosisResult = diagnosis['failFlavor'] as String;
+      });
+    }
+
+    Future.delayed(1500.ms, () {
+      if (mounted) {
+        setState(() {
+          _showDiagnosis = false;
+          _diagnosisResult = null;
+          _currentPhase = 1;
+        });
+      }
+    });
   }
 
   void _executeStrategy(Map<String, dynamic> strategy) {
@@ -143,11 +224,126 @@ class _BossScreenState extends State<BossScreen>
   }
 
   Widget _buildPhaseStart() {
+    final bossIndex = widget.world.id;
+    final diagnosis = _bossDiagnoses[bossIndex];
+
+    if (_showDiagnosis && diagnosis != null) {
+      if (_diagnosisResult != null) {
+        final isCorrect = _diagnosisResult == diagnosis['flavor'];
+        return Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: isCorrect
+                ? Colors.green.shade900.withValues(alpha: 0.3)
+                : Colors.red.shade900.withValues(alpha: 0.3),
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color: isCorrect
+                  ? Colors.green.shade400.withValues(alpha: 0.4)
+                  : Colors.red.shade400.withValues(alpha: 0.4),
+            ),
+          ),
+          child: Column(
+            children: [
+              Icon(
+                isCorrect ? Icons.check_circle : Icons.cancel,
+                color: isCorrect ? Colors.green.shade300 : Colors.red.shade300,
+                size: 36,
+              ),
+              const Gap(12),
+              Text(
+                _diagnosisResult!,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.9),
+                  fontSize: 14,
+                  height: 1.4,
+                ),
+              ),
+            ],
+          ),
+        );
+      }
+
+      final options = diagnosis['options'] as List<String>;
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'DIAGNOSIS PHASE',
+            style: TextStyle(
+              color: Colors.orange.shade300,
+              fontSize: 11,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 2,
+            ),
+          ),
+          const Gap(10),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.05),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+            ),
+            child: Text(
+              diagnosis['symptoms'] as String,
+              style: TextStyle(
+                color: Colors.white.withValues(alpha: 0.8),
+                fontSize: 13,
+                height: 1.4,
+              ),
+            ),
+          ),
+          const Gap(12),
+          Text(
+            'What is the correct diagnosis?',
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.6),
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const Gap(8),
+          ...options.asMap().entries.map((entry) => Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: () => _selectedDiagnosis(entry.key),
+                    borderRadius: BorderRadius.circular(12),
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.05),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+                      ),
+                      child: Text(
+                        entry.value,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              )),
+        ],
+      );
+    }
+
     return SizedBox(
       width: double.infinity,
       height: 56,
       child: ElevatedButton.icon(
-        onPressed: () => setState(() => _currentPhase = 1),
+        onPressed: () => setState(() {
+          _showDiagnosis = true;
+        }),
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.red.shade700,
           foregroundColor: Colors.white,
@@ -319,12 +515,15 @@ class _BossScreenState extends State<BossScreen>
           final abilities = _bossAbilities[bossIndex] ?? [];
           final armorClass = _bossArmor[bossIndex] ?? 14;
 
-          if (isDefeated && state.lastDrawnReward != null) {
+          if (isDefeated && state.lastDrawnReward != null && !_navigatedToReward) {
+            _navigatedToReward = true;
             WidgetsBinding.instance.addPostFrameCallback((_) {
-              Nav.pushReplacement(
-                context,
-                RewardSpinScreen(reward: state.lastDrawnReward!),
-              );
+              if (mounted) {
+                Nav.pushReplacement(
+                  context,
+                  RewardSpinScreen(reward: state.lastDrawnReward!),
+                );
+              }
             });
           }
 

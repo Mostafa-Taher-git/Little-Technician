@@ -168,6 +168,20 @@ class RuleEngine {
         'Automation not triggering',
       ],
     ),
+    CategoryData(
+      name: 'Security',
+      icon: Icons.shield,
+      problems: [
+        'Virus or malware infection',
+        'Suspicious pop-ups and browser redirects',
+        'Computer running slow after virus scare',
+        'Phishing email received',
+        'Suspicious program installed without consent',
+        'Wi-Fi network showing unauthorized devices',
+        'Password not accepted after update',
+        'Firewall blocking legitimate apps',
+      ],
+    ),
   ];
 
   /// Maps a problem string → list of solution steps.
@@ -659,6 +673,64 @@ class RuleEngine {
       'Update the hub firmware and the manufacturer app.',
       'Delete and recreate the automation from scratch.',
       'Ensure all devices support the automation action type (on/off, dim, etc.).',
+    ],
+
+    // ── Security ───────────────────────────────────────────────────────────
+    'virus or malware infection': [
+      'Disconnect from the internet to prevent the malware from spreading or communicating.',
+      'Boot into Safe Mode (hold Shift → Restart → Troubleshoot → Startup Settings → Safe Mode with Networking).',
+      'Run a full scan with Windows Defender (or your installed antivirus) in Safe Mode.',
+      'Download and run Malwarebytes Free for a second-opinion scan.',
+      'Quarantine or delete all threats found, then restart normally.',
+    ],
+    'suspicious pop-ups and browser redirects': [
+      'Close all browser tabs and windows immediately.',
+      'Open Task Manager and end any unfamiliar browser processes.',
+      'Go to your browser settings and remove suspicious extensions/add-ons.',
+      'Reset the browser to its default settings (Settings → Reset settings).',
+      'Run a full antivirus and Malwarebytes scan to remove any adware.',
+    ],
+    'computer running slow after virus scare': [
+      'Open Task Manager (Ctrl + Shift + Esc) and check for unknown processes using high CPU or memory.',
+      'Run a full antivirus scan and remove any detected threats.',
+      'Run Malwarebytes to catch anything the antivirus may have missed.',
+      'Uninstall any programs you did not install or recognize via Settings → Apps.',
+      'Restart the computer and check if performance has improved.',
+    ],
+    'phishing email received': [
+      'Do NOT click any links or download attachments from the email.',
+      'Mark the email as spam or phishing in your email client.',
+      'Delete the email from your inbox and trash folder.',
+      'If you clicked a link, immediately change your passwords for any accounts you may have accessed.',
+      'Run a full antivirus scan on your computer in case anything was downloaded.',
+    ],
+    'suspicious program installed without consent': [
+      'Open Settings → Apps and sort by install date to find recently added programs.',
+      'Uninstall any program you do not recognize or did not install.',
+      'Run a full antivirus and Malwarebytes scan to check for bundled malware.',
+      'Check your browser extensions and remove anything unfamiliar.',
+      'Enable Windows SmartScreen and UAC to prevent future unwanted installations.',
+    ],
+    'wi-fi network showing unauthorized devices': [
+      'Log in to your router admin page (usually 192.168.0.1 or 192.168.1.1 in a browser).',
+      'Check the connected devices list and identify any unknown devices.',
+      'Change your Wi-Fi password immediately from the router admin page.',
+      'Use WPA3 or WPA2 encryption — avoid WEP or open networks.',
+      'Enable MAC address filtering to only allow known devices.',
+    ],
+    'password not accepted after update': [
+      'Ensure Caps Lock is off and you are typing the correct password.',
+      'Try the password you used before the most recent password change.',
+      'Use the "Forgot password" or "Reset password" option on the login screen.',
+      'If on Windows, try logging in with a Microsoft account PIN instead.',
+      'Boot into Safe Mode and try the previous password or use an admin account to reset it.',
+    ],
+    'firewall blocking legitimate apps': [
+      'Open Windows Security → Firewall & network protection → Allow an app through firewall.',
+      'Click "Change settings" and check the boxes for the app on Private and/or Public networks.',
+      'If the app is not listed, click "Allow another app" and browse to the program.',
+      'Verify the app works after adding the firewall exception.',
+      'If using a third-party firewall, add the same exception in that firewall\'s settings.',
     ],
   };
 

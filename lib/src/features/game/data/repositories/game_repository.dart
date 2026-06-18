@@ -83,6 +83,18 @@ class GameRepository {
     await saveProgress(progress);
   }
 
+  Future<void> recordPlayDate(PlayerProgress progress) async {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final already = progress.playDates.any((d) =>
+        d.year == today.year && d.month == today.month && d.day == today.day);
+    if (!already) {
+      progress.playDates.add(today);
+    }
+    progress.lastActiveDate = DateTime.now();
+    await saveProgress(progress);
+  }
+
   Future<void> setTheme(PlayerProgress progress, String themeId) async {
     progress.themeId = themeId;
     await saveProgress(progress);

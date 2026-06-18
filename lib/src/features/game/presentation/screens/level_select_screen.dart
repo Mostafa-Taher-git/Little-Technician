@@ -92,7 +92,7 @@ class LevelSelectScreen extends StatelessWidget {
                         isLocked: isLocked,
                         totalSteps: level.steps.length,
                         onTap: () {
-                          context.read<GameCubit>().selectLevel(level);
+                          context.read<GameCubit>().selectLevel(level, worldOverride: world);
                           if (isCompleted) {
                             Nav.push(context, ReviewScreen(world: world, level: level));
                           } else {

@@ -5,7 +5,7 @@ import 'package:gap/gap.dart';
 import 'package:littletech/src/core/navigation/nav.dart';
 import 'package:littletech/src/features/game/constants/game_data.dart';
 import 'package:littletech/src/features/game/domain/cubit/game_cubit.dart';
-import 'package:littletech/src/features/game/presentation/screens/traps_screen.dart';
+import 'package:littletech/src/features/game/presentation/screens/mistake_screen.dart';
 
 class OrderingScreen extends StatefulWidget {
   final WorldDef world;
@@ -23,8 +23,6 @@ class _OrderingScreenState extends State<OrderingScreen> {
   bool _isCorrect = false;
   int _lives = 3;
   int _attempts = 0;
-  int _wrongCount = 0;
-  bool _showVerified = false;
 
   @override
   void initState() {
@@ -37,7 +35,6 @@ class _OrderingScreenState extends State<OrderingScreen> {
       final item = _shuffled.removeAt(oldIndex);
       _shuffled.insert(newIndex, item);
       _isVerified = false;
-      _showVerified = false;
     });
   }
 
@@ -51,7 +48,6 @@ class _OrderingScreenState extends State<OrderingScreen> {
       setState(() {
         _isVerified = true;
         _isCorrect = true;
-        _showVerified = true;
       });
       context.read<GameCubit>().saveOrderingResult(widget.level.id, _attempts, true);
       context.read<GameCubit>().addPoints(15);
@@ -59,15 +55,13 @@ class _OrderingScreenState extends State<OrderingScreen> {
         if (mounted) {
           Nav.pushReplacement(
             context,
-            TrapsScreen(world: widget.world, level: widget.level),
+            MistakeScreen(world: widget.world, level: widget.level),
           );
         }
       });
     } else {
       setState(() {
         _lives--;
-        _wrongCount = _shuffled.asMap().entries.where((e) => e.value != correct[e.key]).length;
-        _showVerified = true;
       });
       if (_lives <= 0) {
         context.read<GameCubit>().saveOrderingResult(widget.level.id, _attempts, false);
@@ -75,7 +69,7 @@ class _OrderingScreenState extends State<OrderingScreen> {
           if (mounted) {
             Nav.pushReplacement(
               context,
-              TrapsScreen(world: widget.world, level: widget.level),
+              MistakeScreen(world: widget.world, level: widget.level),
             );
           }
         });
@@ -126,15 +120,6 @@ class _OrderingScreenState extends State<OrderingScreen> {
             ),
           ),
           const Gap(16),
-          if (_showVerified && !_isCorrect && _lives > 0)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Text(
-                '$_wrongCount steps in wrong position — try again!',
-                style: TextStyle(color: scheme.onSurface.withValues(alpha: 0.5), fontSize: 13),
-                textAlign: TextAlign.center,
-              ),
-            ),
           Expanded(
             child: ReorderableListView.builder(
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),

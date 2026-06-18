@@ -39,7 +39,7 @@ class _SupTechAvatarState extends State<SupTechAvatar>
     _controller = AnimationController(
       vsync: this,
       duration: 3000.ms,
-    )..repeat(reverse: true);
+    );
 
     _floatAnimation = Tween<double>(begin: -2.0, end: 2.0).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeInOutSine),
@@ -60,6 +60,14 @@ class _SupTechAvatarState extends State<SupTechAvatar>
     _robeFlutter = Tween<double>(begin: 0.0, end: 4.0).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeInOutSine),
     );
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_controller.isAnimating) {
+      _controller.repeat(reverse: true);
+    }
   }
 
   @override

@@ -22,6 +22,7 @@ class PlayerProgress {
   int levelsCleared = 0;
   int bossesDefeated = 0;
   List<DateTime> playDates = [];
+  DateTime? lastActiveDate;
   int totalPlayTimeSeconds = 0;
   int correctAnswers = 0;
   int totalAnswers = 0;

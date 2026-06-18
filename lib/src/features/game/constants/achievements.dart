@@ -195,6 +195,33 @@ class AchievementManager {
       rewardPoints: 500,
       icon: Icons.flag,
     ),
+    Achievement(
+      id: 'virus_hunter',
+      name: 'Virus Hunter',
+      description: 'Complete all security-related levels',
+      type: AchievementType.levels,
+      requirement: 15,
+      rewardPoints: 75,
+      icon: Icons.shield,
+    ),
+    Achievement(
+      id: 'network_fixer',
+      name: 'Network Fixer',
+      description: 'Complete all networking levels',
+      type: AchievementType.levels,
+      requirement: 10,
+      rewardPoints: 75,
+      icon: Icons.wifi,
+    ),
+    Achievement(
+      id: 'boot_doctor',
+      name: 'Boot Doctor',
+      description: 'Complete all OS and boot-related levels',
+      type: AchievementType.levels,
+      requirement: 10,
+      rewardPoints: 75,
+      icon: Icons.desktop_windows,
+    ),
   ];
 
   static List<Achievement> checkNew({

@@ -13,7 +13,13 @@ class SavedSolutionsService {
     final raw = prefs.getString(_key);
     if (raw == null) return [];
     final list = jsonDecode(raw) as List;
-    return list.map((e) => SavedSolution.fromJson(e as Map<String, dynamic>)).toList();
+    final items = list.map((e) => SavedSolution.fromJson(e as Map<String, dynamic>)).toList();
+    if (items.isNotEmpty) {
+      final ids = items.map((s) => s.id ?? 0).toList();
+      final maxId = ids.reduce((a, b) => a > b ? a : b);
+      if (maxId >= _nextId) _nextId = maxId + 1;
+    }
+    return items;
   }
 
   static Future<void> _persist(List<SavedSolution> items) async {

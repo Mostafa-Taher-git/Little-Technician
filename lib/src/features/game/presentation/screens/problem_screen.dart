@@ -32,6 +32,8 @@ class ProblemScreen extends StatefulWidget {
 
 class _ProblemScreenState extends State<ProblemScreen> {
   bool _showingAltForStep = false;
+  bool _navigatedToReward = false;
+  bool _feedbackGiven = false;
 
   @override
   void initState() {
@@ -86,12 +88,15 @@ class _ProblemScreenState extends State<ProblemScreen> {
     final allSolved = solvedCount >= steps.length;
     final progress = steps.isNotEmpty ? solvedCount / steps.length : 0.0;
 
-          if (allSolved && state.lastDrawnReward != null && !widget.isReview) {
+          if (allSolved && state.lastDrawnReward != null && !widget.isReview && !_navigatedToReward) {
+            _navigatedToReward = true;
             WidgetsBinding.instance.addPostFrameCallback((_) {
-              Nav.pushReplacement(
-                context,
-                RewardSpinScreen(reward: state.lastDrawnReward!),
-              );
+              if (mounted) {
+                Nav.pushReplacement(
+                  context,
+                  RewardSpinScreen(reward: state.lastDrawnReward!),
+                );
+              }
             });
           }
 
@@ -193,6 +198,72 @@ class _ProblemScreenState extends State<ProblemScreen> {
                   level: widget.level,
                   onTapAlternative: () => context.read<GameCubit>().resetSteps(),
                 ),
+              if (allSolved && !_feedbackGiven && !widget.isReview)
+                Container(
+                  margin: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: scheme.primary.withValues(alpha: 0.05),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: scheme.outline.withValues(alpha: 0.2)),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.help_outline, color: scheme.secondary, size: 20),
+                      const Gap(10),
+                      Expanded(
+                        child: Text(
+                          'Did this fix it?',
+                          style: TextStyle(
+                            color: scheme.onSurface,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () {
+                          context.read<GameCubit>().saveFeedback(widget.level.id, true);
+                          setState(() => _feedbackGiven = true);
+                        },
+                        icon: Icon(Icons.thumb_up_outlined, color: Colors.green, size: 22),
+                        tooltip: 'Yes, it worked',
+                      ),
+                      IconButton(
+                        onPressed: () {
+                          context.read<GameCubit>().saveFeedback(widget.level.id, false);
+                          setState(() => _feedbackGiven = true);
+                        },
+                        icon: Icon(Icons.thumb_down_outlined, color: Colors.red, size: 22),
+                        tooltip: 'No, it didn\'t work',
+                      ),
+                    ],
+                  ),
+                ).animate().fadeIn().slideY(begin: 0.1),
+              if (_feedbackGiven)
+                Container(
+                  margin: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.green.withValues(alpha: 0.05),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.green.withValues(alpha: 0.2)),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.check_circle, color: Colors.green, size: 18),
+                      const Gap(8),
+                      Text(
+                        'Thanks for your feedback!',
+                        style: TextStyle(
+                          color: Colors.green,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ).animate().fadeIn(),
               Expanded(
                 child: ListView.builder(
                   padding: const EdgeInsets.all(16),

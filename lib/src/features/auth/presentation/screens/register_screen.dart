@@ -41,7 +41,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           child: BlocListener<AuthBloc, AuthState>(
             listener: (context, state) {
               if (state is RegisterSuccess) {
-                Nav.replace(context, const LoginScreen());
+                Nav.pushReplacement(context, const LoginScreen());
                 showSuccessToast(context, 'Account created! Please login.');
               } else if (state is AuthError) {
                 showErrorToast(context, state.message);

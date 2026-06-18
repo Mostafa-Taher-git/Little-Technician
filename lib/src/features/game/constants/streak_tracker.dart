@@ -17,7 +17,13 @@ class StreakTracker {
     return streak;
   }
 
-  static bool playedToday(List<DateTime> playDates) {
+  static bool playedToday(List<DateTime> playDates, {DateTime? lastActiveDate}) {
+    if (lastActiveDate != null) {
+      final today = DateTime.now();
+      return lastActiveDate.year == today.year &&
+          lastActiveDate.month == today.month &&
+          lastActiveDate.day == today.day;
+    }
     final today = DateTime.now();
     return playDates.any((d) =>
         d.year == today.year && d.month == today.month && d.day == today.day);

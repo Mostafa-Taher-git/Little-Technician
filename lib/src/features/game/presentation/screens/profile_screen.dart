@@ -90,12 +90,12 @@ class ProfileScreen extends StatelessWidget {
                                 ),
                               ),
                               const Gap(16),
-                              Icon(Icons.local_fire_department,
+                              const Icon(Icons.local_fire_department,
                                   color: Colors.orange, size: 18),
                               const Gap(6),
                               Text(
                                 '${StreakTracker.calculateStreak(progress.playDates)} day streak',
-                                style: TextStyle(
+                                style: const TextStyle(
                                   color: Colors.orange,
                                   fontSize: 16,
                                   fontWeight: FontWeight.w700,
