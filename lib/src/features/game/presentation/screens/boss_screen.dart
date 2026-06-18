@@ -37,6 +37,7 @@ class _BossScreenState extends State<BossScreen>
   };
 
   static const _bossArmor = {1: 14, 2: 16, 3: 12, 4: 15, 5: 18};
+  static const _bossChallengeRating = {1: 3, 2: 5, 3: 4, 4: 6, 5: 8};
 
   static const Map<int, List<Map<String, dynamic>>> _strategies = {
     1: [
@@ -400,6 +401,7 @@ class _BossScreenState extends State<BossScreen>
                       hpDisplay: '${boss.hp}',
                       abilities: abilities,
                       isDefeated: isDefeated,
+                      challengeRating: _bossChallengeRating[bossIndex] ?? 3,
                     ).animate().fadeIn(delay: 700.ms).slideY(begin: 0.1),
                     const Gap(24),
                     Padding(
@@ -549,12 +551,14 @@ class _MonsterStatBlock extends StatelessWidget {
   final String hpDisplay;
   final List<String> abilities;
   final bool isDefeated;
+  final int challengeRating;
 
   const _MonsterStatBlock({
     required this.armorClass,
     required this.hpDisplay,
     required this.abilities,
     required this.isDefeated,
+    this.challengeRating = 3,
   });
 
   @override
@@ -585,6 +589,8 @@ class _MonsterStatBlock extends StatelessWidget {
               _StatChip(label: 'AC', value: '$armorClass'),
               const Gap(16),
               _StatChip(label: 'HP', value: hpDisplay),
+              const Gap(16),
+              _StatChip(label: 'CR', value: '$challengeRating'),
               const Gap(16),
               _StatChip(
                 label: 'Status',

@@ -6,6 +6,7 @@ import 'package:littletech/src/features/auth/data/services/auth_service.dart';
 import 'package:littletech/src/features/game/constants/game_data.dart';
 import 'package:littletech/src/features/game/constants/reward_pool.dart';
 import 'package:littletech/src/features/game/constants/skin_tiers.dart';
+import 'package:littletech/src/features/game/constants/streak_tracker.dart';
 import 'package:littletech/src/features/game/domain/cubit/game_cubit.dart';
 
 class StatsScreen extends StatelessWidget {
@@ -103,6 +104,33 @@ class StatsScreen extends StatelessWidget {
                       _StatSquare(icon: Icons.card_giftcard, label: 'Rewards', value: '$earnedRewards', scheme: scheme),
                       const Gap(10),
                       _StatSquare(icon: Icons.auto_awesome, label: 'Skins', value: '${p.unlockedSkinIds.length}', scheme: scheme),
+                    ],
+                  ),
+                  const Gap(10),
+                  Row(
+                    children: [
+                      _StatSquare(
+                        icon: Icons.speed,
+                        label: 'Accuracy',
+                        value: p.totalAnswers > 0 ? '${(p.correctAnswers * 100 / p.totalAnswers).round()}%' : '—',
+                        scheme: scheme,
+                      ),
+                      const Gap(10),
+                      _StatSquare(
+                        icon: Icons.local_fire_department,
+                        label: 'Streak',
+                        value: '${StreakTracker.calculateStreak(p.playDates)} days',
+                        scheme: scheme,
+                      ),
+                      const Gap(10),
+                      _StatSquare(
+                        icon: Icons.timer,
+                        label: 'Play Time',
+                        value: p.totalPlayTimeSeconds > 3600
+                            ? '${(p.totalPlayTimeSeconds / 3600).round()}h'
+                            : '${(p.totalPlayTimeSeconds / 60).round()}m',
+                        scheme: scheme,
+                      ),
                     ],
                   ),
                   const Gap(24),

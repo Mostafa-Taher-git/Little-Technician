@@ -179,7 +179,11 @@ class _RewardSpinScreenState extends State<RewardSpinScreen>
     if (world != null && level != null) {
       Nav.pushReplacement(
         context,
-        LevelCompleteScreen(world: world, level: level),
+        LevelCompleteScreen(
+          world: world,
+          level: level,
+          reward: widget.reward,
+        ),
       );
     } else {
       Nav.pop(context);

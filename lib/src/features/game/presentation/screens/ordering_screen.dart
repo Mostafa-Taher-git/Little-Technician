@@ -5,7 +5,7 @@ import 'package:gap/gap.dart';
 import 'package:littletech/src/core/navigation/nav.dart';
 import 'package:littletech/src/features/game/constants/game_data.dart';
 import 'package:littletech/src/features/game/domain/cubit/game_cubit.dart';
-import 'package:littletech/src/features/game/presentation/screens/problem_screen.dart';
+import 'package:littletech/src/features/game/presentation/screens/traps_screen.dart';
 
 class OrderingScreen extends StatefulWidget {
   final WorldDef world;
@@ -21,6 +21,10 @@ class _OrderingScreenState extends State<OrderingScreen> {
   late List<String> _shuffled;
   bool _isVerified = false;
   bool _isCorrect = false;
+  int _lives = 3;
+  int _attempts = 0;
+  int _wrongCount = 0;
+  bool _showVerified = false;
 
   @override
   void initState() {
@@ -33,6 +37,7 @@ class _OrderingScreenState extends State<OrderingScreen> {
       final item = _shuffled.removeAt(oldIndex);
       _shuffled.insert(newIndex, item);
       _isVerified = false;
+      _showVerified = false;
     });
   }
 
@@ -40,20 +45,41 @@ class _OrderingScreenState extends State<OrderingScreen> {
     final correct = widget.level.steps;
     final match = _shuffled.length == correct.length &&
         _shuffled.asMap().entries.every((e) => e.value == correct[e.key]);
-    setState(() {
-      _isVerified = true;
-      _isCorrect = match;
-    });
+    _attempts++;
+
     if (match) {
+      setState(() {
+        _isVerified = true;
+        _isCorrect = true;
+        _showVerified = true;
+      });
+      context.read<GameCubit>().saveOrderingResult(widget.level.id, _attempts, true);
       context.read<GameCubit>().addPoints(15);
       Future.delayed(800.ms, () {
         if (mounted) {
           Nav.pushReplacement(
             context,
-            ProblemScreen(world: widget.world, level: widget.level),
+            TrapsScreen(world: widget.world, level: widget.level),
           );
         }
       });
+    } else {
+      setState(() {
+        _lives--;
+        _wrongCount = _shuffled.asMap().entries.where((e) => e.value != correct[e.key]).length;
+        _showVerified = true;
+      });
+      if (_lives <= 0) {
+        context.read<GameCubit>().saveOrderingResult(widget.level.id, _attempts, false);
+        Future.delayed(1.ms, () {
+          if (mounted) {
+            Nav.pushReplacement(
+              context,
+              TrapsScreen(world: widget.world, level: widget.level),
+            );
+          }
+        });
+      }
     }
   }
 
@@ -66,6 +92,25 @@ class _OrderingScreenState extends State<OrderingScreen> {
       appBar: AppBar(
         title: const Text('Rite of Order'),
         backgroundColor: Colors.transparent,
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 12),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: List.generate(3, (i) {
+                final filled = i < _lives;
+                return Padding(
+                  padding: const EdgeInsets.only(right: 2),
+                  child: Icon(
+                    filled ? Icons.favorite : Icons.favorite_border,
+                    color: filled ? Colors.red.shade400 : scheme.onSurface.withValues(alpha: 0.2),
+                    size: 18,
+                  ),
+                );
+              }),
+            ),
+          ),
+        ],
       ),
       body: Column(
         children: [
@@ -81,26 +126,15 @@ class _OrderingScreenState extends State<OrderingScreen> {
             ),
           ),
           const Gap(16),
-          if (_isVerified && !_isCorrect)
-            Container(
-              margin: const EdgeInsets.symmetric(horizontal: 20),
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.red.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: Colors.red.withValues(alpha: 0.3)),
+          if (_showVerified && !_isCorrect && _lives > 0)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Text(
+                '$_wrongCount steps in wrong position — try again!',
+                style: TextStyle(color: scheme.onSurface.withValues(alpha: 0.5), fontSize: 13),
+                textAlign: TextAlign.center,
               ),
-              child: Row(
-                children: [
-                  const Icon(Icons.close, color: Colors.red, size: 18),
-                  const Gap(8),
-                  Text(
-                    'Not quite right — try again!',
-                    style: TextStyle(color: Colors.red.shade300, fontSize: 13),
-                  ),
-                ],
-              ),
-            ).animate().shake(),
+            ),
           Expanded(
             child: ReorderableListView.builder(
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
@@ -113,26 +147,15 @@ class _OrderingScreenState extends State<OrderingScreen> {
                 child: child,
               ),
               itemBuilder: (_, i) {
-                final isCorrectPos = _isVerified && _shuffled[i] == widget.level.steps[i];
-                final isWrongPos = _isVerified && _shuffled[i] != widget.level.steps[i];
-
                 return Container(
                   key: ValueKey(_shuffled[i]),
                   margin: const EdgeInsets.only(bottom: 8),
                   padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
-                    color: isCorrectPos
-                        ? Colors.green.withValues(alpha: 0.1)
-                        : isWrongPos
-                            ? Colors.red.withValues(alpha: 0.1)
-                            : scheme.surface,
+                    color: scheme.surface,
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(
-                      color: isCorrectPos
-                          ? Colors.green
-                          : isWrongPos
-                              ? Colors.red
-                              : scheme.outline.withValues(alpha: 0.3),
+                      color: scheme.outline.withValues(alpha: 0.3),
                       width: 1.5,
                     ),
                   ),
@@ -153,18 +176,12 @@ class _OrderingScreenState extends State<OrderingScreen> {
                         child: Text(
                           '${i + 1}. ${_shuffled[i]}',
                           style: TextStyle(
-                            color: isCorrectPos
-                                ? Colors.green.shade300
-                                : isWrongPos
-                                    ? Colors.red.shade300
-                                    : scheme.onSurface,
+                            color: scheme.onSurface,
                             fontSize: 13,
                             height: 1.3,
                           ),
                         ),
                       ),
-                      if (isCorrectPos)
-                        const Icon(Icons.check_circle, color: Colors.green, size: 18),
                     ],
                   ),
                 );
@@ -177,7 +194,7 @@ class _OrderingScreenState extends State<OrderingScreen> {
               width: double.infinity,
               height: 52,
               child: ElevatedButton.icon(
-                onPressed: _isVerified && _isCorrect ? null : _verify,
+                onPressed: (_isVerified && _isCorrect) || _lives <= 0 ? null : _verify,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: _isVerified && _isCorrect
                       ? Colors.green.shade700

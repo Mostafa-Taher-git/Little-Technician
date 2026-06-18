@@ -33,13 +33,16 @@ class ChallengeScreen extends StatelessWidget {
             subtitle: daily.title,
             description: daily.description,
             bonusPoints: daily.bonusPoints,
+            pointsMultiplier: daily.pointsMultiplier,
             color: Colors.orange,
             onTap: () {
               final level = GameData.worlds
                   .expand((w) => w.levels)
                   .firstWhere((l) => l.id == daily.levelId);
               final world = GameData.worlds.firstWhere((w) => w.levels.contains(level));
-              context.read<GameCubit>().selectLevel(level);
+              context.read<GameCubit>()
+                ..selectLevel(level)
+                ..setPointsMultiplier(daily.pointsMultiplier);
               Nav.push(context, ProblemScreen(world: world, level: level));
             },
           ),
@@ -50,11 +53,14 @@ class ChallengeScreen extends StatelessWidget {
             subtitle: GameData.worlds[weekly.worldIndex].name,
             description: weekly.specialRule,
             bonusPoints: weekly.bonusPoints,
+            pointsMultiplier: weekly.pointsMultiplier,
             color: Colors.red,
             onTap: () {
               final world = GameData.worlds[weekly.worldIndex];
-              context.read<GameCubit>().selectWorld(world);
-              context.read<GameCubit>().setBossMultiplier(2);
+              context.read<GameCubit>()
+                ..selectWorld(world)
+                ..setBossMultiplier(2)
+                ..setPointsMultiplier(weekly.pointsMultiplier);
               Nav.push(context, LevelSelectScreen(world: world));
             },
           ),
@@ -70,6 +76,7 @@ class _ChallengeCard extends StatelessWidget {
   final String subtitle;
   final String description;
   final int bonusPoints;
+  final int pointsMultiplier;
   final Color color;
   final VoidCallback onTap;
 
@@ -79,6 +86,7 @@ class _ChallengeCard extends StatelessWidget {
     required this.subtitle,
     required this.description,
     required this.bonusPoints,
+    required this.pointsMultiplier,
     required this.color,
     required this.onTap,
   });
@@ -142,7 +150,7 @@ class _ChallengeCard extends StatelessWidget {
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: Text(
-                            '+$bonusPoints pts',
+                            '${pointsMultiplier}x pts',
                             style: const TextStyle(
                               color: Colors.amber,
                               fontSize: 11,

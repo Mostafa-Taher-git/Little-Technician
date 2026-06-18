@@ -6,13 +6,15 @@ class DailyChallenge {
   final String title;
   final String description;
   final int bonusPoints;
+  final int pointsMultiplier;
   final DateTime date;
 
   const DailyChallenge({
     required this.levelId,
     required this.title,
     required this.description,
-    required this.bonusPoints,
+    this.bonusPoints = 50,
+    this.pointsMultiplier = 2,
     required this.date,
   });
 }
@@ -20,14 +22,16 @@ class DailyChallenge {
 class WeeklyBoss {
   final int worldIndex;
   final int bonusPoints;
+  final int pointsMultiplier;
   final DateTime weekStart;
   final String specialRule;
 
   const WeeklyBoss({
     required this.worldIndex,
-    required this.bonusPoints,
+    this.bonusPoints = 200,
+    this.pointsMultiplier = 3,
     required this.weekStart,
-    required this.specialRule,
+    this.specialRule = '',
   });
 }
 

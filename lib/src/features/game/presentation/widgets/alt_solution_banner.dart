@@ -5,8 +5,14 @@ import 'package:littletech/src/features/game/constants/game_data.dart';
 class AltSolutionBanner extends StatelessWidget {
   final WorldDef world;
   final LevelDef level;
+  final VoidCallback? onTapAlternative;
 
-  const AltSolutionBanner({super.key, required this.world, required this.level});
+  const AltSolutionBanner({
+    super.key,
+    required this.world,
+    required this.level,
+    this.onTapAlternative,
+  });
 
   static const _alternatives = {
     'cpu_high_usage': [
@@ -81,6 +87,28 @@ class AltSolutionBanner extends StatelessWidget {
               ],
             ),
           )),
+          if (onTapAlternative != null) ...[
+            const Gap(12),
+            SizedBox(
+              width: double.infinity,
+              height: 40,
+              child: OutlinedButton.icon(
+                onPressed: onTapAlternative,
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: Colors.orange,
+                  side: BorderSide(color: Colors.orange.withValues(alpha: 0.4)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                icon: const Icon(Icons.replay, size: 18),
+                label: const Text(
+                  'This didn\'t work — retry with alternatives',
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                ),
+              ),
+            ),
+          ],
         ],
       ),
     );

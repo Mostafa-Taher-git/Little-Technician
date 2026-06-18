@@ -13,6 +13,8 @@ import 'package:littletech/src/features/home/presentation/bloc/counter_cubit.dar
 import 'package:littletech/src/features/game/presentation/screens/world_select_screen.dart';
 import 'package:littletech/src/features/game/presentation/screens/profile_screen.dart';
 import 'package:littletech/src/features/game/presentation/widgets/suptech_avatar.dart';
+import 'package:littletech/src/features/game/presentation/widgets/challenge_banner.dart';
+import 'package:littletech/src/features/game/presentation/screens/challenge_screen.dart';
 import 'package:littletech/src/features/game/domain/cubit/game_cubit.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -156,7 +158,11 @@ class HomeScreen extends StatelessWidget {
                   ],
                 ),
               ).animate().fadeIn(duration: 500.ms).slideY(begin: 0.1),
-              const Gap(28),
+              ChallengeBanner(
+                onDailyTap: () => Nav.push(context, const ChallengeScreen()),
+                onWeeklyTap: () => Nav.push(context, const ChallengeScreen()),
+              ),
+              const Gap(12),
 
               // Quick actions
               Text('Quick Actions', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: scheme.onSurface)),

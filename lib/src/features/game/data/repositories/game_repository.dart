@@ -56,6 +56,13 @@ class GameRepository {
     await saveProgress(progress);
   }
 
+  Future<void> completeWorld(PlayerProgress progress, int worldId) async {
+    if (!progress.completedWorldIds.contains(worldId)) {
+      progress.completedWorldIds.add(worldId);
+    }
+    await saveProgress(progress);
+  }
+
   Future<void> defeatBoss(PlayerProgress progress) async {
     progress.bossesDefeated++;
     progress.extraSupTechUses++;

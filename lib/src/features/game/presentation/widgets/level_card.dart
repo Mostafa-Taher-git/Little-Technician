@@ -155,6 +155,14 @@ class LevelCard extends StatelessWidget {
           ),
           if (!isLocked)
             ..._buildRivets(scheme.outline),
+          if (!isLocked)
+            Positioned.fill(
+              child: CustomPaint(
+                painter: _ChainLinkPainter(
+                  color: scheme.outline.withValues(alpha: 0.15),
+                ),
+              ),
+            ),
           if (isLocked)
             Positioned.fill(
               child: Container(
@@ -199,6 +207,49 @@ class _Rivet extends StatelessWidget {
       ),
     );
   }
+}
+
+class _ChainLinkPainter extends CustomPainter {
+  final Color color;
+
+  _ChainLinkPainter({required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.5;
+
+    void drawLinks(Offset start, Offset end) {
+      final dx = end.dx - start.dx;
+      final dy = end.dy - start.dy;
+      final dist = dx * dx + dy * dy;
+      if (dist <= 0) return;
+      final linkCount = (dist / 2500).ceil().clamp(2, 8);
+      for (var i = 0; i < linkCount; i++) {
+        final t = (i + 1) / (linkCount + 1);
+        canvas.drawOval(
+          Rect.fromCenter(
+            center: Offset(start.dx + dx * t, start.dy + dy * t),
+            width: 7,
+            height: 4,
+          ),
+          paint,
+        );
+      }
+    }
+
+    final w = size.width - 6;
+    final h = size.height - 6;
+    drawLinks(const Offset(6, 6), Offset(w, 6));
+    drawLinks(Offset(w, 6), Offset(w, h));
+    drawLinks(Offset(w, h), Offset(6, h));
+    drawLinks(Offset(6, h), const Offset(6, 6));
+  }
+
+  @override
+  bool shouldRepaint(covariant _ChainLinkPainter old) => old.color != color;
 }
 
 class _DungeonDoor extends StatelessWidget {

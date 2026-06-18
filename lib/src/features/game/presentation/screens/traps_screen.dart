@@ -22,6 +22,9 @@ class _TrapsScreenState extends State<TrapsScreen> {
   int _correctCount = 0;
   bool _isAnswered = false;
   bool _passed = false;
+  bool _showResults = false;
+  final List<bool> _userAnswers = [];
+  final List<bool> _trapResults = [];
 
   static const _traps = {
     'cpu_high_usage': [
@@ -52,6 +55,8 @@ class _TrapsScreenState extends State<TrapsScreen> {
     final spotOn = userSaysTrue == correct;
     setState(() {
       _isAnswered = true;
+      _userAnswers.add(userSaysTrue);
+      _trapResults.add(spotOn);
       if (spotOn) _correctCount++;
     });
   }
@@ -63,15 +68,14 @@ class _TrapsScreenState extends State<TrapsScreen> {
         _isAnswered = false;
       });
     } else {
-      _finish();
+      setState(() => _showResults = true);
     }
   }
 
-  void _finish() {
+  void _continueToQuest() {
     _passed = _correctCount >= _levelTraps.length ~/ 2 + 1;
-    if (_passed) {
-      context.read<GameCubit>().addPoints(15);
-    }
+    context.read<GameCubit>().saveTrapsResult(widget.level.id, _correctCount, _levelTraps.length, _passed);
+    if (_passed) context.read<GameCubit>().addPoints(15);
     Nav.pushReplacement(
       context,
       ProblemScreen(world: widget.world, level: widget.level),
@@ -81,9 +85,11 @@ class _TrapsScreenState extends State<TrapsScreen> {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+
+    if (_showResults) return _buildResults(scheme);
+
     final trap = _levelTraps[_currentIndex];
     final statement = trap['statement'] as String;
-    final isTrue = trap['isTrue'] as bool;
 
     return Scaffold(
       backgroundColor: scheme.surface,
@@ -190,46 +196,7 @@ class _TrapsScreenState extends State<TrapsScreen> {
                   ),
                 ],
               ),
-            if (_isAnswered) ...[
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(
-                  color: (_isAnswered && ((isTrue && _correctCount > 0) || (!isTrue && _correctCount > 0)))
-                      ? Colors.green.withValues(alpha: 0.1)
-                      : Colors.red.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Row(
-                  children: [
-                    Icon(
-                      (_isAnswered && ((isTrue && _correctCount > 0) || (!isTrue && _correctCount > 0)))
-                          ? Icons.check_circle
-                          : Icons.info_outline,
-                      color: (_isAnswered && ((isTrue && _correctCount > 0) || (!isTrue && _correctCount > 0)))
-                          ? Colors.green
-                          : Colors.orange,
-                      size: 20,
-                    ),
-                    const Gap(10),
-                    Expanded(
-                      child: Text(
-                        isTrue
-                            ? 'This statement is TRUE — correct troubleshooting knowledge!'
-                            : 'This statement is FALSE — don\'t fall for common myths!',
-                        style: TextStyle(
-                          color: (_isAnswered && ((isTrue && _correctCount > 0) || (!isTrue && _correctCount > 0)))
-                              ? Colors.green.shade300
-                              : Colors.orange.shade300,
-                          fontSize: 13,
-                          height: 1.3,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ).animate().fadeIn(),
-              const Gap(20),
+            if (_isAnswered)
               SizedBox(
                 width: double.infinity,
                 height: 52,
@@ -243,14 +210,151 @@ class _TrapsScreenState extends State<TrapsScreen> {
                     ),
                   ),
                   child: Text(
-                    _currentIndex < _levelTraps.length - 1 ? 'Next Trap' : 'Start Quest',
+                    _currentIndex < _levelTraps.length - 1 ? 'Next Trap' : 'Review Results',
                     style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
                   ),
                 ),
               ),
-            ],
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildResults(ColorScheme scheme) {
+    _passed = _correctCount >= _levelTraps.length ~/ 2 + 1;
+
+    return Scaffold(
+      backgroundColor: scheme.surface,
+      appBar: AppBar(
+        title: const Text('Detect Deception Complete'),
+        backgroundColor: Colors.transparent,
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(20),
+        children: [
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: _passed
+                    ? [Colors.green.shade800, Colors.green.shade600]
+                    : [Colors.red.shade800, Colors.red.shade600],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Column(
+              children: [
+                Icon(
+                  _passed ? Icons.emoji_events : Icons.info_outline,
+                  color: Colors.white,
+                  size: 48,
+                ),
+                const Gap(12),
+                Text(
+                  '$_correctCount / ${_levelTraps.length} Correct',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 28,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const Gap(4),
+                Text(
+                  _passed ? 'Passed!' : 'Failed — continue anyway',
+                  style: const TextStyle(color: Colors.white70, fontSize: 14),
+                ),
+              ],
+            ),
+          ).animate().fadeIn().scale(begin: const Offset(0.9, 0.9)),
+          const Gap(24),
+          ..._levelTraps.asMap().entries.map((entry) {
+            final i = entry.key;
+            final trap = entry.value;
+            final isCorrect = i < _trapResults.length ? _trapResults[i] : false;
+            final userAnswer = i < _userAnswers.length ? _userAnswers[i] : false;
+
+            return Container(
+              margin: const EdgeInsets.only(bottom: 10),
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: isCorrect
+                    ? Colors.green.withValues(alpha: 0.05)
+                    : Colors.red.withValues(alpha: 0.05),
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(
+                  color: isCorrect
+                      ? Colors.green.withValues(alpha: 0.3)
+                      : Colors.red.withValues(alpha: 0.3),
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(
+                        isCorrect ? Icons.check_circle : Icons.cancel,
+                        color: isCorrect ? Colors.green : Colors.red,
+                        size: 18,
+                      ),
+                      const Gap(8),
+                      Expanded(
+                        child: Text(
+                          trap['statement'] as String,
+                          style: TextStyle(
+                            color: scheme.onSurface,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const Gap(6),
+                  Text(
+                    'You said: ${userAnswer ? "TRUE" : "FALSE"}',
+                    style: TextStyle(
+                      color: isCorrect ? Colors.green.shade300 : Colors.red.shade300,
+                      fontSize: 12,
+                    ),
+                  ),
+                  if (!isCorrect)
+                    Text(
+                      'Correct: ${trap['isTrue'] ? "TRUE" : "FALSE"}',
+                      style: TextStyle(
+                        color: Colors.green.shade300,
+                        fontSize: 12,
+                      ),
+                    ),
+                ],
+              ),
+            );
+          }),
+          const Gap(24),
+          SizedBox(
+            width: double.infinity,
+            height: 56,
+            child: ElevatedButton.icon(
+              onPressed: _continueToQuest,
+              icon: const Icon(Icons.arrow_forward, size: 20),
+              label: const Text(
+                'Start Quest',
+                style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: scheme.secondary,
+                foregroundColor: scheme.onSecondary,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+              ),
+            ),
+          ).animate().fadeIn(delay: 300.ms).slideY(begin: 0.2),
+        ],
       ),
     );
   }

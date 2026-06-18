@@ -5,12 +5,14 @@ class StepTile extends StatelessWidget {
   final int stepNumber;
   final String text;
   final bool isCompleted;
+  final String? imageUrl;
 
   const StepTile({
     super.key,
     required this.stepNumber,
     required this.text,
     this.isCompleted = false,
+    this.imageUrl,
   });
 
   @override
@@ -28,45 +30,65 @@ class StepTile extends StatelessWidget {
               : scheme.outline.withValues(alpha: 0.3),
         ),
       ),
-      child: Row(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            width: 30,
-            height: 30,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: isCompleted
-                  ? scheme.secondary
-                  : scheme.primary,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: isCompleted
-                ? Icon(Icons.check, color: scheme.onSecondary, size: 16)
-                : Text(
-                    '$stepNumber',
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 30,
+                height: 30,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: isCompleted
+                      ? scheme.secondary
+                      : scheme.primary,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: isCompleted
+                    ? Icon(Icons.check, color: scheme.onSecondary, size: 16)
+                    : Text(
+                        '$stepNumber',
+                        style: TextStyle(
+                          color: scheme.onPrimary,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 13,
+                        ),
+                      ),
+              ),
+              const Gap(12),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 5),
+                  child: Text(
+                    text,
                     style: TextStyle(
-                      color: scheme.onPrimary,
-                      fontWeight: FontWeight.w700,
-                      fontSize: 13,
+                      fontSize: 14,
+                      color: scheme.onSurface.withValues(alpha: isCompleted ? 0.6 : 1.0),
+                      decoration: isCompleted ? TextDecoration.lineThrough : null,
+                      height: 1.4,
                     ),
                   ),
-          ),
-          const Gap(12),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.only(top: 5),
-              child: Text(
-                text,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: scheme.onSurface.withValues(alpha: isCompleted ? 0.6 : 1.0),
-                  decoration: isCompleted ? TextDecoration.lineThrough : null,
-                  height: 1.4,
                 ),
               ),
-            ),
+            ],
           ),
+          if (imageUrl != null && !isCompleted) ...[
+            const Gap(10),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Image.network(
+                imageUrl!,
+                width: double.infinity,
+                height: 120,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                loadingBuilder: (_, child, progress) =>
+                    progress == null ? child : const SizedBox(height: 120, child: Center(child: CircularProgressIndicator(strokeWidth: 2))),
+              ),
+            ),
+          ],
         ],
       ),
     );

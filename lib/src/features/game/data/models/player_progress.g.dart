@@ -27,53 +27,83 @@ const PlayerProgressSchema = CollectionSchema(
       name: r'completedLevelIds',
       type: IsarType.stringList,
     ),
-    r'currentLevelId': PropertySchema(
+    r'completedWorldIds': PropertySchema(
       id: 2,
+      name: r'completedWorldIds',
+      type: IsarType.longList,
+    ),
+    r'correctAnswers': PropertySchema(
+      id: 3,
+      name: r'correctAnswers',
+      type: IsarType.long,
+    ),
+    r'currentLevelId': PropertySchema(
+      id: 4,
       name: r'currentLevelId',
       type: IsarType.string,
     ),
     r'currentWorldId': PropertySchema(
-      id: 3,
+      id: 5,
       name: r'currentWorldId',
       type: IsarType.long,
     ),
     r'earnedRewardIds': PropertySchema(
-      id: 4,
+      id: 6,
       name: r'earnedRewardIds',
       type: IsarType.stringList,
     ),
     r'extraSupTechUses': PropertySchema(
-      id: 5,
+      id: 7,
       name: r'extraSupTechUses',
       type: IsarType.long,
     ),
     r'levelsCleared': PropertySchema(
-      id: 6,
+      id: 8,
       name: r'levelsCleared',
       type: IsarType.long,
     ),
+    r'playDates': PropertySchema(
+      id: 9,
+      name: r'playDates',
+      type: IsarType.dateTimeList,
+    ),
     r'points': PropertySchema(
-      id: 7,
+      id: 10,
       name: r'points',
       type: IsarType.long,
     ),
+    r'prepResults': PropertySchema(
+      id: 11,
+      name: r'prepResults',
+      type: IsarType.stringList,
+    ),
     r'supTechUsesThisLevel': PropertySchema(
-      id: 8,
+      id: 12,
       name: r'supTechUsesThisLevel',
       type: IsarType.long,
     ),
     r'themeId': PropertySchema(
-      id: 9,
+      id: 13,
       name: r'themeId',
       type: IsarType.string,
     ),
+    r'totalAnswers': PropertySchema(
+      id: 14,
+      name: r'totalAnswers',
+      type: IsarType.long,
+    ),
+    r'totalPlayTimeSeconds': PropertySchema(
+      id: 15,
+      name: r'totalPlayTimeSeconds',
+      type: IsarType.long,
+    ),
     r'unlockedSkinIds': PropertySchema(
-      id: 10,
+      id: 16,
       name: r'unlockedSkinIds',
       type: IsarType.stringList,
     ),
     r'userId': PropertySchema(
-      id: 11,
+      id: 17,
       name: r'userId',
       type: IsarType.long,
     )
@@ -119,6 +149,7 @@ int _playerProgressEstimateSize(
       bytesCount += value.length * 3;
     }
   }
+  bytesCount += 3 + object.completedWorldIds.length * 8;
   {
     final value = object.currentLevelId;
     if (value != null) {
@@ -129,6 +160,14 @@ int _playerProgressEstimateSize(
   {
     for (var i = 0; i < object.earnedRewardIds.length; i++) {
       final value = object.earnedRewardIds[i];
+      bytesCount += value.length * 3;
+    }
+  }
+  bytesCount += 3 + object.playDates.length * 8;
+  bytesCount += 3 + object.prepResults.length * 3;
+  {
+    for (var i = 0; i < object.prepResults.length; i++) {
+      final value = object.prepResults[i];
       bytesCount += value.length * 3;
     }
   }
@@ -156,16 +195,22 @@ void _playerProgressSerialize(
 ) {
   writer.writeLong(offsets[0], object.bossesDefeated);
   writer.writeStringList(offsets[1], object.completedLevelIds);
-  writer.writeString(offsets[2], object.currentLevelId);
-  writer.writeLong(offsets[3], object.currentWorldId);
-  writer.writeStringList(offsets[4], object.earnedRewardIds);
-  writer.writeLong(offsets[5], object.extraSupTechUses);
-  writer.writeLong(offsets[6], object.levelsCleared);
-  writer.writeLong(offsets[7], object.points);
-  writer.writeLong(offsets[8], object.supTechUsesThisLevel);
-  writer.writeString(offsets[9], object.themeId);
-  writer.writeStringList(offsets[10], object.unlockedSkinIds);
-  writer.writeLong(offsets[11], object.userId);
+  writer.writeLongList(offsets[2], object.completedWorldIds);
+  writer.writeLong(offsets[3], object.correctAnswers);
+  writer.writeString(offsets[4], object.currentLevelId);
+  writer.writeLong(offsets[5], object.currentWorldId);
+  writer.writeStringList(offsets[6], object.earnedRewardIds);
+  writer.writeLong(offsets[7], object.extraSupTechUses);
+  writer.writeLong(offsets[8], object.levelsCleared);
+  writer.writeDateTimeList(offsets[9], object.playDates);
+  writer.writeLong(offsets[10], object.points);
+  writer.writeStringList(offsets[11], object.prepResults);
+  writer.writeLong(offsets[12], object.supTechUsesThisLevel);
+  writer.writeString(offsets[13], object.themeId);
+  writer.writeLong(offsets[14], object.totalAnswers);
+  writer.writeLong(offsets[15], object.totalPlayTimeSeconds);
+  writer.writeStringList(offsets[16], object.unlockedSkinIds);
+  writer.writeLong(offsets[17], object.userId);
 }
 
 PlayerProgress _playerProgressDeserialize(
@@ -177,17 +222,23 @@ PlayerProgress _playerProgressDeserialize(
   final object = PlayerProgress();
   object.bossesDefeated = reader.readLong(offsets[0]);
   object.completedLevelIds = reader.readStringList(offsets[1]) ?? [];
-  object.currentLevelId = reader.readStringOrNull(offsets[2]);
-  object.currentWorldId = reader.readLong(offsets[3]);
-  object.earnedRewardIds = reader.readStringList(offsets[4]) ?? [];
-  object.extraSupTechUses = reader.readLong(offsets[5]);
+  object.completedWorldIds = reader.readLongList(offsets[2]) ?? [];
+  object.correctAnswers = reader.readLong(offsets[3]);
+  object.currentLevelId = reader.readStringOrNull(offsets[4]);
+  object.currentWorldId = reader.readLong(offsets[5]);
+  object.earnedRewardIds = reader.readStringList(offsets[6]) ?? [];
+  object.extraSupTechUses = reader.readLong(offsets[7]);
   object.id = id;
-  object.levelsCleared = reader.readLong(offsets[6]);
-  object.points = reader.readLong(offsets[7]);
-  object.supTechUsesThisLevel = reader.readLong(offsets[8]);
-  object.themeId = reader.readStringOrNull(offsets[9]);
-  object.unlockedSkinIds = reader.readStringList(offsets[10]) ?? [];
-  object.userId = reader.readLong(offsets[11]);
+  object.levelsCleared = reader.readLong(offsets[8]);
+  object.playDates = reader.readDateTimeList(offsets[9]) ?? [];
+  object.points = reader.readLong(offsets[10]);
+  object.prepResults = reader.readStringList(offsets[11]) ?? [];
+  object.supTechUsesThisLevel = reader.readLong(offsets[12]);
+  object.themeId = reader.readStringOrNull(offsets[13]);
+  object.totalAnswers = reader.readLong(offsets[14]);
+  object.totalPlayTimeSeconds = reader.readLong(offsets[15]);
+  object.unlockedSkinIds = reader.readStringList(offsets[16]) ?? [];
+  object.userId = reader.readLong(offsets[17]);
   return object;
 }
 
@@ -203,24 +254,36 @@ P _playerProgressDeserializeProp<P>(
     case 1:
       return (reader.readStringList(offset) ?? []) as P;
     case 2:
-      return (reader.readStringOrNull(offset)) as P;
+      return (reader.readLongList(offset) ?? []) as P;
     case 3:
       return (reader.readLong(offset)) as P;
     case 4:
-      return (reader.readStringList(offset) ?? []) as P;
+      return (reader.readStringOrNull(offset)) as P;
     case 5:
       return (reader.readLong(offset)) as P;
     case 6:
-      return (reader.readLong(offset)) as P;
+      return (reader.readStringList(offset) ?? []) as P;
     case 7:
       return (reader.readLong(offset)) as P;
     case 8:
       return (reader.readLong(offset)) as P;
     case 9:
-      return (reader.readStringOrNull(offset)) as P;
+      return (reader.readDateTimeList(offset) ?? []) as P;
     case 10:
-      return (reader.readStringList(offset) ?? []) as P;
+      return (reader.readLong(offset)) as P;
     case 11:
+      return (reader.readStringList(offset) ?? []) as P;
+    case 12:
+      return (reader.readLong(offset)) as P;
+    case 13:
+      return (reader.readStringOrNull(offset)) as P;
+    case 14:
+      return (reader.readLong(offset)) as P;
+    case 15:
+      return (reader.readLong(offset)) as P;
+    case 16:
+      return (reader.readStringList(offset) ?? []) as P;
+    case 17:
       return (reader.readLong(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -703,6 +766,207 @@ extension PlayerProgressQueryFilter
         upper,
         includeUpper,
       );
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      completedWorldIdsElementEqualTo(int value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'completedWorldIds',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      completedWorldIdsElementGreaterThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'completedWorldIds',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      completedWorldIdsElementLessThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'completedWorldIds',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      completedWorldIdsElementBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'completedWorldIds',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      completedWorldIdsLengthEqualTo(int length) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'completedWorldIds',
+        length,
+        true,
+        length,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      completedWorldIdsIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'completedWorldIds',
+        0,
+        true,
+        0,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      completedWorldIdsIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'completedWorldIds',
+        0,
+        false,
+        999999,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      completedWorldIdsLengthLessThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'completedWorldIds',
+        0,
+        true,
+        length,
+        include,
+      );
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      completedWorldIdsLengthGreaterThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'completedWorldIds',
+        length,
+        include,
+        999999,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      completedWorldIdsLengthBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'completedWorldIds',
+        lower,
+        includeLower,
+        upper,
+        includeUpper,
+      );
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      correctAnswersEqualTo(int value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'correctAnswers',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      correctAnswersGreaterThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'correctAnswers',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      correctAnswersLessThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'correctAnswers',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      correctAnswersBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'correctAnswers',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
     });
   }
 
@@ -1311,6 +1575,151 @@ extension PlayerProgressQueryFilter
   }
 
   QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      playDatesElementEqualTo(DateTime value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'playDates',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      playDatesElementGreaterThan(
+    DateTime value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'playDates',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      playDatesElementLessThan(
+    DateTime value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'playDates',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      playDatesElementBetween(
+    DateTime lower,
+    DateTime upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'playDates',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      playDatesLengthEqualTo(int length) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'playDates',
+        length,
+        true,
+        length,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      playDatesIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'playDates',
+        0,
+        true,
+        0,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      playDatesIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'playDates',
+        0,
+        false,
+        999999,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      playDatesLengthLessThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'playDates',
+        0,
+        true,
+        length,
+        include,
+      );
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      playDatesLengthGreaterThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'playDates',
+        length,
+        include,
+        999999,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      playDatesLengthBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'playDates',
+        lower,
+        includeLower,
+        upper,
+        includeUpper,
+      );
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
       pointsEqualTo(int value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
@@ -1363,6 +1772,231 @@ extension PlayerProgressQueryFilter
         upper: upper,
         includeUpper: includeUpper,
       ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      prepResultsElementEqualTo(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'prepResults',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      prepResultsElementGreaterThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'prepResults',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      prepResultsElementLessThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'prepResults',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      prepResultsElementBetween(
+    String lower,
+    String upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'prepResults',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      prepResultsElementStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'prepResults',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      prepResultsElementEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'prepResults',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      prepResultsElementContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'prepResults',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      prepResultsElementMatches(String pattern, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'prepResults',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      prepResultsElementIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'prepResults',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      prepResultsElementIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'prepResults',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      prepResultsLengthEqualTo(int length) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'prepResults',
+        length,
+        true,
+        length,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      prepResultsIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'prepResults',
+        0,
+        true,
+        0,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      prepResultsIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'prepResults',
+        0,
+        false,
+        999999,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      prepResultsLengthLessThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'prepResults',
+        0,
+        true,
+        length,
+        include,
+      );
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      prepResultsLengthGreaterThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'prepResults',
+        length,
+        include,
+        999999,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      prepResultsLengthBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'prepResults',
+        lower,
+        includeLower,
+        upper,
+        includeUpper,
+      );
     });
   }
 
@@ -1572,6 +2206,118 @@ extension PlayerProgressQueryFilter
       return query.addFilterCondition(FilterCondition.greaterThan(
         property: r'themeId',
         value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      totalAnswersEqualTo(int value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'totalAnswers',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      totalAnswersGreaterThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'totalAnswers',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      totalAnswersLessThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'totalAnswers',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      totalAnswersBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'totalAnswers',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      totalPlayTimeSecondsEqualTo(int value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'totalPlayTimeSeconds',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      totalPlayTimeSecondsGreaterThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'totalPlayTimeSeconds',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      totalPlayTimeSecondsLessThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'totalPlayTimeSeconds',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      totalPlayTimeSecondsBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'totalPlayTimeSeconds',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
       ));
     });
   }
@@ -1883,6 +2629,20 @@ extension PlayerProgressQuerySortBy
   }
 
   QueryBuilder<PlayerProgress, PlayerProgress, QAfterSortBy>
+      sortByCorrectAnswers() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'correctAnswers', Sort.asc);
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterSortBy>
+      sortByCorrectAnswersDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'correctAnswers', Sort.desc);
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterSortBy>
       sortByCurrentLevelId() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'currentLevelId', Sort.asc);
@@ -1978,6 +2738,34 @@ extension PlayerProgressQuerySortBy
     });
   }
 
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterSortBy>
+      sortByTotalAnswers() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'totalAnswers', Sort.asc);
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterSortBy>
+      sortByTotalAnswersDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'totalAnswers', Sort.desc);
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterSortBy>
+      sortByTotalPlayTimeSeconds() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'totalPlayTimeSeconds', Sort.asc);
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterSortBy>
+      sortByTotalPlayTimeSecondsDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'totalPlayTimeSeconds', Sort.desc);
+    });
+  }
+
   QueryBuilder<PlayerProgress, PlayerProgress, QAfterSortBy> sortByUserId() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'userId', Sort.asc);
@@ -2005,6 +2793,20 @@ extension PlayerProgressQuerySortThenBy
       thenByBossesDefeatedDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'bossesDefeated', Sort.desc);
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterSortBy>
+      thenByCorrectAnswers() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'correctAnswers', Sort.asc);
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterSortBy>
+      thenByCorrectAnswersDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'correctAnswers', Sort.desc);
     });
   }
 
@@ -2116,6 +2918,34 @@ extension PlayerProgressQuerySortThenBy
     });
   }
 
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterSortBy>
+      thenByTotalAnswers() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'totalAnswers', Sort.asc);
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterSortBy>
+      thenByTotalAnswersDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'totalAnswers', Sort.desc);
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterSortBy>
+      thenByTotalPlayTimeSeconds() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'totalPlayTimeSeconds', Sort.asc);
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterSortBy>
+      thenByTotalPlayTimeSecondsDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'totalPlayTimeSeconds', Sort.desc);
+    });
+  }
+
   QueryBuilder<PlayerProgress, PlayerProgress, QAfterSortBy> thenByUserId() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'userId', Sort.asc);
@@ -2143,6 +2973,20 @@ extension PlayerProgressQueryWhereDistinct
       distinctByCompletedLevelIds() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'completedLevelIds');
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QDistinct>
+      distinctByCompletedWorldIds() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'completedWorldIds');
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QDistinct>
+      distinctByCorrectAnswers() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'correctAnswers');
     });
   }
 
@@ -2182,9 +3026,23 @@ extension PlayerProgressQueryWhereDistinct
     });
   }
 
+  QueryBuilder<PlayerProgress, PlayerProgress, QDistinct>
+      distinctByPlayDates() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'playDates');
+    });
+  }
+
   QueryBuilder<PlayerProgress, PlayerProgress, QDistinct> distinctByPoints() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'points');
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QDistinct>
+      distinctByPrepResults() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'prepResults');
     });
   }
 
@@ -2199,6 +3057,20 @@ extension PlayerProgressQueryWhereDistinct
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'themeId', caseSensitive: caseSensitive);
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QDistinct>
+      distinctByTotalAnswers() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'totalAnswers');
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QDistinct>
+      distinctByTotalPlayTimeSeconds() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'totalPlayTimeSeconds');
     });
   }
 
@@ -2237,6 +3109,19 @@ extension PlayerProgressQueryProperty
     });
   }
 
+  QueryBuilder<PlayerProgress, List<int>, QQueryOperations>
+      completedWorldIdsProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'completedWorldIds');
+    });
+  }
+
+  QueryBuilder<PlayerProgress, int, QQueryOperations> correctAnswersProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'correctAnswers');
+    });
+  }
+
   QueryBuilder<PlayerProgress, String?, QQueryOperations>
       currentLevelIdProperty() {
     return QueryBuilder.apply(this, (query) {
@@ -2270,9 +3155,23 @@ extension PlayerProgressQueryProperty
     });
   }
 
+  QueryBuilder<PlayerProgress, List<DateTime>, QQueryOperations>
+      playDatesProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'playDates');
+    });
+  }
+
   QueryBuilder<PlayerProgress, int, QQueryOperations> pointsProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'points');
+    });
+  }
+
+  QueryBuilder<PlayerProgress, List<String>, QQueryOperations>
+      prepResultsProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'prepResults');
     });
   }
 
@@ -2286,6 +3185,19 @@ extension PlayerProgressQueryProperty
   QueryBuilder<PlayerProgress, String?, QQueryOperations> themeIdProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'themeId');
+    });
+  }
+
+  QueryBuilder<PlayerProgress, int, QQueryOperations> totalAnswersProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'totalAnswers');
+    });
+  }
+
+  QueryBuilder<PlayerProgress, int, QQueryOperations>
+      totalPlayTimeSecondsProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'totalPlayTimeSeconds');
     });
   }
 

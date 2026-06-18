@@ -5,7 +5,7 @@ import 'package:gap/gap.dart';
 import 'package:littletech/src/core/navigation/nav.dart';
 import 'package:littletech/src/features/game/constants/game_data.dart';
 import 'package:littletech/src/features/game/domain/cubit/game_cubit.dart';
-import 'package:littletech/src/features/game/presentation/screens/problem_screen.dart';
+import 'package:littletech/src/features/game/presentation/screens/ordering_screen.dart';
 
 class QuizScreen extends StatefulWidget {
   final WorldDef world;
@@ -24,6 +24,8 @@ class _QuizScreenState extends State<QuizScreen> {
   bool _isAnswered = false;
   int _lives = 3;
   bool _gameOver = false;
+  bool _showResults = false;
+  final List<int> _userAnswers = [];
 
   static const _questions = {
     'cpu_high_usage': [
@@ -52,6 +54,27 @@ class _QuizScreenState extends State<QuizScreen> {
         'correct': 0,
       },
     ],
+    'battery_draining': [
+      {
+        'question': 'Which setting drains phone battery the most?',
+        'options': ['Screen brightness', 'Wallpaper color', 'Ringtone volume', 'Notification sound'],
+        'correct': 0,
+      },
+    ],
+    'slow_phone': [
+      {
+        'question': 'What is the quickest way to speed up a slow phone?',
+        'options': ['Restart the phone', 'Buy a new phone', 'Remove the SIM card', 'Factory reset'],
+        'correct': 0,
+      },
+    ],
+    'no_internet': [
+      {
+        'question': 'What should you restart first when troubleshooting no internet?',
+        'options': ['Router and modem', 'Computer only', 'All light bulbs', 'The power company'],
+        'correct': 0,
+      },
+    ],
   };
 
   List<Map<String, dynamic>> get _levelQuestions {
@@ -69,6 +92,7 @@ class _QuizScreenState extends State<QuizScreen> {
     setState(() {
       _selectedAnswer = index;
       _isAnswered = true;
+      _userAnswers.add(index);
       if (index == _levelQuestions[_currentQuestion]['correct']) {
         _correctCount++;
       } else {
@@ -86,27 +110,28 @@ class _QuizScreenState extends State<QuizScreen> {
         _isAnswered = false;
       });
     } else {
-      _finish();
+      setState(() => _showResults = true);
     }
   }
 
-  void _finish() {
-    final passed = !_gameOver && _correctCount >= _levelQuestions.length ~/ 2 + 1;
-    if (passed) {
-      context.read<GameCubit>().addPoints(20);
-    }
+  void _continueToOrdering() {
+    final passed = _correctCount >= _levelQuestions.length ~/ 2 + 1;
+    context.read<GameCubit>().saveQuizResult(widget.level.id, _correctCount, _levelQuestions.length, _lives);
+    if (passed) context.read<GameCubit>().addPoints(20);
     Nav.pushReplacement(
       context,
-      ProblemScreen(world: widget.world, level: widget.level),
+      OrderingScreen(world: widget.world, level: widget.level),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+
+    if (_showResults) return _buildResults(scheme);
+
     final q = _levelQuestions[_currentQuestion];
     final options = List<String>.from(q['options'] as List);
-    final correctIndex = q['correct'] as int;
 
     return Scaffold(
       backgroundColor: scheme.surface,
@@ -175,24 +200,7 @@ class _QuizScreenState extends State<QuizScreen> {
             ...options.asMap().entries.map((entry) {
               final i = entry.key;
               final option = entry.value;
-              Color bgColor = scheme.surface;
-              Color borderColor = scheme.outline.withValues(alpha: 0.3);
-              Color textColor = scheme.onSurface;
-
-              if (_isAnswered) {
-                if (i == correctIndex) {
-                  bgColor = Colors.green.withValues(alpha: 0.1);
-                  borderColor = Colors.green;
-                  textColor = Colors.green;
-                } else if (i == _selectedAnswer) {
-                  bgColor = Colors.red.withValues(alpha: 0.1);
-                  borderColor = Colors.red;
-                  textColor = Colors.red;
-                }
-              } else if (_selectedAnswer == i) {
-                bgColor = scheme.secondary.withValues(alpha: 0.1);
-                borderColor = scheme.secondary;
-              }
+              final isSelected = _selectedAnswer == i;
 
               return Padding(
                 padding: const EdgeInsets.only(bottom: 12),
@@ -205,9 +213,16 @@ class _QuizScreenState extends State<QuizScreen> {
                       width: double.infinity,
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: bgColor,
+                        color: isSelected
+                            ? scheme.primary.withValues(alpha: 0.1)
+                            : scheme.surface,
                         borderRadius: BorderRadius.circular(14),
-                        border: Border.all(color: borderColor, width: 1.5),
+                        border: Border.all(
+                          color: isSelected
+                              ? scheme.primary
+                              : scheme.outline.withValues(alpha: 0.3),
+                          width: isSelected ? 2 : 1.5,
+                        ),
                       ),
                       child: Row(
                         children: [
@@ -216,17 +231,17 @@ class _QuizScreenState extends State<QuizScreen> {
                             height: 28,
                             alignment: Alignment.center,
                             decoration: BoxDecoration(
-                              color: _isAnswered && i == correctIndex
-                                  ? Colors.green
-                                  : _isAnswered && i == _selectedAnswer
-                                      ? Colors.red
-                                      : scheme.primary,
+                              color: isSelected
+                                  ? scheme.primary
+                                  : scheme.primary.withValues(alpha: 0.05),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Text(
                               String.fromCharCode(65 + i),
                               style: TextStyle(
-                                color: scheme.onPrimary,
+                                color: isSelected
+                                    ? scheme.onPrimary
+                                    : scheme.onSurface.withValues(alpha: 0.5),
                                 fontWeight: FontWeight.w700,
                                 fontSize: 13,
                               ),
@@ -237,16 +252,14 @@ class _QuizScreenState extends State<QuizScreen> {
                             child: Text(
                               option,
                               style: TextStyle(
-                                color: textColor,
+                                color: isSelected
+                                    ? scheme.primary
+                                    : scheme.onSurface,
                                 fontSize: 15,
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
                           ),
-                          if (_isAnswered && i == correctIndex)
-                            const Icon(Icons.check_circle, color: Colors.green, size: 20),
-                          if (_isAnswered && i == _selectedAnswer && i != correctIndex)
-                            const Icon(Icons.cancel, color: Colors.red, size: 20),
                         ],
                       ),
                     ),
@@ -254,35 +267,6 @@ class _QuizScreenState extends State<QuizScreen> {
                 ),
               ).animate().fadeIn(delay: (100 * i).ms).slideX(begin: 0.05);
             }),
-            if (_gameOver)
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.red.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: Colors.red.withValues(alpha: 0.3)),
-                ),
-                child: Column(
-                  children: [
-                    const Icon(Icons.warning_amber_rounded, color: Colors.red, size: 32),
-                    const Gap(8),
-                    Text(
-                      'You ran out of lives!',
-                      style: TextStyle(
-                        color: Colors.red.shade300,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    const Gap(4),
-                    Text(
-                      'Don\'t worry — you can still attempt the quest.',
-                      style: TextStyle(color: Colors.red.shade200, fontSize: 12),
-                    ),
-                  ],
-                ),
-              ).animate().shake(),
             const Spacer(),
             SizedBox(
               width: double.infinity,
@@ -298,13 +282,171 @@ class _QuizScreenState extends State<QuizScreen> {
                   ),
                 ),
                 child: Text(
-                  _currentQuestion < _levelQuestions.length - 1 ? 'Next' : 'Start Quest',
+                  _currentQuestion < _levelQuestions.length - 1 ? 'Next' : 'Review Results',
                   style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
                 ),
               ),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildResults(ColorScheme scheme) {
+    final passed = _correctCount >= _levelQuestions.length ~/ 2 + 1;
+
+    return Scaffold(
+      backgroundColor: scheme.surface,
+      appBar: AppBar(
+        title: const Text('Sage\'s Trial Complete'),
+        backgroundColor: Colors.transparent,
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(20),
+        children: [
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: passed
+                    ? [Colors.green.shade800, Colors.green.shade600]
+                    : [Colors.red.shade800, Colors.red.shade600],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Column(
+              children: [
+                Icon(
+                  passed ? Icons.emoji_events : Icons.info_outline,
+                  color: Colors.white,
+                  size: 48,
+                ),
+                const Gap(12),
+                Text(
+                  '$_correctCount / ${_levelQuestions.length} Correct',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 28,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const Gap(4),
+                Text(
+                  passed ? 'Passed!' : 'Failed — continue anyway',
+                  style: const TextStyle(
+                    color: Colors.white70,
+                    fontSize: 14,
+                  ),
+                ),
+                const Gap(8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(3, (i) {
+                    final filled = i < _lives;
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 4),
+                      child: Icon(
+                        filled ? Icons.favorite : Icons.favorite_border,
+                        color: Colors.white,
+                        size: 18,
+                      ),
+                    );
+                  }),
+                ),
+              ],
+            ),
+          ).animate().fadeIn().scale(begin: const Offset(0.9, 0.9)),
+          const Gap(24),
+          ..._levelQuestions.asMap().entries.map((entry) {
+            final i = entry.key;
+            final q = entry.value;
+            final userAnswer = i < _userAnswers.length ? _userAnswers[i] : -1;
+            final correctAns = q['correct'] as int;
+            final isCorrect = userAnswer == correctAns;
+            final options = List<String>.from(q['options'] as List);
+
+            return Container(
+              margin: const EdgeInsets.only(bottom: 10),
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: isCorrect
+                    ? Colors.green.withValues(alpha: 0.05)
+                    : Colors.red.withValues(alpha: 0.05),
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(
+                  color: isCorrect
+                      ? Colors.green.withValues(alpha: 0.3)
+                      : Colors.red.withValues(alpha: 0.3),
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(
+                        isCorrect ? Icons.check_circle : Icons.cancel,
+                        color: isCorrect ? Colors.green : Colors.red,
+                        size: 18,
+                      ),
+                      const Gap(8),
+                      Expanded(
+                        child: Text(
+                          q['question'] as String,
+                          style: TextStyle(
+                            color: scheme.onSurface,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const Gap(8),
+                  Text(
+                    'Your answer: ${userAnswer >= 0 ? options[userAnswer] : '—'}',
+                    style: TextStyle(
+                      color: isCorrect ? Colors.green.shade300 : Colors.red.shade300,
+                      fontSize: 12,
+                    ),
+                  ),
+                  if (!isCorrect)
+                    Text(
+                      'Correct: ${options[correctAns]}',
+                      style: TextStyle(
+                        color: Colors.green.shade300,
+                        fontSize: 12,
+                      ),
+                    ),
+                ],
+              ),
+            );
+          }),
+          const Gap(24),
+          SizedBox(
+            width: double.infinity,
+            height: 56,
+            child: ElevatedButton.icon(
+              onPressed: _continueToOrdering,
+              icon: const Icon(Icons.arrow_forward, size: 20),
+              label: const Text(
+                'Continue to Ordering',
+                style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: scheme.secondary,
+                foregroundColor: scheme.onSecondary,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+              ),
+            ),
+          ).animate().fadeIn(delay: 300.ms).slideY(begin: 0.2),
+        ],
       ),
     );
   }

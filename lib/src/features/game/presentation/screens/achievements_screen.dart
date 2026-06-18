@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:gap/gap.dart';
 import 'package:littletech/src/features/game/constants/achievements.dart';
+import 'package:littletech/src/features/game/constants/streak_tracker.dart';
 import 'package:littletech/src/features/game/domain/cubit/game_cubit.dart';
 
 class AchievementsScreen extends StatelessWidget {
@@ -40,8 +41,8 @@ class AchievementsScreen extends StatelessWidget {
                   AchievementType.bosses => progress.bossesDefeated,
                   AchievementType.points => progress.points,
                   AchievementType.rewards => earnedIds.length,
-                  AchievementType.streak => 0,
-                  AchievementType.worlds => 0,
+                  AchievementType.streak => StreakTracker.calculateStreak(progress.playDates),
+                  AchievementType.worlds => progress.completedWorldIds.length,
                 };
                 final isDone = progressVal >= a.requirement;
 

@@ -4,6 +4,7 @@ import 'package:gap/gap.dart';
 import 'package:littletech/src/features/auth/data/models/user_model.dart';
 import 'package:littletech/src/features/auth/data/services/auth_service.dart';
 import 'package:littletech/src/features/game/constants/reward_pool.dart';
+import 'package:littletech/src/features/game/constants/streak_tracker.dart';
 import 'package:littletech/src/features/game/domain/cubit/game_cubit.dart';
 import 'package:littletech/src/features/game/domain/cubit/theme_cubit.dart';
 import 'package:littletech/src/features/game/presentation/widgets/reward_chip.dart';
@@ -77,13 +78,25 @@ class ProfileScreen extends StatelessWidget {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(Icons.monetization_on,
+                              Icon(                              Icons.monetization_on,
                                   color: scheme.secondary, size: 18),
                               const Gap(6),
                               Text(
                                 '${progress.points} points',
                                 style: TextStyle(
                                   color: scheme.secondary,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                              const Gap(16),
+                              Icon(Icons.local_fire_department,
+                                  color: Colors.orange, size: 18),
+                              const Gap(6),
+                              Text(
+                                '${StreakTracker.calculateStreak(progress.playDates)} day streak',
+                                style: TextStyle(
+                                  color: Colors.orange,
                                   fontSize: 16,
                                   fontWeight: FontWeight.w700,
                                 ),

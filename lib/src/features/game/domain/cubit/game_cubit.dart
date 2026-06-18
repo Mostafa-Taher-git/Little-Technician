@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:littletech/src/features/game/constants/game_data.dart';
 import 'package:littletech/src/features/game/constants/reward_pool.dart';
@@ -14,6 +15,7 @@ class GameState {
   final RewardDef? lastDrawnReward;
   final bool isBossMode;
   final String? hintText;
+  final int pointsMultiplier;
 
   const GameState({
     required this.progress,
@@ -25,6 +27,7 @@ class GameState {
     this.lastDrawnReward,
     this.isBossMode = false,
     this.hintText,
+    this.pointsMultiplier = 1,
   });
 
   GameState copyWith({
@@ -37,6 +40,7 @@ class GameState {
     RewardDef? lastDrawnReward,
     bool? isBossMode,
     String? hintText,
+    int? pointsMultiplier,
   }) {
     return GameState(
       progress: progress ?? this.progress,
@@ -48,6 +52,7 @@ class GameState {
       lastDrawnReward: lastDrawnReward ?? this.lastDrawnReward,
       isBossMode: isBossMode ?? this.isBossMode,
       hintText: hintText ?? this.hintText,
+      pointsMultiplier: pointsMultiplier ?? this.pointsMultiplier,
     );
   }
 
@@ -84,6 +89,10 @@ class GameCubit extends Cubit<GameState> {
 
   void setBossMultiplier(int multiplier) {
     emit(state.copyWith(bossHpMultiplier: multiplier));
+  }
+
+  void setPointsMultiplier(int multiplier) {
+    emit(state.copyWith(pointsMultiplier: multiplier));
   }
 
   void selectLevel(LevelDef level) {
@@ -127,12 +136,16 @@ class GameCubit extends Cubit<GameState> {
   }
 
   void _completeLevel(PlayerProgress progress) {
-    final basePoints = state.currentLevel!.points;
+    final basePoints = state.currentLevel!.points * state.pointsMultiplier;
     _repository.addPoints(progress, basePoints);
     _repository.completeLevel(progress, state.currentLevel!.id);
     _repository.resetLevelUses(progress);
+    final world = state.currentWorld;
+    if (world != null && GameData.isWorldComplete(world, progress.completedLevelIds)) {
+      _repository.completeWorld(progress, world.id);
+    }
     _drawReward(progress);
-    emit(state.copyWith(progress: progress, hintText: null));
+    emit(state.copyWith(progress: progress, hintText: null, pointsMultiplier: 1));
   }
 
   void attackBoss({int damage = 1}) {
@@ -150,10 +163,10 @@ class GameCubit extends Cubit<GameState> {
 
   void _defeatBoss(PlayerProgress progress) {
     final boss = state.currentWorld!.boss;
-    _repository.addPoints(progress, boss.points);
+    _repository.addPoints(progress, boss.points * state.pointsMultiplier);
     _repository.defeatBoss(progress);
     _drawReward(progress);
-    emit(state.copyWith(progress: progress, currentBossHp: 0));
+    emit(state.copyWith(progress: progress, currentBossHp: 0, pointsMultiplier: 1));
   }
 
   void _drawReward(PlayerProgress progress) {
@@ -209,7 +222,43 @@ class GameCubit extends Cubit<GameState> {
 
   void addPoints(int amount) {
     final p = state.progress;
-    p.points += amount;
+    _repository.addPoints(p, amount);
+    emit(state.copyWith(progress: p));
+  }
+
+  void saveQuizResult(String levelId, int correct, int total, int hearts) {
+    final p = state.progress;
+    final raw = p.getPrepResult(levelId);
+    final data = raw != null
+        ? json.decode(raw) as Map<String, dynamic>
+        : <String, dynamic>{};
+    data['quiz'] = {'correct': correct, 'total': total, 'hearts': hearts};
+    p.setPrepResult(levelId, json.encode(data));
+    _repository.saveProgress(p);
+    emit(state.copyWith(progress: p));
+  }
+
+  void saveOrderingResult(String levelId, int attempts, bool passed) {
+    final p = state.progress;
+    final raw = p.getPrepResult(levelId);
+    final data = raw != null
+        ? json.decode(raw) as Map<String, dynamic>
+        : <String, dynamic>{};
+    data['ordering'] = {'attempts': attempts, 'passed': passed};
+    p.setPrepResult(levelId, json.encode(data));
+    _repository.saveProgress(p);
+    emit(state.copyWith(progress: p));
+  }
+
+  void saveTrapsResult(String levelId, int correct, int total, bool passed) {
+    final p = state.progress;
+    final raw = p.getPrepResult(levelId);
+    final data = raw != null
+        ? json.decode(raw) as Map<String, dynamic>
+        : <String, dynamic>{};
+    data['traps'] = {'correct': correct, 'total': total, 'passed': passed};
+    p.setPrepResult(levelId, json.encode(data));
+    _repository.saveProgress(p);
     emit(state.copyWith(progress: p));
   }
 
@@ -224,5 +273,9 @@ class GameCubit extends Cubit<GameState> {
     if (worldId < GameData.worlds.length) {
       selectWorld(GameData.worlds[worldId]);
     }
+  }
+
+  void resetSteps() {
+    emit(state.copyWith(currentStepIndex: 0, hintText: null));
   }
 }
