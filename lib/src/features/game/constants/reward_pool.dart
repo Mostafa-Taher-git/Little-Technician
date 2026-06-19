@@ -281,4 +281,9 @@ class RewardPool {
       return null;
     }
   }
+
+  static List<RewardDef> get badges {
+    _ensureInit();
+    return List.unmodifiable(rewards.where((r) => r.type == RewardType.icon || r.type == RewardType.title));
+  }
 }

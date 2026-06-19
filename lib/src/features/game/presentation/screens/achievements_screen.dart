@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:gap/gap.dart';
 import 'package:littletech/src/features/game/constants/achievements.dart';
+import 'package:littletech/src/features/game/constants/reward_pool.dart';
 import 'package:littletech/src/features/game/constants/streak_tracker.dart';
 import 'package:littletech/src/features/game/domain/cubit/game_cubit.dart';
 
@@ -16,7 +17,7 @@ class AchievementsScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: scheme.surface,
       appBar: AppBar(
-        title: const Text('Honors & Deeds'),
+        title: const Text('Honors & Badges'),
         backgroundColor: Colors.transparent,
       ),
       body: BlocBuilder<GameCubit, GameState>(
@@ -118,6 +119,83 @@ class AchievementsScreen extends StatelessWidget {
                     ],
                   ),
                 ).animate().fadeIn(delay: (30 * AchievementManager.all.indexOf(a)).ms);
+              }),
+              const Gap(24),
+              Text(
+                'Badges',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: scheme.onSurface,
+                ),
+              ),
+              const Gap(12),
+              ...RewardPool.badges.asMap().entries.map((entry) {
+                final index = entry.key;
+                final badge = entry.value;
+                final isEarned = earnedIds.contains(badge.id);
+                final delay = 30 * AchievementManager.all.length + 50 * index;
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 10),
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: isEarned
+                        ? badge.color.withValues(alpha: 0.08)
+                        : scheme.surface,
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(
+                      color: isEarned
+                          ? badge.color.withValues(alpha: 0.3)
+                          : scheme.outline.withValues(alpha: 0.2),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: isEarned
+                              ? badge.color.withValues(alpha: 0.1)
+                              : scheme.primary.withValues(alpha: 0.05),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Icon(
+                          badge.icon,
+                          color: isEarned ? badge.color : scheme.onSurface.withValues(alpha: 0.3),
+                          size: 20,
+                        ),
+                      ),
+                      const Gap(12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              badge.displayName,
+                              style: TextStyle(
+                                color: isEarned ? badge.color : scheme.onSurface.withValues(alpha: 0.6),
+                                fontWeight: FontWeight.w600,
+                                fontSize: 14,
+                              ),
+                            ),
+                            Text(
+                              isEarned ? 'Earned Badge' : 'Locked',
+                              style: TextStyle(
+                                color: isEarned ? badge.color.withValues(alpha: 0.7) : scheme.onSurface.withValues(alpha: 0.4),
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      if (isEarned)
+                        Icon(Icons.check_circle, color: badge.color, size: 22)
+                      else
+                        const Icon(Icons.lock, color: Colors.grey, size: 22),
+                    ],
+                  ),
+                ).animate().fadeIn(delay: delay.ms);
               }),
             ],
           );

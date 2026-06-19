@@ -149,7 +149,7 @@ class ProfileScreen extends StatelessWidget {
                         Expanded(
                           child: _ProfileAction(
                             icon: Icons.emoji_events,
-                            label: 'Honors',
+                            label: 'Honors & Badges',
                             onTap: () => Nav.push(context, const AchievementsScreen()),
                             scheme: scheme,
                           ),

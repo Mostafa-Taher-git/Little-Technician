@@ -17,6 +17,8 @@ import 'package:littletech/src/features/game/presentation/widgets/challenge_bann
 import 'package:littletech/src/features/game/presentation/screens/challenge_screen.dart';
 import 'package:littletech/src/features/game/domain/cubit/game_cubit.dart';
 import 'package:littletech/src/features/game/constants/streak_tracker.dart';
+import 'package:littletech/src/features/game/constants/achievements.dart';
+import 'package:littletech/src/features/game/constants/reward_pool.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -39,6 +41,91 @@ class HomeScreen extends StatelessWidget {
 
               // Player stats row (points, streak, title)
               _PlayerStatsRow(),
+              const Gap(16),
+
+              // Earned Honors & Badges
+              BlocBuilder<GameCubit, GameState>(
+                builder: (_, state) {
+                  final progress = state.progress;
+                  final earnedIds = progress.earnedRewardIds;
+
+                  final earnedAchievements = AchievementManager.all.where((a) {
+                    final progressVal = switch (a.type) {
+                      AchievementType.levels => progress.levelsCleared,
+                      AchievementType.bosses => progress.bossesDefeated,
+                      AchievementType.points => progress.points,
+                      AchievementType.rewards => earnedIds.length,
+                      AchievementType.streak => StreakTracker.calculateStreak(progress.playDates),
+                      AchievementType.worlds => progress.completedWorldIds.length,
+                    };
+                    return progressVal >= a.requirement;
+                  }).toList();
+
+                  final earnedBadges = RewardPool.badges.where((b) => earnedIds.contains(b.id)).toList();
+
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(Icons.emoji_events, color: scheme.secondary, size: 18),
+                          const Gap(6),
+                          Text(
+                            'Honors & Badges',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                              color: scheme.onSurface,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const Gap(12),
+                      if (earnedAchievements.isEmpty && earnedBadges.isEmpty)
+                        Text(
+                          'Complete levels to earn honors and badges!',
+                          style: TextStyle(
+                            color: scheme.onSurface.withValues(alpha: 0.5),
+                            fontSize: 13,
+                          ),
+                        )
+                      else
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: [
+                            ...earnedAchievements.map((a) => Tooltip(
+                              message: a.name,
+                              child: Container(
+                                width: 36,
+                                height: 36,
+                                decoration: BoxDecoration(
+                                  color: Colors.green.withValues(alpha: 0.1),
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(color: Colors.green.withValues(alpha: 0.3)),
+                                ),
+                                child: Icon(a.icon, color: Colors.green.shade300, size: 18),
+                              ),
+                            )),
+                            ...earnedBadges.map((b) => Tooltip(
+                              message: b.displayName,
+                              child: Container(
+                                width: 36,
+                                height: 36,
+                                decoration: BoxDecoration(
+                                  color: b.color.withValues(alpha: 0.1),
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(color: b.color.withValues(alpha: 0.3)),
+                                ),
+                                child: Icon(b.icon, color: b.color, size: 18),
+                              ),
+                            )),
+                          ],
+                        ),
+                    ],
+                  ).animate().fadeIn(duration: 400.ms).slideY(begin: 0.05);
+                },
+              ),
               const Gap(16),
 
               // Stats card with gradient
