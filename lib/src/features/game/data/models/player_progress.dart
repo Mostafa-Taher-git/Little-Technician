@@ -13,9 +13,11 @@ class PlayerProgress {
   int supTechUsesThisLevel = 1;
   int extraSupTechUses = 0;
   int currentWorldId = 0;
+  String? currentCategoryId;
   String? currentLevelId;
   List<String> completedLevelIds = [];
   List<int> completedWorldIds = [];
+  List<String> completedCategoryIds = [];
 List<String> earnedRewardIds = [];
   List<String> unlockedSkinIds = [];
   String? activeSkinId;  // Currently equipped skin
@@ -51,6 +53,7 @@ List<String> earnedRewardIds = [];
   void ensureMutableLists() {
     completedLevelIds = List<String>.from(completedLevelIds);
     completedWorldIds = List<int>.from(completedWorldIds);
+    completedCategoryIds = List<String>.from(completedCategoryIds);
     earnedRewardIds = List<String>.from(earnedRewardIds);
     unlockedSkinIds = List<String>.from(unlockedSkinIds);
     playDates = List<DateTime>.from(playDates);

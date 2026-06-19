@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:littletech/src/core/constants/category_manager.dart';
 import 'package:littletech/src/core/navigation/nav.dart';
 import 'package:littletech/src/features/game/constants/game_data.dart';
 import 'package:littletech/src/features/game/domain/cubit/game_cubit.dart';
@@ -43,23 +44,12 @@ class _WorldSelectScreenState extends State<WorldSelectScreen> {
     }
   }
 
-  static const _deviceWorldFilter = <String, Set<String>>{
-    'desktop': {'Core Components', 'Operating System', 'Software & Network', 'Storage & Display', 'Gaming Rig'},
-    'laptop': {'Core Components', 'Operating System', 'Software & Network', 'Storage & Display', 'Gaming Rig'},
-    'phone': {'Mobile Troubleshooting'},
-    'tablet': {'Mobile Troubleshooting'},
-    'printer': {'Peripherals'},
-    'router': {'Software & Network'},
-    'smart_tv': {'Gaming Rig', 'Storage & Display'},
-    'console': {'Gaming Rig'},
-    'smart_home': {'Smart Home'},
-  };
-
   List<WorldDef> get _filteredWorlds {
     if (_selectedDeviceId == null) return GameData.worlds;
-    final allowed = _deviceWorldFilter[_selectedDeviceId];
-    if (allowed == null) return GameData.worlds;
-    return GameData.worlds.where((w) => allowed.contains(w.name)).toList();
+    return GameData.worlds.where((w) {
+      final cat = CategoryManager.byId(w.id);
+      return cat != null && cat.deviceTypes.contains(_selectedDeviceId);
+    }).toList();
   }
 
   @override
@@ -71,7 +61,7 @@ class _WorldSelectScreenState extends State<WorldSelectScreen> {
     return Scaffold(
       backgroundColor: scheme.surface,
       appBar: AppBar(
-        title: const Text('Campaign Map'),
+        title: const Text('Dungeon Map'),
         backgroundColor: Colors.transparent,
         actions: [
           BlocBuilder<GameCubit, GameState>(
@@ -182,7 +172,7 @@ class _WorldSelectScreenState extends State<WorldSelectScreen> {
               final completed = world.levels
                   .where((l) => state.progress.completedLevelIds.contains(l.id))
                   .length;
-              final worldIndex = GameData.worlds.indexOf(world);
+              final worldIndex = GameData.worlds.indexWhere((w) => w.id == world.id);
               final isUnlocked = worldIndex == 0 ||
                   GameData.worlds[worldIndex - 1].levels
                       .every((l) => state.progress.completedLevelIds.contains(l.id));

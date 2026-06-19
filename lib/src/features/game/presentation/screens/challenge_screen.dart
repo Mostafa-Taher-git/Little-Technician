@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:gap/gap.dart';
 import 'package:littletech/src/core/navigation/nav.dart';
+import 'package:littletech/src/core/constants/category_manager.dart';
 import 'package:littletech/src/features/game/constants/challenges.dart';
 import 'package:littletech/src/features/game/constants/game_data.dart';
 import 'package:littletech/src/features/game/domain/cubit/game_cubit.dart';
@@ -51,13 +52,16 @@ class ChallengeScreen extends StatelessWidget {
           _ChallengeCard(
             title: 'Weekly Raid',
             icon: Icons.calendar_month,
-            subtitle: GameData.worlds[weekly.worldIndex].name,
+            subtitle: CategoryManager.byId(weekly.categoryId)?.name ?? 'Unknown',
             description: weekly.specialRule,
             bonusPoints: weekly.bonusPoints,
             pointsMultiplier: weekly.pointsMultiplier,
             color: Colors.red,
             onTap: () {
-              final world = GameData.worlds[weekly.worldIndex];
+              final world = GameData.worlds.firstWhere(
+                (w) => w.id == weekly.categoryId,
+                orElse: () => GameData.worlds.first,
+              );
               context.read<GameCubit>()
                 ..selectWorld(world)
                 ..setBossMultiplier(2)

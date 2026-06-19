@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:littletech/src/core/constants/category_manager.dart';
 import 'package:littletech/src/features/game/constants/challenges.dart';
-import 'package:littletech/src/features/game/constants/game_data.dart';
 
 class ChallengeBanner extends StatelessWidget {
   final VoidCallback onDailyTap;
@@ -55,7 +55,7 @@ class ChallengeBanner extends StatelessWidget {
             icon: Icons.calendar_month_rounded,
             iconColor: const Color(0xFFEF4444),
             iconBgColor: const Color(0xFFEF4444).withValues(alpha: 0.1),
-            title: 'Weekly Raid: ${GameData.worlds[weekly.worldIndex].name}',
+            title: 'Weekly Raid: ${CategoryManager.byId(weekly.categoryId)?.name ?? 'Unknown'}',
             subtitle: '+${weekly.bonusPoints} pts • ${weekly.specialRule}',
             subtitleColor: scheme.onSurface.withValues(alpha: 0.5),
             onTap: onWeeklyTap,

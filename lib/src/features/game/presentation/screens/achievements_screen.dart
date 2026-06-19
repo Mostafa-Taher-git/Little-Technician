@@ -44,6 +44,7 @@ class AchievementsScreen extends StatelessWidget {
                   AchievementType.rewards => earnedIds.length,
                   AchievementType.streak => StreakTracker.calculateStreak(progress.playDates),
                   AchievementType.worlds => progress.completedWorldIds.length,
+                  AchievementType.categories => progress.completedCategoryIds.length,
                 };
                 final isDone = progressVal >= a.requirement;
 

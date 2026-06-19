@@ -77,18 +77,25 @@ class GameCubit extends Cubit<GameState> {
   Future<void> loadGame() async {
     try {
       final progress = await _repository.getOrCreateProgress(_userId);
-      final world = GameData.worlds.isNotEmpty &&
-              progress.currentWorldId < GameData.worlds.length
-          ? GameData.worlds[progress.currentWorldId]
-          : null;
+      WorldDef? world;
+      if (progress.currentCategoryId != null) {
+        try {
+          world = GameData.worlds.firstWhere((w) => w.id == progress.currentCategoryId);
+        } catch (_) {
+          if (GameData.worlds.isNotEmpty) world = GameData.worlds.first;
+        }
+      } else if (progress.currentWorldId < GameData.worlds.length) {
+        world = GameData.worlds[progress.currentWorldId];
+      } else if (GameData.worlds.isNotEmpty) {
+        world = GameData.worlds.first;
+      }
       emit(GameState(progress: progress, currentWorld: world));
     } catch (_) {}
   }
 
   void selectWorld(WorldDef world) {
     final progress = state.progress;
-    progress.currentWorldId = world.id;
-    _safePersist(() => _repository.setCurrentLevel(progress, world.id, null));
+    _safePersist(() => _repository.setCurrentCategory(progress, world.id, null));
     emit(state.copyWith(progress: progress, currentWorld: world, bossHpMultiplier: 1));
   }
 
@@ -105,7 +112,7 @@ class GameCubit extends Cubit<GameState> {
     final world = worldOverride ?? state.currentWorld;
     progress.currentLevelId = level.id;
     _levelStartTime = DateTime.now();
-    _safePersist(() => _repository.setCurrentLevel(progress, world?.id ?? 0, level.id));
+    _safePersist(() => _repository.setCurrentCategory(progress, world?.id, level.id));
     emit(state.copyWith(
       progress: progress,
       currentWorld: world ?? state.currentWorld,
@@ -193,7 +200,8 @@ class GameCubit extends Cubit<GameState> {
     _safePersist(() => _repository.resetLevelUses(progress));
     final world = state.currentWorld;
     if (world != null && GameData.isWorldComplete(world, progress.completedLevelIds)) {
-      _safePersist(() => _repository.completeWorld(progress, world.id));
+      _safePersist(() => _repository.completeWorld(progress, 0));
+      _safePersist(() => _repository.completeCategory(progress, world.id));
     }
 
     // Draw reward safely — ensure state always emits even if reward fails
@@ -392,9 +400,13 @@ class GameCubit extends Cubit<GameState> {
     emit(state.copyWith(progress: progress));
   }
 
-  void selectWorldById(int worldId) {
-    if (worldId < GameData.worlds.length) {
-      selectWorld(GameData.worlds[worldId]);
+  void selectWorldById(String worldId) {
+    final world = GameData.worlds.cast<WorldDef?>().firstWhere(
+      (w) => w!.id == worldId,
+      orElse: () => null,
+    );
+    if (world != null) {
+      selectWorld(world);
     }
   }
 

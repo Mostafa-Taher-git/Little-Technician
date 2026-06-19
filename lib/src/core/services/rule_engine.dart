@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:littletech/src/core/constants/category_manager.dart';
 import 'package:littletech/src/features/solutions/data/models/problem_solution_model.dart';
 
 /// Each category has an icon and a list of problems.
@@ -12,177 +13,11 @@ class CategoryData {
 
 /// The complete knowledge-base for LittleTech.
 class RuleEngine {
-  static const List<CategoryData> categories = [
-    CategoryData(
-      name: 'CPU',
-      icon: Icons.memory,
-      problems: [
-        'High CPU usage',
-        'CPU overheating',
-        'Computer not turning on',
-        'Beep codes on startup',
-        'CPU fan not spinning',
-        'CPU not detected in BIOS',
-      ],
-    ),
-    CategoryData(
-      name: 'RAM',
-      icon: Icons.developer_board,
-      problems: [
-        'Random crashes / BSOD',
-        'Insufficient memory warning',
-        'RAM not detected',
-        'RAM overheating',
-        'RAM compatibility issues',
-      ],
-    ),
-    CategoryData(
-      name: 'Boot & OS',
-      icon: Icons.desktop_windows,
-      problems: [
-        "PC won't boot",
-        'Boot loop',
-        'Blue screen of death (BSOD)',
-        'OS running slow',
-        'Windows not updating',
-      ],
-    ),
-    CategoryData(
-      name: 'Audio',
-      icon: Icons.volume_up,
-      problems: [
-        'No sound output',
-        'Distorted audio',
-        'Audio device not found',
-        'Microphone not working',
-        'Audio lag / delay',
-      ],
-    ),
-    CategoryData(
-      name: 'Mouse',
-      icon: Icons.mouse,
-      problems: [
-        'Mouse not responding',
-        'Cursor lagging or stuttering',
-        'Mouse double-click issue',
-        'Wireless mouse disconnecting',
-        'Scroll wheel not working',
-      ],
-    ),
-    CategoryData(
-      name: 'Keyboard',
-      icon: Icons.keyboard,
-      problems: [
-        'Keyboard not responding',
-        'Keys typing wrong characters',
-        'Sticky keys',
-        'Backlight not working',
-        'Wireless keyboard lag',
-      ],
-    ),
-    CategoryData(
-      name: 'Printer',
-      icon: Icons.print,
-      problems: [
-        'Printer not responding',
-        'Paper jam',
-        'Poor print quality',
-        'Printer offline',
-        'Driver installation failed',
-      ],
-    ),
-    CategoryData(
-      name: 'Programs',
-      icon: Icons.apps,
-      problems: [
-        'Program crashes on launch',
-        'Software installation failed',
-        'Program running slow',
-        'DLL file missing error',
-        'Program not compatible',
-      ],
-    ),
-    CategoryData(
-      name: 'Internet',
-      icon: Icons.wifi,
-      problems: [
-        'No internet connection',
-        'Slow internet speed',
-        'Wi-Fi not detected',
-        'DNS server not responding',
-        'VPN not connecting',
-      ],
-    ),
-    CategoryData(
-      name: 'Hard Drive',
-      icon: Icons.storage,
-      problems: [
-        'Hard drive not detected',
-        'Clicking or grinding noise',
-        'Slow disk performance',
-        'Disk full — no space',
-        'Corrupted files / sectors',
-      ],
-    ),
-    CategoryData(
-      name: 'Display',
-      icon: Icons.monitor,
-      problems: [
-        'No display output',
-        'Flickering screen',
-        'Black screen on boot',
-        'Wrong resolution',
-        'Dead pixels',
-      ],
-    ),
-    CategoryData(
-      name: 'Mobile',
-      icon: Icons.phone_android,
-      problems: [
-        'Battery draining too fast',
-        'Phone overheating',
-        'Apps crashing on phone',
-        'Phone not charging',
-        'Slow phone performance',
-      ],
-    ),
-    CategoryData(
-      name: 'Gaming',
-      icon: Icons.sports_esports,
-      problems: [
-        'Game crashing on startup',
-        'Low FPS in games',
-        'Controller not connecting',
-        'Game audio stuttering',
-        'Graphics driver crash',
-      ],
-    ),
-    CategoryData(
-      name: 'Smart Home',
-      icon: Icons.home_max,
-      problems: [
-        'Smart device offline',
-        'Voice assistant not responding',
-        'Smart light not connecting',
-        'Home hub setup failed',
-        'Automation not triggering',
-      ],
-    ),
-    CategoryData(
-      name: 'Security',
-      icon: Icons.shield,
-      problems: [
-        'Virus or malware infection',
-        'Suspicious pop-ups and browser redirects',
-        'Computer running slow after virus scare',
-        'Phishing email received',
-        'Suspicious program installed without consent',
-        'Wi-Fi network showing unauthorized devices',
-        'Password not accepted after update',
-        'Firewall blocking legitimate apps',
-      ],
-    ),
-  ];
+  static List<CategoryData> get categories {
+    return CategoryManager.all.map((cat) {
+      return CategoryData(name: cat.name, icon: cat.icon, problems: cat.problemKeys);
+    }).toList();
+  }
 
   /// Maps a problem string → list of solution steps.
   static final Map<String, List<String>> _solutions = {
@@ -766,5 +601,10 @@ class RuleEngine {
     }
 
     return null;
+  }
+
+  static List<String>? solutionsForProblem(String problem) {
+    final result = solve(problem);
+    return result?.steps;
   }
 }

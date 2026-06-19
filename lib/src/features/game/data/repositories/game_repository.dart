@@ -66,6 +66,13 @@ class GameRepository {
     await saveProgress(progress);
   }
 
+  Future<void> completeCategory(PlayerProgress progress, String categoryId) async {
+    if (!progress.completedCategoryIds.contains(categoryId)) {
+      progress.completedCategoryIds.add(categoryId);
+    }
+    await saveProgress(progress);
+  }
+
   Future<void> defeatBoss(PlayerProgress progress) async {
     progress.bossesDefeated++;
     progress.extraSupTechUses++;
@@ -116,6 +123,13 @@ class GameRepository {
   Future<void> setCurrentLevel(
       PlayerProgress progress, int worldId, String? levelId) async {
     progress.currentWorldId = worldId;
+    progress.currentLevelId = levelId;
+    await saveProgress(progress);
+  }
+
+  Future<void> setCurrentCategory(
+      PlayerProgress progress, String? categoryId, String? levelId) async {
+    progress.currentCategoryId = categoryId;
     progress.currentLevelId = levelId;
     await saveProgress(progress);
   }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-enum AchievementType { levels, bosses, points, rewards, streak, worlds }
+enum AchievementType { levels, bosses, points, rewards, streak, worlds, categories }
 
 class Achievement {
   final String id;
@@ -171,8 +171,8 @@ class AchievementManager {
     Achievement(
       id: 'complete_world',
       name: 'World Explorer',
-      description: 'Complete an entire world',
-      type: AchievementType.worlds,
+      description: 'Complete a category campaign',
+      type: AchievementType.categories,
       requirement: 1,
       rewardPoints: 50,
       icon: Icons.public,
@@ -180,8 +180,8 @@ class AchievementManager {
     Achievement(
       id: 'three_worlds',
       name: 'Adventurer',
-      description: 'Complete 3 worlds',
-      type: AchievementType.worlds,
+      description: 'Complete 3 category campaigns',
+      type: AchievementType.categories,
       requirement: 3,
       rewardPoints: 100,
       icon: Icons.travel_explore,
@@ -189,9 +189,9 @@ class AchievementManager {
     Achievement(
       id: 'all_worlds',
       name: 'Conqueror',
-      description: 'Complete all worlds',
-      type: AchievementType.worlds,
-      requirement: 8,
+      description: 'Complete all category campaigns',
+      type: AchievementType.categories,
+      requirement: 13,
       rewardPoints: 500,
       icon: Icons.flag,
     ),
@@ -231,6 +231,7 @@ class AchievementManager {
     required int rewardsEarned,
     required int streak,
     required int worldsCompleted,
+    int categoriesCompleted = 0,
     List<String> alreadyUnlockedIds = const [],
   }) {
     final newAchievements = <Achievement>[];
@@ -244,6 +245,7 @@ class AchievementManager {
         AchievementType.rewards => rewardsEarned,
         AchievementType.streak => streak,
         AchievementType.worlds => worldsCompleted,
+        AchievementType.categories => categoriesCompleted,
       };
       if (progress >= a.requirement) {
         newAchievements.add(a);

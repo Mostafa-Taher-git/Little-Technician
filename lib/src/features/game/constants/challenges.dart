@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:littletech/src/core/constants/category_manager.dart';
 import 'game_data.dart';
 
 class DailyChallenge {
@@ -20,14 +21,14 @@ class DailyChallenge {
 }
 
 class WeeklyBoss {
-  final int worldIndex;
+  final String categoryId;
   final int bonusPoints;
   final int pointsMultiplier;
   final DateTime weekStart;
   final String specialRule;
 
   const WeeklyBoss({
-    required this.worldIndex,
+    required this.categoryId,
     this.bonusPoints = 200,
     this.pointsMultiplier = 3,
     required this.weekStart,
@@ -66,16 +67,17 @@ class ChallengeManager {
     final weekNumber = daysSinceEpoch ~/ 7;
     final rng = Random(weekNumber);
 
-    final worldIndex = rng.nextInt(GameData.worlds.length);
+    final catIndex = rng.nextInt(CategoryManager.all.length);
+    final cat = CategoryManager.all[catIndex];
 
     final rules = [
-      'Defeat the boss in ${GameData.worlds[worldIndex].name} with no hints!',
+      'Defeat the boss in ${cat.name} with no hints!',
       'Defeat the boss using only basic attacks!',
       'Defeat the boss in under 3 attacks!',
     ];
 
     return WeeklyBoss(
-      worldIndex: worldIndex,
+      categoryId: cat.id,
       bonusPoints: 200,
       weekStart: DateTime(now.year, now.month, now.day - now.weekday + 1),
       specialRule: rules[rng.nextInt(rules.length)],

@@ -213,7 +213,7 @@ class ReviewScreen extends StatelessWidget {
                   ),
                   icon: const Icon(Icons.arrow_back, size: 20),
                   label: const Text(
-                    'Back to Campaign Map',
+                    'Back to Dungeon Map',
                     style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700),
                   ),
                   style: ElevatedButton.styleFrom(

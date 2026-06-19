@@ -163,6 +163,25 @@ class _BossScreenState extends State<BossScreen>
     ],
   };
 
+  static int _bossIndex(String worldId) {
+    const indexMap = {
+      'core_components': 1,
+      'ram': 2,
+      'operating_system': 2,
+      'audio': 4,
+      'peripherals': 3,
+      'software': 4,
+      'internet': 4,
+      'storage': 5,
+      'display': 5,
+      'mobile': 6,
+      'gaming': 7,
+      'smart_home': 8,
+      'security': 5,
+    };
+    return indexMap[worldId] ?? 1;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -194,7 +213,7 @@ class _BossScreenState extends State<BossScreen>
   }
 
   void _selectedDiagnosis(int selectedIndex) {
-    final bossIndex = widget.world.id;
+    final bossIndex = _bossIndex(widget.world.id);
     final diagnosis = _bossDiagnoses[bossIndex];
     if (diagnosis == null) return;
 
@@ -269,7 +288,7 @@ class _BossScreenState extends State<BossScreen>
   }
 
   Widget _buildPhaseStart() {
-    final bossIndex = widget.world.id;
+    final bossIndex = _bossIndex(widget.world.id);
     final diagnosis = _bossDiagnoses[bossIndex];
 
     if (_showDiagnosis && diagnosis != null) {
@@ -556,7 +575,7 @@ class _BossScreenState extends State<BossScreen>
           final boss = widget.world.boss;
           final hpLeft = state.currentBossHp;
           final isDefeated = hpLeft <= 0;
-          final bossIndex = widget.world.id;
+          final bossIndex = _bossIndex(widget.world.id);
           final abilities = _bossAbilities[bossIndex] ?? [];
           final armorClass = _bossArmor[bossIndex] ?? 14;
 

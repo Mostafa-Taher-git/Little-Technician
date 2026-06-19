@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:littletech/src/features/auth/data/models/user_model.dart';
 import 'package:littletech/src/features/auth/data/services/auth_service.dart';
+import 'package:littletech/src/core/constants/category_manager.dart';
 import 'package:littletech/src/features/game/constants/game_data.dart';
 import 'package:littletech/src/features/game/constants/reward_pool.dart';
 import 'package:littletech/src/features/game/constants/skin_tiers.dart';
@@ -34,9 +35,7 @@ class StatsScreen extends StatelessWidget {
                   .whereType<RewardDef>()
                   .length;
               final totalLevels = GameData.worlds.fold(0, (s, w) => s + w.levels.length);
-              final worldsCompleted = GameData.worlds
-                  .where((w) => w.levels.every((l) => p.completedLevelIds.contains(l.id)))
-                  .length;
+              final worldsCompleted = p.completedCategoryIds.length;
               final currentSkin = SkinTierManager.skinForLevelsCleared(p.levelsCleared);
 
               return ListView(
@@ -93,7 +92,7 @@ class StatsScreen extends StatelessWidget {
                       const Gap(10),
                       _StatSquare(icon: Icons.shield, label: 'Bosses', value: '${p.bossesDefeated}', scheme: scheme),
                       const Gap(10),
-                      _StatSquare(icon: Icons.public, label: 'Worlds', value: '$worldsCompleted/${GameData.worlds.length}', scheme: scheme),
+                      _StatSquare(icon: Icons.public, label: 'Categories', value: '$worldsCompleted/${CategoryManager.all.length}', scheme: scheme),
                     ],
                   ),
                   const Gap(10),

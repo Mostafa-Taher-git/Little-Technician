@@ -307,7 +307,7 @@ class _ProblemScreenState extends State<ProblemScreen> {
                         LevelSelectScreen(world: widget.world),
                       ),
                       icon: const Icon(Icons.arrow_back, size: 20),
-                      label: const Text('Back to Campaign Map'),
+                      label: const Text('Back to Dungeon Map'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: scheme.secondary,
                         foregroundColor: scheme.onSecondary,

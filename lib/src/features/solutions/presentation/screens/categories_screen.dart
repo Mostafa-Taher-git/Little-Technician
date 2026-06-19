@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:littletech/src/core/constants/category_manager.dart';
 import 'package:littletech/src/core/services/rule_engine.dart';
 import 'package:littletech/src/core/widgets/app_widgets.dart';
 import 'problems_list_screen.dart';
@@ -25,7 +26,7 @@ class CategoriesScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Text(
-                  '${RuleEngine.categories.length} categories',
+                  '${CategoryManager.all.length} categories',
                   style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: scheme.onSurface.withValues(alpha: 0.6)),
                 ),
               ),
@@ -42,9 +43,9 @@ class CategoriesScreen extends StatelessWidget {
             mainAxisSpacing: 12,
             childAspectRatio: 1,
           ),
-          itemCount: RuleEngine.categories.length,
+          itemCount: CategoryManager.all.length,
           itemBuilder: (context, index) {
-            final cat = RuleEngine.categories[index];
+            final cat = CategoryManager.all[index];
             return CategoryCard(
               title: cat.name,
               icon: cat.icon,
@@ -52,7 +53,7 @@ class CategoriesScreen extends StatelessWidget {
               onTap: () => Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => ProblemsListScreen(category: cat),
+                  builder: (_) => ProblemsListScreen(category: CategoryData(name: cat.name, icon: cat.icon, problems: cat.problemKeys)),
                 ),
               ),
             ).animate(delay: Duration(milliseconds: 50 * index)).fadeIn().scale(begin: const Offset(0.9, 0.9));

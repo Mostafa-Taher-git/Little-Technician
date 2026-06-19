@@ -17,103 +17,118 @@ const PlayerProgressSchema = CollectionSchema(
   name: r'PlayerProgress',
   id: -69375815682459782,
   properties: {
-    r'activeSkinId': PropertySchema(
+    r'activeFrameId': PropertySchema(
       id: 0,
+      name: r'activeFrameId',
+      type: IsarType.string,
+    ),
+    r'activeSkinId': PropertySchema(
+      id: 1,
       name: r'activeSkinId',
       type: IsarType.string,
     ),
     r'bossesDefeated': PropertySchema(
-      id: 1,
+      id: 2,
       name: r'bossesDefeated',
       type: IsarType.long,
     ),
+    r'completedCategoryIds': PropertySchema(
+      id: 3,
+      name: r'completedCategoryIds',
+      type: IsarType.stringList,
+    ),
     r'completedLevelIds': PropertySchema(
-      id: 2,
+      id: 4,
       name: r'completedLevelIds',
       type: IsarType.stringList,
     ),
     r'completedWorldIds': PropertySchema(
-      id: 3,
+      id: 5,
       name: r'completedWorldIds',
       type: IsarType.longList,
     ),
     r'correctAnswers': PropertySchema(
-      id: 4,
+      id: 6,
       name: r'correctAnswers',
       type: IsarType.long,
     ),
+    r'currentCategoryId': PropertySchema(
+      id: 7,
+      name: r'currentCategoryId',
+      type: IsarType.string,
+    ),
     r'currentLevelId': PropertySchema(
-      id: 5,
+      id: 8,
       name: r'currentLevelId',
       type: IsarType.string,
     ),
     r'currentWorldId': PropertySchema(
-      id: 6,
+      id: 9,
       name: r'currentWorldId',
       type: IsarType.long,
     ),
     r'earnedRewardIds': PropertySchema(
-      id: 7,
+      id: 10,
       name: r'earnedRewardIds',
       type: IsarType.stringList,
     ),
     r'extraSupTechUses': PropertySchema(
-      id: 8,
+      id: 11,
       name: r'extraSupTechUses',
       type: IsarType.long,
     ),
     r'lastActiveDate': PropertySchema(
-      id: 9,
+      id: 12,
       name: r'lastActiveDate',
       type: IsarType.dateTime,
     ),
     r'levelsCleared': PropertySchema(
-      id: 10,
+      id: 13,
       name: r'levelsCleared',
       type: IsarType.long,
     ),
     r'playDates': PropertySchema(
-      id: 11,
+      id: 14,
       name: r'playDates',
       type: IsarType.dateTimeList,
     ),
     r'points': PropertySchema(
-      id: 12,
+      id: 15,
       name: r'points',
       type: IsarType.long,
     ),
     r'prepResults': PropertySchema(
-      id: 13,
+      id: 16,
       name: r'prepResults',
       type: IsarType.stringList,
     ),
     r'supTechUsesThisLevel': PropertySchema(
-      id: 14,
+      id: 17,
       name: r'supTechUsesThisLevel',
       type: IsarType.long,
     ),
     r'themeId': PropertySchema(
-      id: 15,
+      id: 18,
       name: r'themeId',
       type: IsarType.string,
     ),
     r'totalAnswers': PropertySchema(
-      id: 16,
+      id: 19,
       name: r'totalAnswers',
       type: IsarType.long,
     ),
     r'totalPlayTimeSeconds': PropertySchema(
-      id: 17,
+      id: 20,
       name: r'totalPlayTimeSeconds',
       type: IsarType.long,
     ),
     r'unlockedSkinIds': PropertySchema(
-      id: 18,
+      id: 21,
       name: r'unlockedSkinIds',
       type: IsarType.stringList,
     ),
     r'userId': PropertySchema(
-      id: 19,
+      id: 22,
       name: r'userId',
       type: IsarType.long,
     )
@@ -153,9 +168,22 @@ int _playerProgressEstimateSize(
 ) {
   var bytesCount = offsets.last;
   {
+    final value = object.activeFrameId;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
+  {
     final value = object.activeSkinId;
     if (value != null) {
       bytesCount += 3 + value.length * 3;
+    }
+  }
+  bytesCount += 3 + object.completedCategoryIds.length * 3;
+  {
+    for (var i = 0; i < object.completedCategoryIds.length; i++) {
+      final value = object.completedCategoryIds[i];
+      bytesCount += value.length * 3;
     }
   }
   bytesCount += 3 + object.completedLevelIds.length * 3;
@@ -166,6 +194,12 @@ int _playerProgressEstimateSize(
     }
   }
   bytesCount += 3 + object.completedWorldIds.length * 8;
+  {
+    final value = object.currentCategoryId;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
   {
     final value = object.currentLevelId;
     if (value != null) {
@@ -209,26 +243,29 @@ void _playerProgressSerialize(
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  writer.writeString(offsets[0], object.activeSkinId);
-  writer.writeLong(offsets[1], object.bossesDefeated);
-  writer.writeStringList(offsets[2], object.completedLevelIds);
-  writer.writeLongList(offsets[3], object.completedWorldIds);
-  writer.writeLong(offsets[4], object.correctAnswers);
-  writer.writeString(offsets[5], object.currentLevelId);
-  writer.writeLong(offsets[6], object.currentWorldId);
-  writer.writeStringList(offsets[7], object.earnedRewardIds);
-  writer.writeLong(offsets[8], object.extraSupTechUses);
-  writer.writeDateTime(offsets[9], object.lastActiveDate);
-  writer.writeLong(offsets[10], object.levelsCleared);
-  writer.writeDateTimeList(offsets[11], object.playDates);
-  writer.writeLong(offsets[12], object.points);
-  writer.writeStringList(offsets[13], object.prepResults);
-  writer.writeLong(offsets[14], object.supTechUsesThisLevel);
-  writer.writeString(offsets[15], object.themeId);
-  writer.writeLong(offsets[16], object.totalAnswers);
-  writer.writeLong(offsets[17], object.totalPlayTimeSeconds);
-  writer.writeStringList(offsets[18], object.unlockedSkinIds);
-  writer.writeLong(offsets[19], object.userId);
+  writer.writeString(offsets[0], object.activeFrameId);
+  writer.writeString(offsets[1], object.activeSkinId);
+  writer.writeLong(offsets[2], object.bossesDefeated);
+  writer.writeStringList(offsets[3], object.completedCategoryIds);
+  writer.writeStringList(offsets[4], object.completedLevelIds);
+  writer.writeLongList(offsets[5], object.completedWorldIds);
+  writer.writeLong(offsets[6], object.correctAnswers);
+  writer.writeString(offsets[7], object.currentCategoryId);
+  writer.writeString(offsets[8], object.currentLevelId);
+  writer.writeLong(offsets[9], object.currentWorldId);
+  writer.writeStringList(offsets[10], object.earnedRewardIds);
+  writer.writeLong(offsets[11], object.extraSupTechUses);
+  writer.writeDateTime(offsets[12], object.lastActiveDate);
+  writer.writeLong(offsets[13], object.levelsCleared);
+  writer.writeDateTimeList(offsets[14], object.playDates);
+  writer.writeLong(offsets[15], object.points);
+  writer.writeStringList(offsets[16], object.prepResults);
+  writer.writeLong(offsets[17], object.supTechUsesThisLevel);
+  writer.writeString(offsets[18], object.themeId);
+  writer.writeLong(offsets[19], object.totalAnswers);
+  writer.writeLong(offsets[20], object.totalPlayTimeSeconds);
+  writer.writeStringList(offsets[21], object.unlockedSkinIds);
+  writer.writeLong(offsets[22], object.userId);
 }
 
 PlayerProgress _playerProgressDeserialize(
@@ -238,27 +275,30 @@ PlayerProgress _playerProgressDeserialize(
   Map<Type, List<int>> allOffsets,
 ) {
   final object = PlayerProgress();
-  object.activeSkinId = reader.readStringOrNull(offsets[0]);
-  object.bossesDefeated = reader.readLong(offsets[1]);
-  object.completedLevelIds = reader.readStringList(offsets[2]) ?? [];
-  object.completedWorldIds = reader.readLongList(offsets[3]) ?? [];
-  object.correctAnswers = reader.readLong(offsets[4]);
-  object.currentLevelId = reader.readStringOrNull(offsets[5]);
-  object.currentWorldId = reader.readLong(offsets[6]);
-  object.earnedRewardIds = reader.readStringList(offsets[7]) ?? [];
-  object.extraSupTechUses = reader.readLong(offsets[8]);
+  object.activeFrameId = reader.readStringOrNull(offsets[0]);
+  object.activeSkinId = reader.readStringOrNull(offsets[1]);
+  object.bossesDefeated = reader.readLong(offsets[2]);
+  object.completedCategoryIds = reader.readStringList(offsets[3]) ?? [];
+  object.completedLevelIds = reader.readStringList(offsets[4]) ?? [];
+  object.completedWorldIds = reader.readLongList(offsets[5]) ?? [];
+  object.correctAnswers = reader.readLong(offsets[6]);
+  object.currentCategoryId = reader.readStringOrNull(offsets[7]);
+  object.currentLevelId = reader.readStringOrNull(offsets[8]);
+  object.currentWorldId = reader.readLong(offsets[9]);
+  object.earnedRewardIds = reader.readStringList(offsets[10]) ?? [];
+  object.extraSupTechUses = reader.readLong(offsets[11]);
   object.id = id;
-  object.lastActiveDate = reader.readDateTimeOrNull(offsets[9]);
-  object.levelsCleared = reader.readLong(offsets[10]);
-  object.playDates = reader.readDateTimeList(offsets[11]) ?? [];
-  object.points = reader.readLong(offsets[12]);
-  object.prepResults = reader.readStringList(offsets[13]) ?? [];
-  object.supTechUsesThisLevel = reader.readLong(offsets[14]);
-  object.themeId = reader.readStringOrNull(offsets[15]);
-  object.totalAnswers = reader.readLong(offsets[16]);
-  object.totalPlayTimeSeconds = reader.readLong(offsets[17]);
-  object.unlockedSkinIds = reader.readStringList(offsets[18]) ?? [];
-  object.userId = reader.readLong(offsets[19]);
+  object.lastActiveDate = reader.readDateTimeOrNull(offsets[12]);
+  object.levelsCleared = reader.readLong(offsets[13]);
+  object.playDates = reader.readDateTimeList(offsets[14]) ?? [];
+  object.points = reader.readLong(offsets[15]);
+  object.prepResults = reader.readStringList(offsets[16]) ?? [];
+  object.supTechUsesThisLevel = reader.readLong(offsets[17]);
+  object.themeId = reader.readStringOrNull(offsets[18]);
+  object.totalAnswers = reader.readLong(offsets[19]);
+  object.totalPlayTimeSeconds = reader.readLong(offsets[20]);
+  object.unlockedSkinIds = reader.readStringList(offsets[21]) ?? [];
+  object.userId = reader.readLong(offsets[22]);
   return object;
 }
 
@@ -272,42 +312,48 @@ P _playerProgressDeserializeProp<P>(
     case 0:
       return (reader.readStringOrNull(offset)) as P;
     case 1:
-      return (reader.readLong(offset)) as P;
-    case 2:
-      return (reader.readStringList(offset) ?? []) as P;
-    case 3:
-      return (reader.readLongList(offset) ?? []) as P;
-    case 4:
-      return (reader.readLong(offset)) as P;
-    case 5:
       return (reader.readStringOrNull(offset)) as P;
+    case 2:
+      return (reader.readLong(offset)) as P;
+    case 3:
+      return (reader.readStringList(offset) ?? []) as P;
+    case 4:
+      return (reader.readStringList(offset) ?? []) as P;
+    case 5:
+      return (reader.readLongList(offset) ?? []) as P;
     case 6:
       return (reader.readLong(offset)) as P;
     case 7:
-      return (reader.readStringList(offset) ?? []) as P;
-    case 8:
-      return (reader.readLong(offset)) as P;
-    case 9:
-      return (reader.readDateTimeOrNull(offset)) as P;
-    case 10:
-      return (reader.readLong(offset)) as P;
-    case 11:
-      return (reader.readDateTimeList(offset) ?? []) as P;
-    case 12:
-      return (reader.readLong(offset)) as P;
-    case 13:
-      return (reader.readStringList(offset) ?? []) as P;
-    case 14:
-      return (reader.readLong(offset)) as P;
-    case 15:
       return (reader.readStringOrNull(offset)) as P;
-    case 16:
+    case 8:
+      return (reader.readStringOrNull(offset)) as P;
+    case 9:
       return (reader.readLong(offset)) as P;
+    case 10:
+      return (reader.readStringList(offset) ?? []) as P;
+    case 11:
+      return (reader.readLong(offset)) as P;
+    case 12:
+      return (reader.readDateTimeOrNull(offset)) as P;
+    case 13:
+      return (reader.readLong(offset)) as P;
+    case 14:
+      return (reader.readDateTimeList(offset) ?? []) as P;
+    case 15:
+      return (reader.readLong(offset)) as P;
+    case 16:
+      return (reader.readStringList(offset) ?? []) as P;
     case 17:
       return (reader.readLong(offset)) as P;
     case 18:
-      return (reader.readStringList(offset) ?? []) as P;
+      return (reader.readStringOrNull(offset)) as P;
     case 19:
+      return (reader.readLong(offset)) as P;
+    case 20:
+      return (reader.readLong(offset)) as P;
+    case 21:
+      return (reader.readStringList(offset) ?? []) as P;
+    case 22:
       return (reader.readLong(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -510,6 +556,160 @@ extension PlayerProgressQueryWhere
 
 extension PlayerProgressQueryFilter
     on QueryBuilder<PlayerProgress, PlayerProgress, QFilterCondition> {
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      activeFrameIdIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'activeFrameId',
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      activeFrameIdIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'activeFrameId',
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      activeFrameIdEqualTo(
+    String? value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'activeFrameId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      activeFrameIdGreaterThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'activeFrameId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      activeFrameIdLessThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'activeFrameId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      activeFrameIdBetween(
+    String? lower,
+    String? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'activeFrameId',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      activeFrameIdStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'activeFrameId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      activeFrameIdEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'activeFrameId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      activeFrameIdContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'activeFrameId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      activeFrameIdMatches(String pattern, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'activeFrameId',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      activeFrameIdIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'activeFrameId',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      activeFrameIdIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'activeFrameId',
+        value: '',
+      ));
+    });
+  }
+
   QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
       activeSkinIdIsNull() {
     return QueryBuilder.apply(this, (query) {
@@ -717,6 +917,233 @@ extension PlayerProgressQueryFilter
         upper: upper,
         includeUpper: includeUpper,
       ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      completedCategoryIdsElementEqualTo(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'completedCategoryIds',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      completedCategoryIdsElementGreaterThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'completedCategoryIds',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      completedCategoryIdsElementLessThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'completedCategoryIds',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      completedCategoryIdsElementBetween(
+    String lower,
+    String upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'completedCategoryIds',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      completedCategoryIdsElementStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'completedCategoryIds',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      completedCategoryIdsElementEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'completedCategoryIds',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      completedCategoryIdsElementContains(String value,
+          {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'completedCategoryIds',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      completedCategoryIdsElementMatches(String pattern,
+          {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'completedCategoryIds',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      completedCategoryIdsElementIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'completedCategoryIds',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      completedCategoryIdsElementIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'completedCategoryIds',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      completedCategoryIdsLengthEqualTo(int length) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'completedCategoryIds',
+        length,
+        true,
+        length,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      completedCategoryIdsIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'completedCategoryIds',
+        0,
+        true,
+        0,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      completedCategoryIdsIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'completedCategoryIds',
+        0,
+        false,
+        999999,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      completedCategoryIdsLengthLessThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'completedCategoryIds',
+        0,
+        true,
+        length,
+        include,
+      );
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      completedCategoryIdsLengthGreaterThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'completedCategoryIds',
+        length,
+        include,
+        999999,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      completedCategoryIdsLengthBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'completedCategoryIds',
+        lower,
+        includeLower,
+        upper,
+        includeUpper,
+      );
     });
   }
 
@@ -1144,6 +1571,160 @@ extension PlayerProgressQueryFilter
         includeLower: includeLower,
         upper: upper,
         includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      currentCategoryIdIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'currentCategoryId',
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      currentCategoryIdIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'currentCategoryId',
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      currentCategoryIdEqualTo(
+    String? value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'currentCategoryId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      currentCategoryIdGreaterThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'currentCategoryId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      currentCategoryIdLessThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'currentCategoryId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      currentCategoryIdBetween(
+    String? lower,
+    String? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'currentCategoryId',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      currentCategoryIdStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'currentCategoryId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      currentCategoryIdEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'currentCategoryId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      currentCategoryIdContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'currentCategoryId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      currentCategoryIdMatches(String pattern, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'currentCategoryId',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      currentCategoryIdIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'currentCategoryId',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      currentCategoryIdIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'currentCategoryId',
+        value: '',
       ));
     });
   }
@@ -2867,6 +3448,20 @@ extension PlayerProgressQueryLinks
 extension PlayerProgressQuerySortBy
     on QueryBuilder<PlayerProgress, PlayerProgress, QSortBy> {
   QueryBuilder<PlayerProgress, PlayerProgress, QAfterSortBy>
+      sortByActiveFrameId() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'activeFrameId', Sort.asc);
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterSortBy>
+      sortByActiveFrameIdDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'activeFrameId', Sort.desc);
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterSortBy>
       sortByActiveSkinId() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'activeSkinId', Sort.asc);
@@ -2905,6 +3500,20 @@ extension PlayerProgressQuerySortBy
       sortByCorrectAnswersDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'correctAnswers', Sort.desc);
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterSortBy>
+      sortByCurrentCategoryId() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'currentCategoryId', Sort.asc);
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterSortBy>
+      sortByCurrentCategoryIdDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'currentCategoryId', Sort.desc);
     });
   }
 
@@ -3063,6 +3672,20 @@ extension PlayerProgressQuerySortBy
 extension PlayerProgressQuerySortThenBy
     on QueryBuilder<PlayerProgress, PlayerProgress, QSortThenBy> {
   QueryBuilder<PlayerProgress, PlayerProgress, QAfterSortBy>
+      thenByActiveFrameId() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'activeFrameId', Sort.asc);
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterSortBy>
+      thenByActiveFrameIdDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'activeFrameId', Sort.desc);
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterSortBy>
       thenByActiveSkinId() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'activeSkinId', Sort.asc);
@@ -3101,6 +3724,20 @@ extension PlayerProgressQuerySortThenBy
       thenByCorrectAnswersDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'correctAnswers', Sort.desc);
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterSortBy>
+      thenByCurrentCategoryId() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'currentCategoryId', Sort.asc);
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterSortBy>
+      thenByCurrentCategoryIdDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'currentCategoryId', Sort.desc);
     });
   }
 
@@ -3271,6 +3908,14 @@ extension PlayerProgressQuerySortThenBy
 extension PlayerProgressQueryWhereDistinct
     on QueryBuilder<PlayerProgress, PlayerProgress, QDistinct> {
   QueryBuilder<PlayerProgress, PlayerProgress, QDistinct>
+      distinctByActiveFrameId({bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'activeFrameId',
+          caseSensitive: caseSensitive);
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QDistinct>
       distinctByActiveSkinId({bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'activeSkinId', caseSensitive: caseSensitive);
@@ -3281,6 +3926,13 @@ extension PlayerProgressQueryWhereDistinct
       distinctByBossesDefeated() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'bossesDefeated');
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QDistinct>
+      distinctByCompletedCategoryIds() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'completedCategoryIds');
     });
   }
 
@@ -3302,6 +3954,14 @@ extension PlayerProgressQueryWhereDistinct
       distinctByCorrectAnswers() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'correctAnswers');
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QDistinct>
+      distinctByCurrentCategoryId({bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'currentCategoryId',
+          caseSensitive: caseSensitive);
     });
   }
 
@@ -3419,6 +4079,13 @@ extension PlayerProgressQueryProperty
   }
 
   QueryBuilder<PlayerProgress, String?, QQueryOperations>
+      activeFrameIdProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'activeFrameId');
+    });
+  }
+
+  QueryBuilder<PlayerProgress, String?, QQueryOperations>
       activeSkinIdProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'activeSkinId');
@@ -3428,6 +4095,13 @@ extension PlayerProgressQueryProperty
   QueryBuilder<PlayerProgress, int, QQueryOperations> bossesDefeatedProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'bossesDefeated');
+    });
+  }
+
+  QueryBuilder<PlayerProgress, List<String>, QQueryOperations>
+      completedCategoryIdsProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'completedCategoryIds');
     });
   }
 
@@ -3448,6 +4122,13 @@ extension PlayerProgressQueryProperty
   QueryBuilder<PlayerProgress, int, QQueryOperations> correctAnswersProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'correctAnswers');
+    });
+  }
+
+  QueryBuilder<PlayerProgress, String?, QQueryOperations>
+      currentCategoryIdProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'currentCategoryId');
     });
   }
 
