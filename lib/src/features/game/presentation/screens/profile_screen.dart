@@ -302,7 +302,9 @@ SupTechAvatar(
                       spacing: 8,
                       runSpacing: 8,
                       children: RewardPool.all.where((r) => r.type == RewardType.nicknameFrame).map((frame) {
-                        final unlocked = progress.earnedRewardIds.contains(frame.id);
+                        final earned = progress.earnedRewardIds.contains(frame.id);
+                        final purchased = progress.purchasedItemIds.contains(frame.id);
+                        final unlocked = earned || purchased;
                         final isActive = progress.activeFrameId == frame.id;
                         return GestureDetector(
                           onTap: unlocked
@@ -333,7 +335,7 @@ SupTechAvatar(
                                 Icon(frame.icon, color: unlocked ? frame.color : scheme.onSurface.withValues(alpha: 0.3), size: 18),
                                 const Gap(8),
                                 Text(
-                                  frame.displayName,
+                                  unlocked ? frame.displayName : '${frame.displayName} · 1000 pts',
                                   style: TextStyle(
                                     color: unlocked ? frame.color : scheme.onSurface.withValues(alpha: 0.3),
                                     fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
@@ -345,7 +347,20 @@ SupTechAvatar(
                                   Icon(Icons.check_circle, color: frame.color, size: 16),
                                 ] else if (!unlocked) ...[
                                   const Gap(6),
-                                  Icon(Icons.lock, color: scheme.onSurface.withValues(alpha: 0.3), size: 16),
+                                  GestureDetector(
+                                    onTap: () => context.read<GameCubit>().purchaseItem(frame.id),
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                      decoration: BoxDecoration(
+                                        color: scheme.secondary.withValues(alpha: 0.2),
+                                        borderRadius: BorderRadius.circular(6),
+                                      ),
+                                      child: Text(
+                                        'Buy',
+                                        style: TextStyle(color: scheme.secondary, fontSize: 10, fontWeight: FontWeight.w700),
+                                      ),
+                                    ),
+                                  ),
                                 ],
                               ],
                             ),
@@ -392,7 +407,8 @@ SupTechAvatar(
                       spacing: 8,
                       runSpacing: 8,
                       children: SkinTierManager.skins.map((skin) {
-                        final unlocked = progress.unlockedSkinIds.contains(skin.id);
+                        final purchased = progress.purchasedItemIds.contains(skin.id);
+                        final unlocked = progress.unlockedSkinIds.contains(skin.id) || purchased;
                         final isActive = progress.activeSkinId == skin.id;
                         return GestureDetector(
                           onTap: unlocked
@@ -435,7 +451,20 @@ SupTechAvatar(
                                   Icon(Icons.check_circle, color: skin.color, size: 16),
                                 ] else if (!unlocked) ...[
                                   const Gap(6),
-                                  Icon(Icons.lock, color: scheme.onSurface.withValues(alpha: 0.3), size: 16),
+                                  GestureDetector(
+                                    onTap: () => context.read<GameCubit>().purchaseItem(skin.id),
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                      decoration: BoxDecoration(
+                                        color: scheme.secondary.withValues(alpha: 0.2),
+                                        borderRadius: BorderRadius.circular(6),
+                                      ),
+                                      child: Text(
+                                        'Buy',
+                                        style: TextStyle(color: scheme.secondary, fontSize: 10, fontWeight: FontWeight.w700),
+                                      ),
+                                    ),
+                                  ),
                                 ],
                               ],
                             ),

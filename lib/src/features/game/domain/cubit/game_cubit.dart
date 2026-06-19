@@ -400,6 +400,17 @@ class GameCubit extends Cubit<GameState> {
     emit(state.copyWith(progress: progress));
   }
 
+  void purchaseItem(String itemId) {
+    final progress = state.progress;
+    if (progress.points < 1000) return;
+    if (progress.purchasedItemIds.contains(itemId)) return;
+    if (progress.earnedRewardIds.contains(itemId)) return;
+    progress.points -= 1000;
+    progress.purchasedItemIds = List<String>.from(progress.purchasedItemIds)..add(itemId);
+    _safePersist(() => _repository.saveProgress(progress));
+    emit(state.copyWith(progress: progress));
+  }
+
   void selectWorldById(String worldId) {
     final world = GameData.worlds.cast<WorldDef?>().firstWhere(
       (w) => w!.id == worldId,

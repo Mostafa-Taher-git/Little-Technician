@@ -18,6 +18,7 @@ class PlayerProgress {
   List<String> completedLevelIds = [];
   List<int> completedWorldIds = [];
   List<String> completedCategoryIds = [];
+  List<String> purchasedItemIds = [];
 List<String> earnedRewardIds = [];
   List<String> unlockedSkinIds = [];
   String? activeSkinId;  // Currently equipped skin
@@ -58,5 +59,6 @@ List<String> earnedRewardIds = [];
     unlockedSkinIds = List<String>.from(unlockedSkinIds);
     playDates = List<DateTime>.from(playDates);
     prepResults = List<String>.from(prepResults);
+    purchasedItemIds = List<String>.from(purchasedItemIds);
   }
 }

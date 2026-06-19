@@ -102,33 +102,38 @@ const PlayerProgressSchema = CollectionSchema(
       name: r'prepResults',
       type: IsarType.stringList,
     ),
-    r'supTechUsesThisLevel': PropertySchema(
+    r'purchasedItemIds': PropertySchema(
       id: 17,
+      name: r'purchasedItemIds',
+      type: IsarType.stringList,
+    ),
+    r'supTechUsesThisLevel': PropertySchema(
+      id: 18,
       name: r'supTechUsesThisLevel',
       type: IsarType.long,
     ),
     r'themeId': PropertySchema(
-      id: 18,
+      id: 19,
       name: r'themeId',
       type: IsarType.string,
     ),
     r'totalAnswers': PropertySchema(
-      id: 19,
+      id: 20,
       name: r'totalAnswers',
       type: IsarType.long,
     ),
     r'totalPlayTimeSeconds': PropertySchema(
-      id: 20,
+      id: 21,
       name: r'totalPlayTimeSeconds',
       type: IsarType.long,
     ),
     r'unlockedSkinIds': PropertySchema(
-      id: 21,
+      id: 22,
       name: r'unlockedSkinIds',
       type: IsarType.stringList,
     ),
     r'userId': PropertySchema(
-      id: 22,
+      id: 23,
       name: r'userId',
       type: IsarType.long,
     )
@@ -221,6 +226,13 @@ int _playerProgressEstimateSize(
       bytesCount += value.length * 3;
     }
   }
+  bytesCount += 3 + object.purchasedItemIds.length * 3;
+  {
+    for (var i = 0; i < object.purchasedItemIds.length; i++) {
+      final value = object.purchasedItemIds[i];
+      bytesCount += value.length * 3;
+    }
+  }
   {
     final value = object.themeId;
     if (value != null) {
@@ -260,12 +272,13 @@ void _playerProgressSerialize(
   writer.writeDateTimeList(offsets[14], object.playDates);
   writer.writeLong(offsets[15], object.points);
   writer.writeStringList(offsets[16], object.prepResults);
-  writer.writeLong(offsets[17], object.supTechUsesThisLevel);
-  writer.writeString(offsets[18], object.themeId);
-  writer.writeLong(offsets[19], object.totalAnswers);
-  writer.writeLong(offsets[20], object.totalPlayTimeSeconds);
-  writer.writeStringList(offsets[21], object.unlockedSkinIds);
-  writer.writeLong(offsets[22], object.userId);
+  writer.writeStringList(offsets[17], object.purchasedItemIds);
+  writer.writeLong(offsets[18], object.supTechUsesThisLevel);
+  writer.writeString(offsets[19], object.themeId);
+  writer.writeLong(offsets[20], object.totalAnswers);
+  writer.writeLong(offsets[21], object.totalPlayTimeSeconds);
+  writer.writeStringList(offsets[22], object.unlockedSkinIds);
+  writer.writeLong(offsets[23], object.userId);
 }
 
 PlayerProgress _playerProgressDeserialize(
@@ -293,12 +306,13 @@ PlayerProgress _playerProgressDeserialize(
   object.playDates = reader.readDateTimeList(offsets[14]) ?? [];
   object.points = reader.readLong(offsets[15]);
   object.prepResults = reader.readStringList(offsets[16]) ?? [];
-  object.supTechUsesThisLevel = reader.readLong(offsets[17]);
-  object.themeId = reader.readStringOrNull(offsets[18]);
-  object.totalAnswers = reader.readLong(offsets[19]);
-  object.totalPlayTimeSeconds = reader.readLong(offsets[20]);
-  object.unlockedSkinIds = reader.readStringList(offsets[21]) ?? [];
-  object.userId = reader.readLong(offsets[22]);
+  object.purchasedItemIds = reader.readStringList(offsets[17]) ?? [];
+  object.supTechUsesThisLevel = reader.readLong(offsets[18]);
+  object.themeId = reader.readStringOrNull(offsets[19]);
+  object.totalAnswers = reader.readLong(offsets[20]);
+  object.totalPlayTimeSeconds = reader.readLong(offsets[21]);
+  object.unlockedSkinIds = reader.readStringList(offsets[22]) ?? [];
+  object.userId = reader.readLong(offsets[23]);
   return object;
 }
 
@@ -344,16 +358,18 @@ P _playerProgressDeserializeProp<P>(
     case 16:
       return (reader.readStringList(offset) ?? []) as P;
     case 17:
-      return (reader.readLong(offset)) as P;
+      return (reader.readStringList(offset) ?? []) as P;
     case 18:
-      return (reader.readStringOrNull(offset)) as P;
-    case 19:
       return (reader.readLong(offset)) as P;
+    case 19:
+      return (reader.readStringOrNull(offset)) as P;
     case 20:
       return (reader.readLong(offset)) as P;
     case 21:
-      return (reader.readStringList(offset) ?? []) as P;
+      return (reader.readLong(offset)) as P;
     case 22:
+      return (reader.readStringList(offset) ?? []) as P;
+    case 23:
       return (reader.readLong(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -2834,6 +2850,233 @@ extension PlayerProgressQueryFilter
   }
 
   QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      purchasedItemIdsElementEqualTo(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'purchasedItemIds',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      purchasedItemIdsElementGreaterThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'purchasedItemIds',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      purchasedItemIdsElementLessThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'purchasedItemIds',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      purchasedItemIdsElementBetween(
+    String lower,
+    String upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'purchasedItemIds',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      purchasedItemIdsElementStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'purchasedItemIds',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      purchasedItemIdsElementEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'purchasedItemIds',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      purchasedItemIdsElementContains(String value,
+          {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'purchasedItemIds',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      purchasedItemIdsElementMatches(String pattern,
+          {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'purchasedItemIds',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      purchasedItemIdsElementIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'purchasedItemIds',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      purchasedItemIdsElementIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'purchasedItemIds',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      purchasedItemIdsLengthEqualTo(int length) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'purchasedItemIds',
+        length,
+        true,
+        length,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      purchasedItemIdsIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'purchasedItemIds',
+        0,
+        true,
+        0,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      purchasedItemIdsIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'purchasedItemIds',
+        0,
+        false,
+        999999,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      purchasedItemIdsLengthLessThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'purchasedItemIds',
+        0,
+        true,
+        length,
+        include,
+      );
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      purchasedItemIdsLengthGreaterThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'purchasedItemIds',
+        length,
+        include,
+        999999,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      purchasedItemIdsLengthBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'purchasedItemIds',
+        lower,
+        includeLower,
+        upper,
+        includeUpper,
+      );
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
       supTechUsesThisLevelEqualTo(int value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
@@ -4029,6 +4272,13 @@ extension PlayerProgressQueryWhereDistinct
   }
 
   QueryBuilder<PlayerProgress, PlayerProgress, QDistinct>
+      distinctByPurchasedItemIds() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'purchasedItemIds');
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QDistinct>
       distinctBySupTechUsesThisLevel() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'supTechUsesThisLevel');
@@ -4189,6 +4439,13 @@ extension PlayerProgressQueryProperty
       prepResultsProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'prepResults');
+    });
+  }
+
+  QueryBuilder<PlayerProgress, List<String>, QQueryOperations>
+      purchasedItemIdsProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'purchasedItemIds');
     });
   }
 

@@ -286,4 +286,15 @@ class RewardPool {
     _ensureInit();
     return List.unmodifiable(rewards.where((r) => r.type == RewardType.icon || r.type == RewardType.title));
   }
+
+  static const int storePrice = 1000;
+
+  static List<RewardDef> get storeItems {
+    _ensureInit();
+    return List.unmodifiable(rewards);
+  }
+
+  static bool isPurchasable(RewardDef item, List<String> earnedIds, List<String> purchasedIds) {
+    return !earnedIds.contains(item.id) && !purchasedIds.contains(item.id);
+  }
 }

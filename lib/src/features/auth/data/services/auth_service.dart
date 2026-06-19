@@ -15,7 +15,16 @@ class AuthService {
     final raw = prefs.getString(_usersKey);
     if (raw == null) return [];
     final list = jsonDecode(raw) as List;
-    return list.map((e) => UserModel.fromJson(e as Map<String, dynamic>)).toList();
+    final users = list.map((e) => UserModel.fromJson(e as Map<String, dynamic>)).toList();
+    bool migrated = false;
+    for (var i = 0; i < users.length; i++) {
+      if (users[i].id == 0) {
+        users[i].id = i + 1;
+        migrated = true;
+      }
+    }
+    if (migrated) await _saveUsers(users);
+    return users;
   }
 
   static Future<void> _saveUsers(List<UserModel> users) async {
@@ -35,8 +44,12 @@ class AuthService {
     if (users.any((u) => u.username.toLowerCase() == username.toLowerCase())) {
       return false;
     }
-    users.add(UserModel(username: username, password: password, avatarIcon: avatarIcon));
+    final newId = users.isEmpty ? 1 : users.map((u) => u.id).reduce((a, b) => a > b ? a : b) + 1;
+    users.add(UserModel(id: newId, username: username, password: password, avatarIcon: avatarIcon));
     await _saveUsers(users);
+    final prefs = await _prefs;
+    await prefs.setString(_sessionKey, username);
+    await prefs.setInt('${_sessionKey}_id', newId);
     return true;
   }
 
@@ -44,12 +57,18 @@ class AuthService {
     final users = await _loadUsers();
     final match = users.firstWhere(
       (u) => u.username.toLowerCase() == username.toLowerCase() && u.password == password,
-      orElse: () => UserModel(username: '', password: ''),
+      orElse: () => UserModel(id: 0, username: '', password: ''),
     );
     if (match.username.isEmpty) return false;
     final prefs = await _prefs;
     await prefs.setString(_sessionKey, match.username);
+    await prefs.setInt('${_sessionKey}_id', match.id);
     return true;
+  }
+
+  static Future<int?> getCurrentUserId() async {
+    final prefs = await _prefs;
+    return prefs.getInt('${_sessionKey}_id');
   }
 
   static Future<void> logout() async {
