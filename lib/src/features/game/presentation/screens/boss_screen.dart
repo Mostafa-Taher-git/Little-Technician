@@ -37,6 +37,9 @@ class _BossScreenState extends State<BossScreen>
     3: ['Goblin Frenzy', 'Tangle Trap', 'Sneak Attack'],
     4: ['Dragon Breath', 'Wing Gust', 'Tail Slam'],
     5: ['Death Ray', 'Disintegrate', 'Anti-Magic Cone'],
+    6: ['Battery Leech', 'Power Surge', 'Phantom Drain'],
+    7: ['Frame Freeze', 'Lag Spike', 'Pixel Storm'],
+    8: ['Signal Jam', 'Ghost Command', 'Static Shock'],
   };
 
   static const Map<int, Map<String, dynamic>> _bossDiagnoses = {
@@ -75,10 +78,31 @@ class _BossScreenState extends State<BossScreen>
       'flavor': 'Perfect diagnosis! You counter its gaze abilities! Bonus damage!',
       'failFlavor': 'Wrong! The beholder unleashes all eye rays.',
     },
+    6: {
+      'symptoms': 'A spectral leech that drains battery life from every device it touches, leaving screens dim and processors starving for power.',
+      'options': ['It is a hardware voltage issue', 'It feeds on background processes and battery-draining apps', 'It is a faulty charging cable'],
+      'correct': 1,
+      'flavor': 'Correct! You identify the power drain source! Bonus damage!',
+      'failFlavor': 'Wrong diagnosis. The wraith drains more energy.',
+    },
+    7: {
+      'symptoms': 'A corrupted game entity that spawns frame drops and lag spikes, slowing everything it touches to a crawl.',
+      'options': ['It is a simple network ping issue', 'It corrupts the GPU pipeline and injects stutter into every render frame', 'It is a display resolution problem'],
+      'correct': 1,
+      'flavor': 'Spot on! You target the render pipeline! Bonus damage!',
+      'failFlavor': 'Wrong! The lag dragon freezes your screen.',
+    },
+    8: {
+      'symptoms': 'A possessed smart home hub that rewrites its own firmware, turns lights on at random, and ignores every voice command.',
+      'options': ['It is a weak Wi-Fi signal', 'It has corrupted firmware that hijacks automation routines and voice processing', 'It is a dead smart bulb battery'],
+      'correct': 1,
+      'flavor': 'Brilliant! You target the corrupted firmware! Bonus damage!',
+      'failFlavor': 'Wrong! The specter jams your smart devices.',
+    },
   };
 
-  static const _bossArmor = {1: 14, 2: 16, 3: 12, 4: 15, 5: 18};
-  static const _bossChallengeRating = {1: 3, 2: 5, 3: 4, 4: 6, 5: 8};
+  static const _bossArmor = {1: 14, 2: 16, 3: 12, 4: 15, 5: 18, 6: 13, 7: 17, 8: 14};
+  static const _bossChallengeRating = {1: 3, 2: 5, 3: 4, 4: 6, 5: 8, 6: 4, 7: 7, 8: 5};
 
   static const Map<int, List<Map<String, dynamic>>> _strategies = {
     1: [
@@ -115,6 +139,27 @@ class _BossScreenState extends State<BossScreen>
       {'name': 'Hit the central eye', 'success': 70, 'damage': 1, 'flavor': 'You land a quick strike on the main eye!', 'failFlavor': 'The beholder blinks and your attack misses.'},
       {'name': 'Dispel all eyes', 'success': 40, 'damage': 4, 'flavor': 'You seal three eyes at once! The beholder flails!', 'failFlavor': 'The beholder counters with a concentrated gaze.'},
       {'name': 'Anti-magic field', 'success': 55, 'damage': 2, 'flavor': 'Magic nullifies around you! The beholder is vulnerable!', 'failFlavor': 'The beholder\'s raw power breaks through your field.'},
+    ],
+    6: [
+      {'name': 'Kill background apps', 'success': 70, 'damage': 2, 'flavor': 'You shut down power-draining processes! The wraith weakens!', 'failFlavor': 'The apps restart instantly — the wraith absorbs them.'},
+      {'name': 'Enable battery saver', 'success': 80, 'damage': 1, 'flavor': 'Battery saver mode disrupts the wraith\'s drain!', 'failFlavor': 'The wraith overrides your battery settings.'},
+      {'name': 'Reduce screen brightness', 'success': 60, 'damage': 2, 'flavor': 'Lower brightness starves the wraith of energy!', 'failFlavor': 'The wraith feeds on the dimmed display.'},
+      {'name': 'Force-stop all services', 'success': 40, 'damage': 4, 'flavor': 'You sever every background connection! The wraith screams!', 'failFlavor': 'Critical services restart before you can strike.'},
+      {'name': 'Factory reset the drain', 'success': 50, 'damage': 3, 'flavor': 'A clean slate weakens the wraith\'s grip!', 'failFlavor': 'The wraith survives the reset with data intact.'},
+    ],
+    7: [
+      {'name': 'Lower graphics settings', 'success': 65, 'damage': 2, 'flavor': 'Reduced rendering load cracks the dragon\'s scales!', 'failFlavor': 'The dragon adapts and injects more lag.'},
+      {'name': 'Close background apps', 'success': 75, 'damage': 1, 'flavor': 'Freeing resources disrupts the lag field!', 'failFlavor': 'The dragon spawns more background processes.'},
+      {'name': 'Update GPU drivers', 'success': 45, 'damage': 4, 'flavor': 'Fresh drivers pierce through the lag armor! Massive hit!', 'failFlavor': 'The driver update stalls — the dragon exploits the gap.'},
+      {'name': 'Overclock the GPU', 'success': 35, 'damage': 5, 'flavor': 'Raw power overwhelms the lag dragon! Critical damage!', 'failFlavor': 'The overclock destabilizes — the dragon feeds on the heat.'},
+      {'name': 'Reduce resolution', 'success': 60, 'damage': 2, 'flavor': 'Lower pixel count lightens the render load!', 'failFlavor': 'The dragon corrupts the display output further.'},
+    ],
+    8: [
+      {'name': 'Factory reset the hub', 'success': 60, 'damage': 2, 'flavor': 'Wiping the firmware disrupts the specter\'s control!', 'failFlavor': 'The specter rewrites the firmware before the reset completes.'},
+      {'name': 'Disconnect all devices', 'success': 70, 'damage': 1, 'flavor': 'Isolating the hub starves the specter of targets!', 'failFlavor': 'The specter reconnects through a backdoor.'},
+      {'name': 'Update hub firmware', 'success': 45, 'damage': 4, 'flavor': 'Patched firmware locks out the specter\'s exploits!', 'failFlavor': 'The update fails — the specter blocks the download.'},
+      {'name': 'Change Wi-Fi password', 'success': 50, 'damage': 3, 'flavor': 'New credentials sever the specter\'s network grip!', 'failFlavor': 'The specter brute-forces the new password instantly.'},
+      {'name': 'Use wired Ethernet', 'success': 80, 'damage': 1, 'flavor': 'A hardwired connection bypasses the specter\'s jamming!', 'failFlavor': 'The specter corrupts the Ethernet port instead.'},
     ],
   };
 
@@ -783,20 +828,23 @@ class _MonsterStatBlock extends StatelessWidget {
             ),
           ),
           const Gap(12),
-          Row(
-            children: [
-              _StatChip(label: 'AC', value: '$armorClass'),
-              const Gap(16),
-              _StatChip(label: 'HP', value: hpDisplay),
-              const Gap(16),
-              _StatChip(label: 'CR', value: '$challengeRating'),
-              const Gap(16),
-              _StatChip(
-                label: 'Status',
-                value: isDefeated ? 'DEFEATED' : 'ACTIVE',
-                valueColor: isDefeated ? Colors.green : Colors.red.shade400,
-              ),
-            ],
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                _StatChip(label: 'AC', value: '$armorClass'),
+                const Gap(12),
+                _StatChip(label: 'HP', value: hpDisplay),
+                const Gap(12),
+                _StatChip(label: 'CR', value: '$challengeRating'),
+                const Gap(12),
+                _StatChip(
+                  label: 'Status',
+                  value: isDefeated ? 'DEFEATED' : 'ACTIVE',
+                  valueColor: isDefeated ? Colors.green : Colors.red.shade400,
+                ),
+              ],
+            ),
           ),
           const Gap(12),
           const Divider(color: Colors.white12, height: 1),
@@ -906,6 +954,12 @@ class _MonsterPainter extends CustomPainter {
         _drawDragonWhelp(canvas, cx, cy, s);
       case 5:
         _drawBeholder(canvas, cx, cy, s);
+      case 6:
+        _drawBatteryWraith(canvas, cx, cy, s);
+      case 7:
+        _drawLagDragon(canvas, cx, cy, s);
+      case 8:
+        _drawStaticSpecter(canvas, cx, cy, s);
       default:
         _drawBoneColossus(canvas, cx, cy, s);
     }
@@ -1378,6 +1432,254 @@ class _MonsterPainter extends CustomPainter {
     canvas.drawCircle(Offset(cx, cy), 30 * s, paint);
   }
 
+  void _drawBatteryWraith(Canvas canvas, double cx, double cy, double s) {
+    final paint = Paint()..isAntiAlias = true;
+
+    // Ghostly body
+    paint
+      ..color = const Color(0xFF1B3A4B)
+      ..style = PaintingStyle.fill;
+    final bodyPath = Path()
+      ..moveTo(cx - 25 * s, cy + 30 * s)
+      ..quadraticBezierTo(cx - 35 * s, cy - 5 * s, cx - 15 * s, cy - 30 * s)
+      ..quadraticBezierTo(cx, cy - 42 * s, cx + 15 * s, cy - 30 * s)
+      ..quadraticBezierTo(cx + 35 * s, cy - 5 * s, cx + 25 * s, cy + 30 * s)
+      ..lineTo(cx + 15 * s, cy + 20 * s + sin(phase * 4) * 4 * s)
+      ..lineTo(cx, cy + 28 * s)
+      ..lineTo(cx - 15 * s, cy + 20 * s + sin(phase * 4 + 1) * 4 * s)
+      ..close();
+    canvas.drawPath(bodyPath, paint);
+
+    paint
+      ..color = const Color(0xFF00E5FF)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.5 * s;
+    canvas.drawPath(bodyPath, paint);
+
+    // Battery icon on chest
+    paint
+      ..color = const Color(0xFF00E5FF).withValues(alpha: 0.7)
+      ..style = PaintingStyle.fill;
+    canvas.drawRect(Rect.fromLTWH(cx - 8 * s, cy - 12 * s, 16 * s, 22 * s), paint);
+    paint
+      ..color = const Color(0xFF00E5FF)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.5 * s;
+    canvas.drawRect(Rect.fromLTWH(cx - 8 * s, cy - 12 * s, 16 * s, 22 * s), paint);
+    canvas.drawRect(Rect.fromLTWH(cx - 4 * s, cy - 15 * s, 8 * s, 3 * s), paint);
+
+    // Eyes
+    paint
+      ..color = const Color(0xFFFF4444)
+      ..style = PaintingStyle.fill;
+    canvas.drawCircle(Offset(cx - 8 * s, cy - 22 * s), 4 * s, paint);
+    canvas.drawCircle(Offset(cx + 8 * s, cy - 22 * s), 4 * s, paint);
+    paint
+      ..color = Colors.black
+      ..style = PaintingStyle.fill;
+    canvas.drawCircle(Offset(cx - 8 * s, cy - 22 * s), 2 * s, paint);
+    canvas.drawCircle(Offset(cx + 8 * s, cy - 22 * s), 2 * s, paint);
+
+    // Energy drain tendrils
+    paint
+      ..color = const Color(0xFF00E5FF).withValues(alpha: 0.3)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 3 * s;
+    for (var i = 0; i < 3; i++) {
+      final angle = phase * 2 + i * 2.1;
+      final tendrilPath = Path()
+        ..moveTo(cx - 20 * s + i * 20 * s, cy + 25 * s)
+        ..quadraticBezierTo(
+          cx - 25 * s + i * 20 * s + sin(angle) * 12 * s,
+          cy + 40 * s,
+          cx - 15 * s + i * 20 * s + sin(angle * 1.3) * 8 * s,
+          cy + 50 * s,
+        );
+      canvas.drawPath(tendrilPath, paint);
+    }
+
+    // Glow
+    if (glowIntensity > 0.3) {
+      paint
+        ..color = const Color(0xFF00E5FF).withValues(alpha: 0.12 * glowIntensity)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 18);
+      canvas.drawCircle(Offset(cx, cy), 35 * s, paint);
+    }
+  }
+
+  void _drawLagDragon(Canvas canvas, double cx, double cy, double s) {
+    final paint = Paint()..isAntiAlias = true;
+
+    // Serpentine body
+    paint
+      ..color = const Color(0xFF0D2137)
+      ..style = PaintingStyle.fill;
+    final bodyPath = Path()
+      ..moveTo(cx - 30 * s, cy + 25 * s)
+      ..quadraticBezierTo(cx - 38 * s, cy - 10 * s, cx - 10 * s, cy - 35 * s)
+      ..quadraticBezierTo(cx + 5 * s, cy - 45 * s, cx + 20 * s, cy - 30 * s)
+      ..quadraticBezierTo(cx + 38 * s, cy - 10 * s, cx + 30 * s, cy + 25 * s)
+      ..close();
+    canvas.drawPath(bodyPath, paint);
+
+    // Glitch lines
+    paint
+      ..color = const Color(0xFFFF6B35)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.5 * s;
+    canvas.drawPath(bodyPath, paint);
+
+    for (var i = 0; i < 4; i++) {
+      final glitchY = cy - 20 * s + i * 12 * s;
+      final offset = sin(phase * 5 + i * 1.5) * 4 * s;
+      paint
+        ..color = const Color(0xFFFF6B35).withValues(alpha: 0.4 + 0.3 * sin(phase * 3 + i.toDouble()))
+        ..strokeWidth = 1 * s;
+      canvas.drawLine(Offset(cx - 20 * s + offset, glitchY), Offset(cx + 20 * s + offset, glitchY), paint);
+    }
+
+    // Horns
+    paint
+      ..color = const Color(0xFF0D2137)
+      ..style = PaintingStyle.fill;
+    canvas.drawCircle(Offset(cx - 12 * s, cy - 38 * s), 5 * s, paint);
+    canvas.drawCircle(Offset(cx + 12 * s, cy - 38 * s), 5 * s, paint);
+    paint
+      ..color = const Color(0xFFFF6B35)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.5 * s;
+    canvas.drawCircle(Offset(cx - 12 * s, cy - 38 * s), 5 * s, paint);
+    canvas.drawCircle(Offset(cx + 12 * s, cy - 38 * s), 5 * s, paint);
+
+    // Eyes — flickering
+    final eyeAlpha = 0.5 + 0.5 * sin(phase * 8);
+    paint
+      ..color = const Color(0xFFFF4444).withValues(alpha: eyeAlpha)
+      ..style = PaintingStyle.fill;
+    canvas.drawCircle(Offset(cx - 8 * s, cy - 22 * s), 4 * s, paint);
+    canvas.drawCircle(Offset(cx + 8 * s, cy - 22 * s), 4 * s, paint);
+
+    // Tail
+    paint
+      ..color = const Color(0xFF0D2137)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 5 * s
+      ..strokeCap = StrokeCap.round;
+    final tailPath = Path()
+      ..moveTo(cx + 25 * s, cy + 20 * s)
+      ..quadraticBezierTo(cx + 35 * s + sin(phase * 3) * 8 * s, cy + 35 * s, cx + 28 * s + cos(phase * 2) * 6 * s, cy + 48 * s);
+    canvas.drawPath(tailPath, paint);
+    paint
+      ..color = const Color(0xFFFF6B35)
+      ..strokeWidth = 1.5 * s;
+    canvas.drawPath(tailPath, paint);
+  }
+
+  void _drawStaticSpecter(Canvas canvas, double cx, double cy, double s) {
+    final paint = Paint()..isAntiAlias = true;
+
+    // Hub body — rounded rectangle
+    paint
+      ..color = const Color(0xFF1A1A2E)
+      ..style = PaintingStyle.fill;
+    final hubRect = RRect.fromRectAndRadius(
+      Rect.fromLTWH(cx - 22 * s, cy - 25 * s, 44 * s, 50 * s),
+      Radius.circular(8 * s),
+    );
+    canvas.drawRRect(hubRect, paint);
+    paint
+      ..color = const Color(0xFF4A90D9)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.5 * s;
+    canvas.drawRRect(hubRect, paint);
+
+    // Screen with static
+    paint
+      ..color = const Color(0xFF4A90D9).withValues(alpha: 0.2)
+      ..style = PaintingStyle.fill;
+    final screenRect = RRect.fromRectAndRadius(
+      Rect.fromLTWH(cx - 16 * s, cy - 18 * s, 32 * s, 28 * s),
+      Radius.circular(4 * s),
+    );
+    canvas.drawRRect(screenRect, paint);
+
+    // Static noise
+    final rng = Random(42 + (phase * 10).floor());
+    for (var i = 0; i < 20; i++) {
+      final nx = cx - 14 * s + rng.nextDouble() * 28 * s;
+      final ny = cy - 16 * s + rng.nextDouble() * 24 * s;
+      paint
+        ..color = const Color(0xFF4A90D9).withValues(alpha: rng.nextDouble() * 0.5)
+        ..style = PaintingStyle.fill;
+      canvas.drawRect(Rect.fromLTWH(nx, ny, 2 * s, 1 * s), paint);
+    }
+
+    // Antennae
+    paint
+      ..color = const Color(0xFF1A1A2E)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 3 * s
+      ..strokeCap = StrokeCap.round;
+    canvas.drawLine(Offset(cx - 10 * s, cy - 25 * s), Offset(cx - 18 * s + sin(phase * 3) * 3 * s, cy - 42 * s), paint);
+    canvas.drawLine(Offset(cx + 10 * s, cy - 25 * s), Offset(cx + 18 * s + sin(phase * 3 + 1) * 3 * s, cy - 42 * s), paint);
+    paint
+      ..color = const Color(0xFF4A90D9)
+      ..style = PaintingStyle.fill;
+    canvas.drawCircle(Offset(cx - 18 * s + sin(phase * 3) * 3 * s, cy - 42 * s), 3 * s, paint);
+    canvas.drawCircle(Offset(cx + 18 * s + sin(phase * 3 + 1) * 3 * s, cy - 42 * s), 3 * s, paint);
+
+    // LED eyes
+    final ledColor = Color.lerp(const Color(0xFFFF0000), const Color(0xFF4A90D9), (sin(phase * 4) + 1) / 2)!;
+    paint
+      ..color = ledColor
+      ..style = PaintingStyle.fill;
+    canvas.drawCircle(Offset(cx - 6 * s, cy - 5 * s), 3 * s, paint);
+    canvas.drawCircle(Offset(cx + 6 * s, cy - 5 * s), 3 * s, paint);
+
+    // Signal waves
+    paint
+      ..color = const Color(0xFF4A90D9).withValues(alpha: 0.2)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.5 * s;
+    for (var i = 1; i <= 3; i++) {
+      final waveAlpha = (0.3 - i * 0.08) * (0.5 + 0.5 * sin(phase * 2 + i));
+      paint.color = const Color(0xFF4A90D9).withValues(alpha: waveAlpha);
+      canvas.drawArc(
+        Rect.fromCircle(center: Offset(cx, cy - 25 * s), radius: (10 + i * 8) * s),
+        -pi * 0.8,
+        pi * 0.6,
+        false,
+        paint,
+      );
+    }
+
+    // Cables/tentacles
+    paint
+      ..color = const Color(0xFF1A1A2E)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 4 * s;
+    for (var i = 0; i < 3; i++) {
+      final angle = phase * 2 + i * 2.1;
+      final tentaclePath = Path()
+        ..moveTo(cx - 15 * s + i * 15 * s, cy + 25 * s)
+        ..quadraticBezierTo(
+          cx - 20 * s + i * 15 * s + cos(angle) * 10 * s,
+          cy + 38 * s,
+          cx - 12 * s + i * 15 * s + sin(angle * 1.3) * 8 * s,
+          cy + 48 * s,
+        );
+      canvas.drawPath(tentaclePath, paint);
+    }
+
+    // Glow
+    if (glowIntensity > 0.3) {
+      paint
+        ..color = const Color(0xFF4A90D9).withValues(alpha: 0.1 * glowIntensity)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 16);
+      canvas.drawCircle(Offset(cx, cy), 32 * s, paint);
+    }
+  }
+
   void _drawDefeatedMonster(Canvas canvas, double cx, double cy, double s) {
     final paint = Paint()
       ..isAntiAlias = true
@@ -1429,9 +1731,12 @@ class _ArenaParticlePainter extends CustomPainter {
       Colors.green,
       Colors.cyan,
       const Color(0xFF9B30FF),
-    ][(bossIndex - 1).clamp(0, 4)];
+      const Color(0xFF00E5FF),
+      const Color(0xFFFF6B35),
+      const Color(0xFF4A90D9),
+    ][(bossIndex - 1).clamp(0, 7)];
 
-    for (var i = 0; i < 30; i++) {
+    for (var i = 0; i < 15; i++) {
       final driftX = sin(phase * 1.5 + i * 0.7) * 15;
       final driftY = cos(phase * 1.2 + i * 0.5) * 10;
       final x = (rng.nextDouble() * size.width + driftX) % size.width;

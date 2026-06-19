@@ -128,10 +128,12 @@ class _LevelCompleteScreenState extends State<LevelCompleteScreen>
             ),
           ),
           SafeArea(
-            child: Column(
-              children: [
-                const Spacer(flex: 2),
-                Opacity(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(vertical: 32),
+              child: Column(
+                children: [
+                  const SizedBox(height: 32),
+                  Opacity(
                   opacity: (t - 0.2).clamp(0.0, 1.0),
                   child: Transform.scale(
                     scale: 0.5 + 0.5 * ((t - 0.2) / 0.2).clamp(0.0, 1.0),
@@ -262,38 +264,40 @@ class _LevelCompleteScreenState extends State<LevelCompleteScreen>
                       ),
                     ),
                   ),
-                const Spacer(flex: 2),
-                Opacity(
-                  opacity: (t - 0.75).clamp(0.0, 1.0),
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(32, 0, 32, 32),
-                    child: SizedBox(
-                      width: double.infinity,
-                      height: 56,
-                      child: ElevatedButton.icon(
-                        onPressed: t >= 0.75 ? () {
-                          Nav.pushReplacement(
-                            context,
-                            LevelSelectScreen(world: widget.world),
-                          );
-                        } : null,
-                        icon: const Icon(Icons.arrow_forward, size: 20),
-                        label: const Text(
-                          'Continue',
-                          style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700),
-                        ),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFF59E0B),
-                          foregroundColor: Colors.black,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
+                  const SizedBox(height: 40),
+                  Opacity(
+                    opacity: (t - 0.75).clamp(0.0, 1.0),
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(32, 0, 32, 32),
+                      child: SizedBox(
+                        width: double.infinity,
+                        height: 56,
+                        child: ElevatedButton.icon(
+                          onPressed: t >= 0.75 ? () {
+                            Nav.pushReplacement(
+                              context,
+                              LevelSelectScreen(world: widget.world),
+                            );
+                          } : null,
+                          icon: const Icon(Icons.arrow_forward, size: 20),
+                          label: const Text(
+                            'Continue',
+                            style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFFF59E0B),
+                            foregroundColor: Colors.black,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
                           ),
                         ),
                       ),
                     ),
                   ),
-                ),
+                  const SizedBox(height: 24),
               ],
+              ),
             ),
           ),
         ],

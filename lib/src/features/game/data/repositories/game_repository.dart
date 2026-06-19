@@ -7,10 +7,12 @@ class GameRepository {
   GameRepository(this._isar);
 
   Future<PlayerProgress?> loadProgress(int userId) async {
-    return await _isar.playerProgress
+    final progress = await _isar.playerProgress
         .filter()
         .userIdEqualTo(userId)
         .findFirst();
+    progress?.ensureMutableLists();
+    return progress;
   }
 
   Future<PlayerProgress> getOrCreateProgress(int userId) async {
@@ -20,6 +22,7 @@ class GameRepository {
     await _isar.writeTxn(() async {
       await _isar.playerProgress.put(progress);
     });
+    progress.ensureMutableLists();
     return progress;
   }
 

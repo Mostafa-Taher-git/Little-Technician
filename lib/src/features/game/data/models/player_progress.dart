@@ -39,7 +39,19 @@ class PlayerProgress {
   }
 
   void setPrepResult(String levelId, String json) {
-    prepResults.removeWhere((e) => e.startsWith('$levelId$_sep'));
-    prepResults.add('$levelId$_sep$json');
+    final mutable = List<String>.from(prepResults);
+    mutable.removeWhere((e) => e.startsWith('$levelId$_sep'));
+    mutable.add('$levelId$_sep$json');
+    prepResults = mutable;
+  }
+
+  /// Call after loading from Isar to ensure all lists are growable.
+  void ensureMutableLists() {
+    completedLevelIds = List<String>.from(completedLevelIds);
+    completedWorldIds = List<int>.from(completedWorldIds);
+    earnedRewardIds = List<String>.from(earnedRewardIds);
+    unlockedSkinIds = List<String>.from(unlockedSkinIds);
+    playDates = List<DateTime>.from(playDates);
+    prepResults = List<String>.from(prepResults);
   }
 }

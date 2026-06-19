@@ -157,9 +157,11 @@ class LevelCard extends StatelessWidget {
             ..._buildRivets(scheme.outline),
           if (!isLocked)
             Positioned.fill(
-              child: CustomPaint(
-                painter: _ChainLinkPainter(
-                  color: scheme.outline.withValues(alpha: 0.15),
+              child: IgnorePointer(
+                child: CustomPaint(
+                  painter: _ChainLinkPainter(
+                    color: scheme.outline.withValues(alpha: 0.15),
+                  ),
                 ),
               ),
             ),

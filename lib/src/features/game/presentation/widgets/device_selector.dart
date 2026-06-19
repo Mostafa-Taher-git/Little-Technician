@@ -24,6 +24,7 @@ class DeviceSelector extends StatelessWidget {
     DeviceType(id: 'router', name: 'Router', icon: Icons.router),
     DeviceType(id: 'smart_tv', name: 'Smart TV', icon: Icons.tv),
     DeviceType(id: 'console', name: 'Console', icon: Icons.sports_esports),
+    DeviceType(id: 'smart_home', name: 'Smart Home', icon: Icons.home_max),
   ];
 
   static void show(BuildContext context, {void Function(DeviceType)? onSelected}) {

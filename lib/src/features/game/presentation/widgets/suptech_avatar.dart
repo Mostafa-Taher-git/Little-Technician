@@ -65,7 +65,15 @@ class _SupTechAvatarState extends State<SupTechAvatar>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (!_controller.isAnimating) {
+    if (!_controller.isAnimating && mounted) {
+      _controller.repeat(reverse: true);
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant SupTechAvatar oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!_controller.isAnimating && mounted) {
       _controller.repeat(reverse: true);
     }
   }

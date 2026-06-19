@@ -35,39 +35,45 @@ class HomeScreen extends StatelessWidget {
               // Header
               Row(
                 children: [
-                  Expanded(
+                  Flexible(
                     child: FutureBuilder<UserModel?>(
                       future: AuthService.getCurrentUser(),
                       builder: (_, snap) {
                         final user = snap.data;
                         return Row(
+                          mainAxisSize: MainAxisSize.min,
                           children: [
                             Container(
-                              width: 48,
-                              height: 48,
+                              width: 36,
+                              height: 36,
                               alignment: Alignment.center,
                               decoration: BoxDecoration(
                                 color: scheme.surface,
-                                borderRadius: BorderRadius.circular(14),
+                                borderRadius: BorderRadius.circular(10),
                               ),
-                              child: Text(user?.avatarIcon ?? '🔧', style: const TextStyle(fontSize: 24)),
+                              child: Text(user?.avatarIcon ?? '🔧', style: const TextStyle(fontSize: 18)),
                             ),
-                            const Gap(12),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Hello, ${user?.username ?? 'User'}',
-                                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: scheme.onSurface),
-                                ),
-                                Text('Ready to troubleshoot?', style: TextStyle(color: scheme.onSurface.withValues(alpha: 0.6), fontSize: 13)),
-                              ],
+                            const Gap(8),
+                            Flexible(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Hello, ${user?.username ?? 'User'}',
+                                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: scheme.onSurface),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  Text('Ready to troubleshoot?', style: TextStyle(color: scheme.onSurface.withValues(alpha: 0.6), fontSize: 11), maxLines: 1, overflow: TextOverflow.ellipsis),
+                                ],
+                              ),
                             ),
                           ],
                         );
                       },
                     ),
                   ),
+                  const Gap(4),
                   BlocBuilder<GameCubit, GameState>(
                     builder: (_, state) {
                       return GestureDetector(
@@ -75,35 +81,39 @@ class HomeScreen extends StatelessWidget {
                         child: SupTechAvatar(
                           availableUses: state.availableSupTechUses,
                           isGlowing: state.canUseSupTech,
-                          size: 36,
+                          size: 28,
                         ),
                       );
                     },
                   ),
-                  const Gap(8),
+                  const Gap(2),
                   IconButton(
+                    constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+                    padding: const EdgeInsets.all(4),
                     onPressed: () => Nav.push(context, const SavedSolutionsScreen()),
                     icon: Container(
-                      padding: const EdgeInsets.all(8),
+                      padding: const EdgeInsets.all(5),
                       decoration: BoxDecoration(
                         color: scheme.surface,
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(8),
                         border: Border.all(color: scheme.outline),
                       ),
-                      child: Icon(Icons.bookmark_outline, size: 20, color: scheme.onSurface),
+                      child: Icon(Icons.bookmark_outline, size: 16, color: scheme.onSurface),
                     ),
                   ),
-                  const Gap(8),
+                  const Gap(2),
                   IconButton(
+                    constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+                    padding: const EdgeInsets.all(4),
                     onPressed: () => Nav.push(context, const SettingsScreen()),
                     icon: Container(
-                      padding: const EdgeInsets.all(8),
+                      padding: const EdgeInsets.all(5),
                       decoration: BoxDecoration(
                         color: scheme.surface,
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(8),
                         border: Border.all(color: scheme.outline),
                       ),
-                      child: Icon(Icons.settings_outlined, size: 20, color: scheme.onSurface),
+                      child: Icon(Icons.settings_outlined, size: 16, color: scheme.onSurface),
                     ),
                   ),
                 ],

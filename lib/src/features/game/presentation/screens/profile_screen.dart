@@ -75,31 +75,41 @@ class ProfileScreen extends StatelessWidget {
                             ),
                           ),
                           const Gap(4),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
+                          Wrap(
+                            alignment: WrapAlignment.center,
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            spacing: 6,
+                            runSpacing: 4,
                             children: [
-                              Icon(                              Icons.monetization_on,
-                                  color: scheme.secondary, size: 18),
-                              const Gap(6),
-                              Text(
-                                '${progress.points} points',
-                                style: TextStyle(
-                                  color: scheme.secondary,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w700,
-                                ),
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.monetization_on, color: scheme.secondary, size: 18),
+                                  const Gap(4),
+                                  Text(
+                                    '${progress.points} points',
+                                    style: TextStyle(
+                                      color: scheme.secondary,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ],
                               ),
-                              const Gap(16),
-                              const Icon(Icons.local_fire_department,
-                                  color: Colors.orange, size: 18),
-                              const Gap(6),
-                              Text(
-                                '${StreakTracker.calculateStreak(progress.playDates)} day streak',
-                                style: const TextStyle(
-                                  color: Colors.orange,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w700,
-                                ),
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(Icons.local_fire_department, color: Colors.orange, size: 18),
+                                  const Gap(4),
+                                  Text(
+                                    '${StreakTracker.calculateStreak(progress.playDates)} day streak',
+                                    style: const TextStyle(
+                                      color: Colors.orange,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ],
                           ),

@@ -88,14 +88,21 @@ class _ProblemScreenState extends State<ProblemScreen> {
     final allSolved = solvedCount >= steps.length;
     final progress = steps.isNotEmpty ? solvedCount / steps.length : 0.0;
 
-          if (allSolved && state.lastDrawnReward != null && !widget.isReview && !_navigatedToReward) {
+          if (allSolved && !widget.isReview && !_navigatedToReward) {
             _navigatedToReward = true;
             WidgetsBinding.instance.addPostFrameCallback((_) {
               if (mounted) {
-                Nav.pushReplacement(
-                  context,
-                  RewardSpinScreen(reward: state.lastDrawnReward!),
-                );
+                if (state.lastDrawnReward != null) {
+                  Nav.pushReplacement(
+                    context,
+                    RewardSpinScreen(reward: state.lastDrawnReward!),
+                  );
+                } else {
+                  Nav.pushReplacement(
+                    context,
+                    LevelSelectScreen(world: widget.world),
+                  );
+                }
               }
             });
           }
@@ -346,7 +353,7 @@ class _ProblemScreenState extends State<ProblemScreen> {
                             label: Text(
                               solvedCount >= steps.length
                                   ? 'Completed!'
-                                  : 'Complete Quest Step $solvedCount',
+                                  : 'Complete Quest Step ${solvedCount + 1}',
                             ),
                           ),
                         ),

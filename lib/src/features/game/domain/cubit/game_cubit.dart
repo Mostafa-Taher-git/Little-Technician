@@ -153,7 +153,7 @@ class GameCubit extends Cubit<GameState> {
 
     _safePersist(() => _repository.addPoints(progress, 10));
     if (nextIndex >= steps.length) {
-      _completeLevel(progress);
+      _completeLevel(progress, nextIndex);
     } else {
       emit(state.copyWith(
         progress: progress,
@@ -167,7 +167,7 @@ class GameCubit extends Cubit<GameState> {
     op().catchError((_) {});
   }
 
-  void _completeLevel(PlayerProgress progress) {
+  void _completeLevel(PlayerProgress progress, int finalStepIndex) {
     final level = state.currentLevel!;
     final basePoints = level.points * state.pointsMultiplier;
 
@@ -195,9 +195,25 @@ class GameCubit extends Cubit<GameState> {
     if (world != null && GameData.isWorldComplete(world, progress.completedLevelIds)) {
       _safePersist(() => _repository.completeWorld(progress, world.id));
     }
-    _drawReward(progress);
+
+    // Draw reward safely — ensure state always emits even if reward fails
+    RewardDef? reward;
+    try {
+      reward = RewardPool.draw();
+      _safePersist(() => _repository.addReward(progress, reward!.id));
+      if (reward.type == RewardType.skin) {
+        _safePersist(() => _repository.unlockSkin(progress, reward!.value));
+      }
+    } catch (_) {}
+
     _safePersist(() => _repository.recordPlayDate(progress));
-    emit(state.copyWith(progress: progress, hintText: null, pointsMultiplier: 1));
+    emit(state.copyWith(
+      progress: progress,
+      currentStepIndex: finalStepIndex,
+      lastDrawnReward: reward,
+      hintText: null,
+      pointsMultiplier: 1,
+    ));
   }
 
   void attackBoss({int damage = 1}) {
@@ -220,17 +236,22 @@ class GameCubit extends Cubit<GameState> {
     _safePersist(() => _repository.addPoints(progress, boss.points * state.pointsMultiplier));
     _safePersist(() => _repository.defeatBoss(progress));
     _safePersist(() => _repository.recordPlayDate(progress));
-    _drawReward(progress);
-    emit(state.copyWith(progress: progress, currentBossHp: 0, pointsMultiplier: 1));
-  }
 
-  void _drawReward(PlayerProgress progress) {
-    final rewardDef = RewardPool.draw();
-    _safePersist(() => _repository.addReward(progress, rewardDef.id));
-    if (rewardDef.type == RewardType.skin) {
-      _safePersist(() => _repository.unlockSkin(progress, rewardDef.value));
-    }
-    emit(state.copyWith(progress: progress, lastDrawnReward: rewardDef));
+    RewardDef? reward;
+    try {
+      reward = RewardPool.draw();
+      _safePersist(() => _repository.addReward(progress, reward!.id));
+      if (reward.type == RewardType.skin) {
+        _safePersist(() => _repository.unlockSkin(progress, reward!.value));
+      }
+    } catch (_) {}
+
+    emit(state.copyWith(
+      progress: progress,
+      currentBossHp: 0,
+      lastDrawnReward: reward,
+      pointsMultiplier: 1,
+    ));
   }
 
   void collectReward() {

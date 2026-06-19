@@ -44,14 +44,15 @@ class _WorldSelectScreenState extends State<WorldSelectScreen> {
   }
 
   static const _deviceWorldFilter = <String, Set<String>>{
-    'desktop': {'Core Components', 'Operating System', 'Software & Network', 'Storage & Display'},
-    'laptop': {'Core Components', 'Operating System', 'Software & Network', 'Storage & Display'},
+    'desktop': {'Core Components', 'Operating System', 'Software & Network', 'Storage & Display', 'Gaming Rig'},
+    'laptop': {'Core Components', 'Operating System', 'Software & Network', 'Storage & Display', 'Gaming Rig'},
     'phone': {'Mobile Troubleshooting'},
     'tablet': {'Mobile Troubleshooting'},
     'printer': {'Peripherals'},
     'router': {'Software & Network'},
     'smart_tv': {'Gaming Rig', 'Storage & Display'},
     'console': {'Gaming Rig'},
+    'smart_home': {'Smart Home'},
   };
 
   List<WorldDef> get _filteredWorlds {
@@ -76,32 +77,37 @@ class _WorldSelectScreenState extends State<WorldSelectScreen> {
           BlocBuilder<GameCubit, GameState>(
             builder: (_, state) {
               return Padding(
-                padding: const EdgeInsets.only(right: 12),
+                padding: const EdgeInsets.only(right: 8),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.monetization_on, color: scheme.secondary, size: 18),
-                    const Gap(4),
-                    Text(
-                      '${state.totalPoints}',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w700,
-                        fontSize: 15,
-                        color: scheme.onSurface,
+                    Icon(Icons.monetization_on, color: scheme.secondary, size: 16),
+                    const Gap(2),
+                    Flexible(
+                      child: Text(
+                        '${state.totalPoints}',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 14,
+                          color: scheme.onSurface,
+                        ),
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    const Gap(8),
+                    const Gap(6),
                     SupTechAvatar(
                       availableUses: state.availableSupTechUses,
                       isGlowing: state.canUseSupTech,
-                      size: 34,
+                      size: 30,
                     ),
-                    const Gap(4),
+                    const Gap(2),
                     IconButton(
+                      padding: const EdgeInsets.all(4),
+                      constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
                       icon: Icon(
                         Icons.devices,
                         color: isFiltered ? scheme.secondary : scheme.onSurface.withValues(alpha: 0.6),
-                        size: 20,
+                        size: 18,
                       ),
                       onPressed: () => DeviceSelector.show(context, onSelected: (device) {
                         final newId = _selectedDeviceId == device.id ? null : device.id;
@@ -118,7 +124,7 @@ class _WorldSelectScreenState extends State<WorldSelectScreen> {
                         },
                         child: Container(
                           margin: const EdgeInsets.only(left: 2),
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
                           decoration: BoxDecoration(
                             color: scheme.secondary.withValues(alpha: 0.15),
                             borderRadius: BorderRadius.circular(6),
