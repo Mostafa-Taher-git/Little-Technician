@@ -103,6 +103,11 @@ class GameRepository {
     await saveProgress(progress);
   }
 
+  Future<void> setActiveSkin(PlayerProgress progress, String? skinId) async {
+    progress.activeSkinId = skinId;
+    await saveProgress(progress);
+  }
+
   Future<void> setCurrentLevel(
       PlayerProgress progress, int worldId, String? levelId) async {
     progress.currentWorldId = worldId;

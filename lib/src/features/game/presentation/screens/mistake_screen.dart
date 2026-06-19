@@ -377,9 +377,9 @@ class _MistakeScreenState extends State<MistakeScreen> {
                     borderRadius: BorderRadius.circular(14),
                   ),
                 ),
-                child: Text(
+                child: const Text(
                   'Continue to Scenarios',
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
                 ),
               ),
             ),

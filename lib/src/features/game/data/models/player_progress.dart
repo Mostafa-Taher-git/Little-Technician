@@ -18,6 +18,7 @@ class PlayerProgress {
   List<int> completedWorldIds = [];
   List<String> earnedRewardIds = [];
   List<String> unlockedSkinIds = [];
+  String? activeSkinId;  // Currently equipped skin
   String? themeId;
   int levelsCleared = 0;
   int bossesDefeated = 0;

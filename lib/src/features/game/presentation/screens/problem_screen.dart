@@ -233,7 +233,7 @@ class _ProblemScreenState extends State<ProblemScreen> {
                           context.read<GameCubit>().saveFeedback(widget.level.id, true);
                           setState(() => _feedbackGiven = true);
                         },
-                        icon: Icon(Icons.thumb_up_outlined, color: Colors.green, size: 22),
+                        icon: const Icon(Icons.thumb_up_outlined, color: Colors.green, size: 22),
                         tooltip: 'Yes, it worked',
                       ),
                       IconButton(
@@ -241,7 +241,7 @@ class _ProblemScreenState extends State<ProblemScreen> {
                           context.read<GameCubit>().saveFeedback(widget.level.id, false);
                           setState(() => _feedbackGiven = true);
                         },
-                        icon: Icon(Icons.thumb_down_outlined, color: Colors.red, size: 22),
+                        icon: const Icon(Icons.thumb_down_outlined, color: Colors.red, size: 22),
                         tooltip: 'No, it didn\'t work',
                       ),
                     ],
@@ -256,10 +256,10 @@ class _ProblemScreenState extends State<ProblemScreen> {
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(color: Colors.green.withValues(alpha: 0.2)),
                   ),
-                  child: Row(
+                  child: const Row(
                     children: [
                       Icon(Icons.check_circle, color: Colors.green, size: 18),
-                      const Gap(8),
+                      Gap(8),
                       Text(
                         'Thanks for your feedback!',
                         style: TextStyle(

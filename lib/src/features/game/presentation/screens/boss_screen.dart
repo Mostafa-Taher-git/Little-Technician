@@ -590,7 +590,7 @@ class _BossScreenState extends State<BossScreen>
                       animation: _breathAnimation,
                       builder: (_, child) {
                         return Opacity(
-                          opacity: _entranceAnimation.value,
+                          opacity: _entranceAnimation.value.clamp(0.0, 1.0),
                           child: Transform.scale(
                             scale: _breathAnimation.value,
                             child: child,

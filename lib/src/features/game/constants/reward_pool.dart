@@ -139,7 +139,7 @@ class RewardPool {
       type: RewardType.skin,
       value: 'hacker',
       rarity: Rarity.rare,
-      displayName: 'Familiar: Imp',
+      displayName: 'Skin: Hacker',
       icon: Icons.terminal,
     ),
     RewardDef(
@@ -173,7 +173,7 @@ class RewardPool {
       type: RewardType.skin,
       value: 'engineer',
       rarity: Rarity.epic,
-      displayName: 'Familiar: Sprite',
+      displayName: 'Skin: Engineer',
       icon: Icons.engineering,
     ),
     RewardDef(
@@ -215,7 +215,7 @@ class RewardPool {
       type: RewardType.skin,
       value: 'grandmaster',
       rarity: Rarity.legendary,
-      displayName: 'Familiar: Archmage',
+      displayName: 'Skin: Grandmaster',
       icon: Icons.auto_awesome,
     ),
     RewardDef(

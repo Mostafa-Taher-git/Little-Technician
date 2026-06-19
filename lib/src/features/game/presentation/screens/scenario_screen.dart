@@ -295,7 +295,7 @@ class _ScenarioScreenState extends State<ScenarioScreen> {
 
   void _answer(int index) {
     if (_isAnswered) return;
-    final correctIndex = 0;
+    const correctIndex = 0;
     final isCorrect = index == correctIndex;
 
     setState(() {
@@ -362,14 +362,14 @@ class _ScenarioScreenState extends State<ScenarioScreen> {
                     color: scheme.tertiary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Text(
-                    isFollowUp ? 'Follow-up ${_currentQuestion}/2' : 'Scenario 1/3',
-                    style: TextStyle(
-                      color: scheme.tertiary,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
+                    child: Text(
+                      isFollowUp ? 'Follow-up $_currentQuestion/2' : 'Scenario 1/3',
+                      style: TextStyle(
+                        color: scheme.tertiary,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
-                  ),
                 ),
                 const Spacer(),
                 Text(

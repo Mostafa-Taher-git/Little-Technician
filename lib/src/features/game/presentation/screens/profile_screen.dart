@@ -4,6 +4,7 @@ import 'package:gap/gap.dart';
 import 'package:littletech/src/features/auth/data/models/user_model.dart';
 import 'package:littletech/src/features/auth/data/services/auth_service.dart';
 import 'package:littletech/src/features/game/constants/reward_pool.dart';
+import 'package:littletech/src/features/game/constants/skin_tiers.dart';
 import 'package:littletech/src/features/game/constants/streak_tracker.dart';
 import 'package:littletech/src/features/game/domain/cubit/game_cubit.dart';
 import 'package:littletech/src/features/game/domain/cubit/theme_cubit.dart';
@@ -58,13 +59,14 @@ class ProfileScreen extends StatelessWidget {
                         ),
                         borderRadius: BorderRadius.circular(20),
                       ),
-                      child: Column(
-                        children: [
-                          SupTechAvatar(
-                            availableUses: state.availableSupTechUses,
-                            isGlowing: true,
-                            size: 64,
-                          ),
+                        child: Column(
+                          children: [
+                            SupTechAvatar(
+                              availableUses: state.availableSupTechUses,
+                              isGlowing: true,
+                              size: 64,
+                              skinId: progress.activeSkinId,
+                            ),
                           const Gap(12),
                           Text(
                             user?.username ?? 'Player',
@@ -278,7 +280,7 @@ class ProfileScreen extends StatelessWidget {
                       ),
                     const Gap(24),
                     Text(
-                      'Familiar Skins',
+                      'Skins',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
@@ -286,25 +288,61 @@ class ProfileScreen extends StatelessWidget {
                       ),
                     ),
                     const Gap(12),
-                    if (progress.unlockedSkinIds.isEmpty)
-                      Text(
-                        'Earn skins from rewards!',
-                        style: TextStyle(
-                          color: scheme.onSurface.withValues(alpha: 0.5),
-                        ),
-                      )
-                    else
-                      Wrap(
-                        spacing: 8,
-                        runSpacing: 8,
-                        children: progress.unlockedSkinIds.map((skinId) {
-                          return Chip(
-                            avatar: const Icon(Icons.auto_awesome, size: 16),
-                            label: Text(skinId),
-                            backgroundColor: scheme.secondary.withValues(alpha: 0.1),
-                          );
-                        }).toList(),
-                      ),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: SkinTierManager.skins.map((skin) {
+                        final unlocked = progress.unlockedSkinIds.contains(skin.id);
+                        final isActive = progress.activeSkinId == skin.id;
+                        return GestureDetector(
+                          onTap: unlocked
+                              ? () => context.read<GameCubit>().setActiveSkin(skin.id)
+                              : null,
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: isActive
+                                  ? skin.color.withValues(alpha: 0.2)
+                                  : unlocked
+                                      ? scheme.surface
+                                      : scheme.surface.withValues(alpha: 0.5),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: isActive
+                                    ? skin.color
+                                    : unlocked
+                                        ? scheme.outline.withValues(alpha: 0.3)
+                                        : scheme.outline.withValues(alpha: 0.1),
+                                width: isActive ? 2 : 1,
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(skin.previewIcon, color: unlocked ? skin.color : scheme.onSurface.withValues(alpha: 0.3), size: 18),
+                                const Gap(8),
+                                Text(
+                                  skin.name,
+                                  style: TextStyle(
+                                    color: unlocked ? skin.color : scheme.onSurface.withValues(alpha: 0.3),
+                                    fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                                if (isActive) ...[
+                                  const Gap(6),
+                                  Icon(Icons.check_circle, color: skin.color, size: 16),
+                                ] else if (!unlocked) ...[
+                                  const Gap(6),
+                                  Icon(Icons.lock, color: scheme.onSurface.withValues(alpha: 0.3), size: 16),
+                                ],
+                              ],
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
                   ],
                 ),
               );

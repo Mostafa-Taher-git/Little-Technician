@@ -372,6 +372,16 @@ class GameCubit extends Cubit<GameState> {
     emit(state.copyWith(progress: progress));
   }
 
+  Future<void> setActiveSkin(String? skinId) async {
+    final progress = state.progress;
+    if (skinId != null && !progress.unlockedSkinIds.contains(skinId)) {
+      return; // Can't equip locked skin
+    }
+    progress.activeSkinId = skinId;
+    _safePersist(() => _repository.setActiveSkin(progress, skinId));
+    emit(state.copyWith(progress: progress));
+  }
+
   void selectWorldById(int worldId) {
     if (worldId < GameData.worlds.length) {
       selectWorld(GameData.worlds[worldId]);

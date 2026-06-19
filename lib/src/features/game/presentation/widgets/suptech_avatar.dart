@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:littletech/src/features/game/constants/skin_tiers.dart';
 
 class SupTechAvatar extends StatefulWidget {
   final int availableUses;
@@ -9,6 +10,7 @@ class SupTechAvatar extends StatefulWidget {
   final bool showWizardHat;
   final bool isCasting;
   final VoidCallback? onTap;
+  final String? skinId;
 
   const SupTechAvatar({
     super.key,
@@ -18,6 +20,7 @@ class SupTechAvatar extends StatefulWidget {
     this.showWizardHat = false,
     this.isCasting = false,
     this.onTap,
+    this.skinId,
   });
 
   @override
@@ -89,6 +92,7 @@ class _SupTechAvatarState extends State<SupTechAvatar>
     final size = widget.size;
     final isGlowing = widget.isGlowing;
     final scheme = Theme.of(context).colorScheme;
+    final skin = SkinTierManager.getActiveSkin(widget.skinId);
 
     final avatar = AnimatedBuilder(
       animation: _controller,
@@ -102,6 +106,7 @@ class _SupTechAvatarState extends State<SupTechAvatar>
               isGlowing: isGlowing,
               showWizardHat: widget.showWizardHat,
               isCasting: widget.isCasting,
+              skin: skin,
               anim: _AnimationState(
                 wandSwing: _wandSwingAnimation.value,
                 antennaBob: _antennaBobAnimation.value,
@@ -221,6 +226,7 @@ class _SupTechBodyPainter extends CustomPainter {
   final bool isGlowing;
   final bool showWizardHat;
   final bool isCasting;
+  final SkinDefinition skin;
   final _AnimationState anim;
 
   _SupTechBodyPainter({
@@ -228,11 +234,13 @@ class _SupTechBodyPainter extends CustomPainter {
     required this.isGlowing,
     this.showWizardHat = false,
     this.isCasting = false,
+    SkinDefinition? skin,
     _AnimationState? anim,
-  }) : anim = anim ?? const _AnimationState();
+  }) : skin = skin ?? SkinTierManager.skins.first,
+       anim = anim ?? const _AnimationState();
 
-  Color get _robeColor => isGlowing ? scheme.primary : scheme.onSurface.withValues(alpha: 0.8);
-  Color get _trimColor => isGlowing ? scheme.secondary : scheme.outline;
+  Color get _robeColor => isGlowing ? skin.robeColor.withValues(alpha: 0.9) : skin.robeColor;
+  Color get _trimColor => isGlowing ? skin.trimColor : skin.trimColor.withValues(alpha: 0.7);
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -326,8 +334,8 @@ class _SupTechBodyPainter extends CustomPainter {
 
     for (final dx in [-3.5 * s, 3.5 * s]) {
       final color = isGlowing
-          ? (isCasting ? scheme.secondary : scheme.tertiary)
-          : const Color(0xFF1A202C);
+          ? (isCasting ? skin.eyeColor : skin.trimColor)
+          : skin.eyeColor;
       final eyePaint = Paint()..color = color;
       canvas.drawCircle(Offset(dx, -17 * s), eyeSize, eyePaint);
 
@@ -381,6 +389,7 @@ class _SupTechBodyPainter extends CustomPainter {
     return oldDelegate.isGlowing != isGlowing ||
         oldDelegate.showWizardHat != showWizardHat ||
         oldDelegate.isCasting != isCasting ||
+        oldDelegate.skin.id != skin.id ||
         oldDelegate.anim.castPhase != anim.castPhase ||
         oldDelegate.anim.blinkPhase != anim.blinkPhase;
   }

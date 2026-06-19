@@ -17,98 +17,103 @@ const PlayerProgressSchema = CollectionSchema(
   name: r'PlayerProgress',
   id: -69375815682459782,
   properties: {
-    r'bossesDefeated': PropertySchema(
+    r'activeSkinId': PropertySchema(
       id: 0,
+      name: r'activeSkinId',
+      type: IsarType.string,
+    ),
+    r'bossesDefeated': PropertySchema(
+      id: 1,
       name: r'bossesDefeated',
       type: IsarType.long,
     ),
     r'completedLevelIds': PropertySchema(
-      id: 1,
+      id: 2,
       name: r'completedLevelIds',
       type: IsarType.stringList,
     ),
     r'completedWorldIds': PropertySchema(
-      id: 2,
+      id: 3,
       name: r'completedWorldIds',
       type: IsarType.longList,
     ),
     r'correctAnswers': PropertySchema(
-      id: 3,
+      id: 4,
       name: r'correctAnswers',
       type: IsarType.long,
     ),
     r'currentLevelId': PropertySchema(
-      id: 4,
+      id: 5,
       name: r'currentLevelId',
       type: IsarType.string,
     ),
     r'currentWorldId': PropertySchema(
-      id: 5,
+      id: 6,
       name: r'currentWorldId',
       type: IsarType.long,
     ),
     r'earnedRewardIds': PropertySchema(
-      id: 6,
+      id: 7,
       name: r'earnedRewardIds',
       type: IsarType.stringList,
     ),
     r'extraSupTechUses': PropertySchema(
-      id: 7,
+      id: 8,
       name: r'extraSupTechUses',
       type: IsarType.long,
     ),
     r'lastActiveDate': PropertySchema(
-      id: 8,
+      id: 9,
       name: r'lastActiveDate',
       type: IsarType.dateTime,
     ),
     r'levelsCleared': PropertySchema(
-      id: 9,
+      id: 10,
       name: r'levelsCleared',
       type: IsarType.long,
     ),
     r'playDates': PropertySchema(
-      id: 10,
+      id: 11,
       name: r'playDates',
       type: IsarType.dateTimeList,
     ),
     r'points': PropertySchema(
-      id: 11,
+      id: 12,
       name: r'points',
       type: IsarType.long,
     ),
     r'prepResults': PropertySchema(
-      id: 12,
+      id: 13,
       name: r'prepResults',
       type: IsarType.stringList,
     ),
     r'supTechUsesThisLevel': PropertySchema(
-      id: 13,
+      id: 14,
       name: r'supTechUsesThisLevel',
       type: IsarType.long,
     ),
     r'themeId': PropertySchema(
-      id: 14,
+      id: 15,
       name: r'themeId',
       type: IsarType.string,
     ),
     r'totalAnswers': PropertySchema(
-      id: 15,
+      id: 16,
       name: r'totalAnswers',
       type: IsarType.long,
     ),
     r'totalPlayTimeSeconds': PropertySchema(
-      id: 16,
+      id: 17,
       name: r'totalPlayTimeSeconds',
       type: IsarType.long,
     ),
     r'unlockedSkinIds': PropertySchema(
-      id: 17,
+      id: 18,
       name: r'unlockedSkinIds',
       type: IsarType.stringList,
     ),
     r'userId': PropertySchema(
-      id: 18,
+      id: 19,
       name: r'userId',
       type: IsarType.long,
     )
@@ -147,6 +152,12 @@ int _playerProgressEstimateSize(
   Map<Type, List<int>> allOffsets,
 ) {
   var bytesCount = offsets.last;
+  {
+    final value = object.activeSkinId;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
   bytesCount += 3 + object.completedLevelIds.length * 3;
   {
     for (var i = 0; i < object.completedLevelIds.length; i++) {
@@ -198,25 +209,26 @@ void _playerProgressSerialize(
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  writer.writeLong(offsets[0], object.bossesDefeated);
-  writer.writeStringList(offsets[1], object.completedLevelIds);
-  writer.writeLongList(offsets[2], object.completedWorldIds);
-  writer.writeLong(offsets[3], object.correctAnswers);
-  writer.writeString(offsets[4], object.currentLevelId);
-  writer.writeLong(offsets[5], object.currentWorldId);
-  writer.writeStringList(offsets[6], object.earnedRewardIds);
-  writer.writeLong(offsets[7], object.extraSupTechUses);
-  writer.writeDateTime(offsets[8], object.lastActiveDate);
-  writer.writeLong(offsets[9], object.levelsCleared);
-  writer.writeDateTimeList(offsets[10], object.playDates);
-  writer.writeLong(offsets[11], object.points);
-  writer.writeStringList(offsets[12], object.prepResults);
-  writer.writeLong(offsets[13], object.supTechUsesThisLevel);
-  writer.writeString(offsets[14], object.themeId);
-  writer.writeLong(offsets[15], object.totalAnswers);
-  writer.writeLong(offsets[16], object.totalPlayTimeSeconds);
-  writer.writeStringList(offsets[17], object.unlockedSkinIds);
-  writer.writeLong(offsets[18], object.userId);
+  writer.writeString(offsets[0], object.activeSkinId);
+  writer.writeLong(offsets[1], object.bossesDefeated);
+  writer.writeStringList(offsets[2], object.completedLevelIds);
+  writer.writeLongList(offsets[3], object.completedWorldIds);
+  writer.writeLong(offsets[4], object.correctAnswers);
+  writer.writeString(offsets[5], object.currentLevelId);
+  writer.writeLong(offsets[6], object.currentWorldId);
+  writer.writeStringList(offsets[7], object.earnedRewardIds);
+  writer.writeLong(offsets[8], object.extraSupTechUses);
+  writer.writeDateTime(offsets[9], object.lastActiveDate);
+  writer.writeLong(offsets[10], object.levelsCleared);
+  writer.writeDateTimeList(offsets[11], object.playDates);
+  writer.writeLong(offsets[12], object.points);
+  writer.writeStringList(offsets[13], object.prepResults);
+  writer.writeLong(offsets[14], object.supTechUsesThisLevel);
+  writer.writeString(offsets[15], object.themeId);
+  writer.writeLong(offsets[16], object.totalAnswers);
+  writer.writeLong(offsets[17], object.totalPlayTimeSeconds);
+  writer.writeStringList(offsets[18], object.unlockedSkinIds);
+  writer.writeLong(offsets[19], object.userId);
 }
 
 PlayerProgress _playerProgressDeserialize(
@@ -226,26 +238,27 @@ PlayerProgress _playerProgressDeserialize(
   Map<Type, List<int>> allOffsets,
 ) {
   final object = PlayerProgress();
-  object.bossesDefeated = reader.readLong(offsets[0]);
-  object.completedLevelIds = reader.readStringList(offsets[1]) ?? [];
-  object.completedWorldIds = reader.readLongList(offsets[2]) ?? [];
-  object.correctAnswers = reader.readLong(offsets[3]);
-  object.currentLevelId = reader.readStringOrNull(offsets[4]);
-  object.currentWorldId = reader.readLong(offsets[5]);
-  object.earnedRewardIds = reader.readStringList(offsets[6]) ?? [];
-  object.extraSupTechUses = reader.readLong(offsets[7]);
+  object.activeSkinId = reader.readStringOrNull(offsets[0]);
+  object.bossesDefeated = reader.readLong(offsets[1]);
+  object.completedLevelIds = reader.readStringList(offsets[2]) ?? [];
+  object.completedWorldIds = reader.readLongList(offsets[3]) ?? [];
+  object.correctAnswers = reader.readLong(offsets[4]);
+  object.currentLevelId = reader.readStringOrNull(offsets[5]);
+  object.currentWorldId = reader.readLong(offsets[6]);
+  object.earnedRewardIds = reader.readStringList(offsets[7]) ?? [];
+  object.extraSupTechUses = reader.readLong(offsets[8]);
   object.id = id;
-  object.lastActiveDate = reader.readDateTimeOrNull(offsets[8]);
-  object.levelsCleared = reader.readLong(offsets[9]);
-  object.playDates = reader.readDateTimeList(offsets[10]) ?? [];
-  object.points = reader.readLong(offsets[11]);
-  object.prepResults = reader.readStringList(offsets[12]) ?? [];
-  object.supTechUsesThisLevel = reader.readLong(offsets[13]);
-  object.themeId = reader.readStringOrNull(offsets[14]);
-  object.totalAnswers = reader.readLong(offsets[15]);
-  object.totalPlayTimeSeconds = reader.readLong(offsets[16]);
-  object.unlockedSkinIds = reader.readStringList(offsets[17]) ?? [];
-  object.userId = reader.readLong(offsets[18]);
+  object.lastActiveDate = reader.readDateTimeOrNull(offsets[9]);
+  object.levelsCleared = reader.readLong(offsets[10]);
+  object.playDates = reader.readDateTimeList(offsets[11]) ?? [];
+  object.points = reader.readLong(offsets[12]);
+  object.prepResults = reader.readStringList(offsets[13]) ?? [];
+  object.supTechUsesThisLevel = reader.readLong(offsets[14]);
+  object.themeId = reader.readStringOrNull(offsets[15]);
+  object.totalAnswers = reader.readLong(offsets[16]);
+  object.totalPlayTimeSeconds = reader.readLong(offsets[17]);
+  object.unlockedSkinIds = reader.readStringList(offsets[18]) ?? [];
+  object.userId = reader.readLong(offsets[19]);
   return object;
 }
 
@@ -257,42 +270,44 @@ P _playerProgressDeserializeProp<P>(
 ) {
   switch (propertyId) {
     case 0:
-      return (reader.readLong(offset)) as P;
+      return (reader.readStringOrNull(offset)) as P;
     case 1:
-      return (reader.readStringList(offset) ?? []) as P;
+      return (reader.readLong(offset)) as P;
     case 2:
-      return (reader.readLongList(offset) ?? []) as P;
+      return (reader.readStringList(offset) ?? []) as P;
     case 3:
-      return (reader.readLong(offset)) as P;
+      return (reader.readLongList(offset) ?? []) as P;
     case 4:
-      return (reader.readStringOrNull(offset)) as P;
+      return (reader.readLong(offset)) as P;
     case 5:
-      return (reader.readLong(offset)) as P;
-    case 6:
-      return (reader.readStringList(offset) ?? []) as P;
-    case 7:
-      return (reader.readLong(offset)) as P;
-    case 8:
-      return (reader.readDateTimeOrNull(offset)) as P;
-    case 9:
-      return (reader.readLong(offset)) as P;
-    case 10:
-      return (reader.readDateTimeList(offset) ?? []) as P;
-    case 11:
-      return (reader.readLong(offset)) as P;
-    case 12:
-      return (reader.readStringList(offset) ?? []) as P;
-    case 13:
-      return (reader.readLong(offset)) as P;
-    case 14:
       return (reader.readStringOrNull(offset)) as P;
-    case 15:
+    case 6:
       return (reader.readLong(offset)) as P;
+    case 7:
+      return (reader.readStringList(offset) ?? []) as P;
+    case 8:
+      return (reader.readLong(offset)) as P;
+    case 9:
+      return (reader.readDateTimeOrNull(offset)) as P;
+    case 10:
+      return (reader.readLong(offset)) as P;
+    case 11:
+      return (reader.readDateTimeList(offset) ?? []) as P;
+    case 12:
+      return (reader.readLong(offset)) as P;
+    case 13:
+      return (reader.readStringList(offset) ?? []) as P;
+    case 14:
+      return (reader.readLong(offset)) as P;
+    case 15:
+      return (reader.readStringOrNull(offset)) as P;
     case 16:
       return (reader.readLong(offset)) as P;
     case 17:
-      return (reader.readStringList(offset) ?? []) as P;
+      return (reader.readLong(offset)) as P;
     case 18:
+      return (reader.readStringList(offset) ?? []) as P;
+    case 19:
       return (reader.readLong(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -495,6 +510,160 @@ extension PlayerProgressQueryWhere
 
 extension PlayerProgressQueryFilter
     on QueryBuilder<PlayerProgress, PlayerProgress, QFilterCondition> {
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      activeSkinIdIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'activeSkinId',
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      activeSkinIdIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'activeSkinId',
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      activeSkinIdEqualTo(
+    String? value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'activeSkinId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      activeSkinIdGreaterThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'activeSkinId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      activeSkinIdLessThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'activeSkinId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      activeSkinIdBetween(
+    String? lower,
+    String? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'activeSkinId',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      activeSkinIdStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'activeSkinId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      activeSkinIdEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'activeSkinId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      activeSkinIdContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'activeSkinId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      activeSkinIdMatches(String pattern, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'activeSkinId',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      activeSkinIdIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'activeSkinId',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      activeSkinIdIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'activeSkinId',
+        value: '',
+      ));
+    });
+  }
+
   QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
       bossesDefeatedEqualTo(int value) {
     return QueryBuilder.apply(this, (query) {
@@ -2698,6 +2867,20 @@ extension PlayerProgressQueryLinks
 extension PlayerProgressQuerySortBy
     on QueryBuilder<PlayerProgress, PlayerProgress, QSortBy> {
   QueryBuilder<PlayerProgress, PlayerProgress, QAfterSortBy>
+      sortByActiveSkinId() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'activeSkinId', Sort.asc);
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterSortBy>
+      sortByActiveSkinIdDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'activeSkinId', Sort.desc);
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterSortBy>
       sortByBossesDefeated() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'bossesDefeated', Sort.asc);
@@ -2879,6 +3062,20 @@ extension PlayerProgressQuerySortBy
 
 extension PlayerProgressQuerySortThenBy
     on QueryBuilder<PlayerProgress, PlayerProgress, QSortThenBy> {
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterSortBy>
+      thenByActiveSkinId() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'activeSkinId', Sort.asc);
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterSortBy>
+      thenByActiveSkinIdDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'activeSkinId', Sort.desc);
+    });
+  }
+
   QueryBuilder<PlayerProgress, PlayerProgress, QAfterSortBy>
       thenByBossesDefeated() {
     return QueryBuilder.apply(this, (query) {
@@ -3074,6 +3271,13 @@ extension PlayerProgressQuerySortThenBy
 extension PlayerProgressQueryWhereDistinct
     on QueryBuilder<PlayerProgress, PlayerProgress, QDistinct> {
   QueryBuilder<PlayerProgress, PlayerProgress, QDistinct>
+      distinctByActiveSkinId({bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'activeSkinId', caseSensitive: caseSensitive);
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QDistinct>
       distinctByBossesDefeated() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'bossesDefeated');
@@ -3211,6 +3415,13 @@ extension PlayerProgressQueryProperty
   QueryBuilder<PlayerProgress, int, QQueryOperations> idProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'id');
+    });
+  }
+
+  QueryBuilder<PlayerProgress, String?, QQueryOperations>
+      activeSkinIdProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'activeSkinId');
     });
   }
 
