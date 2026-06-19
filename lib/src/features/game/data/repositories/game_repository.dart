@@ -108,6 +108,11 @@ class GameRepository {
     await saveProgress(progress);
   }
 
+  Future<void> setActiveFrame(PlayerProgress progress, String? frameId) async {
+    progress.activeFrameId = frameId;
+    await saveProgress(progress);
+  }
+
   Future<void> setCurrentLevel(
       PlayerProgress progress, int worldId, String? levelId) async {
     progress.currentWorldId = worldId;

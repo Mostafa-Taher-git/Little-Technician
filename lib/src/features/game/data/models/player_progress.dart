@@ -16,9 +16,10 @@ class PlayerProgress {
   String? currentLevelId;
   List<String> completedLevelIds = [];
   List<int> completedWorldIds = [];
-  List<String> earnedRewardIds = [];
+List<String> earnedRewardIds = [];
   List<String> unlockedSkinIds = [];
   String? activeSkinId;  // Currently equipped skin
+  String? activeFrameId; // Currently equipped nickname frame
   String? themeId;
   int levelsCleared = 0;
   int bossesDefeated = 0;

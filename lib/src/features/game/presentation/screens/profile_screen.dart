@@ -61,20 +61,55 @@ class ProfileScreen extends StatelessWidget {
                       ),
                         child: Column(
                           children: [
-                            SupTechAvatar(
-                              availableUses: state.availableSupTechUses,
-                              isGlowing: true,
-                              size: 64,
-                              skinId: progress.activeSkinId,
-                            ),
+SupTechAvatar(
+                            availableUses: state.availableSupTechUses,
+                            isGlowing: true,
+                            size: 64,
+                            skinId: progress.activeSkinId,
+                          ),
                           const Gap(12),
-                          Text(
-                            user?.username ?? 'Player',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 22,
-                              fontWeight: FontWeight.w700,
-                            ),
+                          Builder(
+                            builder: (_) {
+                              final activeFrame = progress.activeFrameId != null
+                                  ? RewardPool.byId(progress.activeFrameId!)
+                                  : null;
+                              if (activeFrame != null) {
+                                return Container(
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        activeFrame.color.withValues(alpha: 0.3),
+                                        activeFrame.color.withValues(alpha: 0.1),
+                                      ],
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                    ),
+                                    borderRadius: BorderRadius.circular(16),
+                                    border: Border.all(
+                                      color: activeFrame.color.withValues(alpha: 0.5),
+                                      width: 2,
+                                    ),
+                                  ),
+                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                  child: Text(
+                                    user?.username ?? 'Player',
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                );
+                              }
+                              return Text(
+                                user?.username ?? 'Player',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              );
+                            },
                           ),
                           const Gap(4),
                           Wrap(
@@ -251,7 +286,72 @@ class ProfileScreen extends StatelessWidget {
                           onTap: () => _applyTheme(context, 'dragon_fire'),
                           scheme: scheme,
                         ),
-                      ],
+],
+                    ),
+                    const Gap(24),
+                    Text(
+                      'Frames',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        color: scheme.onSurface,
+                      ),
+                    ),
+                    const Gap(12),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: RewardPool.all.where((r) => r.type == RewardType.nicknameFrame).map((frame) {
+                        final unlocked = progress.earnedRewardIds.contains(frame.id);
+                        final isActive = progress.activeFrameId == frame.id;
+                        return GestureDetector(
+                          onTap: unlocked
+                              ? () => context.read<GameCubit>().setActiveFrame(frame.id)
+                              : null,
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: isActive
+                                  ? frame.color.withValues(alpha: 0.2)
+                                  : unlocked
+                                      ? frame.color.withValues(alpha: 0.1)
+                                      : scheme.surface.withValues(alpha: 0.5),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: isActive
+                                    ? frame.color
+                                    : unlocked
+                                        ? frame.color.withValues(alpha: 0.3)
+                                        : scheme.outline.withValues(alpha: 0.1),
+                                width: isActive ? 2 : 1,
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(frame.icon, color: unlocked ? frame.color : scheme.onSurface.withValues(alpha: 0.3), size: 18),
+                                const Gap(8),
+                                Text(
+                                  frame.displayName,
+                                  style: TextStyle(
+                                    color: unlocked ? frame.color : scheme.onSurface.withValues(alpha: 0.3),
+                                    fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                                if (isActive) ...[
+                                  const Gap(6),
+                                  Icon(Icons.check_circle, color: frame.color, size: 16),
+                                ] else if (!unlocked) ...[
+                                  const Gap(6),
+                                  Icon(Icons.lock, color: scheme.onSurface.withValues(alpha: 0.3), size: 16),
+                                ],
+                              ],
+                            ),
+                          ),
+                        );
+                      }).toList(),
                     ),
                     const Gap(24),
                     Text(

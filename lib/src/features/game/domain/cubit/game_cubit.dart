@@ -382,6 +382,16 @@ class GameCubit extends Cubit<GameState> {
     emit(state.copyWith(progress: progress));
   }
 
+  Future<void> setActiveFrame(String? frameId) async {
+    final progress = state.progress;
+    if (frameId != null && !progress.earnedRewardIds.contains(frameId)) {
+      return; // Can't equip locked frame
+    }
+    progress.activeFrameId = frameId;
+    _safePersist(() => _repository.setActiveFrame(progress, frameId));
+    emit(state.copyWith(progress: progress));
+  }
+
   void selectWorldById(int worldId) {
     if (worldId < GameData.worlds.length) {
       selectWorld(GameData.worlds[worldId]);
