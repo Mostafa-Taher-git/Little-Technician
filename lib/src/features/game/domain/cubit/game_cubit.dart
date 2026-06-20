@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:littletech/src/features/auth/data/services/auth_service.dart';
 import 'package:littletech/src/features/game/constants/game_data.dart';
 import 'package:littletech/src/features/game/constants/reward_pool.dart';
 import 'package:littletech/src/features/game/data/models/player_progress.dart';
@@ -76,6 +77,9 @@ class GameCubit extends Cubit<GameState> {
 
   Future<void> loadGame() async {
     try {
+      final validUsers = await AuthService.getAllUsers();
+      final validIds = validUsers.map((u) => u.id).toList();
+      await _repository.cleanupOrphanedProgress(validIds);
       final progress = await _repository.getOrCreateProgress(_userId);
       WorldDef? world;
       if (progress.currentCategoryId != null) {

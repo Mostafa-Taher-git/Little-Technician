@@ -19,7 +19,7 @@ class LittleTechApp extends StatefulWidget {
 }
 
 class _LittleTechAppState extends State<LittleTechApp> {
-  int _userId = 1;
+  int? _userId;
 
   @override
   void initState() {
@@ -28,31 +28,39 @@ class _LittleTechAppState extends State<LittleTechApp> {
   }
 
   Future<void> _loadUserId() async {
-    final id = await AuthService.getCurrentUserId();
+    final userId = AuthService.getCachedUserId();
     if (mounted) {
-      setState(() => _userId = id ?? 1);
+      setState(() => _userId = userId);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final repository = GameRepository(widget.isar);
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (_) => AuthBloc()),
         BlocProvider(create: (_) => CounterCubit()),
         BlocProvider(create: (_) => ThemeCubit()),
-        BlocProvider(create: (_) => GameCubit(repository, _userId)),
+        if (_userId != null)
+          BlocProvider(
+            key: ValueKey('game_$_userId'),
+            create: (_) => GameCubit(GameRepository(widget.isar), _userId!)..loadGame(),
+          ),
       ],
-      child: BlocBuilder<ThemeCubit, ThemeData>(
-        builder: (_, theme) {
-          return MaterialApp(
+      child: BlocListener<AuthBloc, AuthState>(
+        listener: (_, state) {
+          if (state is LoginSuccess || state is RegisterSuccess) {
+            _loadUserId();
+          }
+        },
+        child: BlocBuilder<ThemeCubit, ThemeData>(
+          builder: (_, theme) => MaterialApp(
             title: 'LittleTech',
             debugShowCheckedModeBanner: false,
             theme: theme,
             home: const SplashScreen(),
-          );
-        },
+          ),
+        ),
       ),
     );
   }

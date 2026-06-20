@@ -133,4 +133,15 @@ class GameRepository {
     progress.currentLevelId = levelId;
     await saveProgress(progress);
   }
+
+  Future<void> cleanupOrphanedProgress(List<int> validUserIds) async {
+    final allProgress = await _isar.playerProgress.where().findAll();
+    for (final progress in allProgress) {
+      if (!validUserIds.contains(progress.userId)) {
+        await _isar.writeTxn(() async {
+          await _isar.playerProgress.delete(progress.id);
+        });
+      }
+    }
+  }
 }

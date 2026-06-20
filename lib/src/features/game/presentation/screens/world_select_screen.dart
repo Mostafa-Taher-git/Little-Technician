@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:littletech/src/core/constants/category_manager.dart';
+import 'package:littletech/src/features/auth/data/services/auth_service.dart';
 import 'package:littletech/src/core/navigation/nav.dart';
 import 'package:littletech/src/features/game/constants/game_data.dart';
 import 'package:littletech/src/features/game/domain/cubit/game_cubit.dart';
@@ -27,9 +28,15 @@ class _WorldSelectScreenState extends State<WorldSelectScreen> {
     _loadDeviceFilter();
   }
 
+  Future<String> get _deviceFilterKey async {
+    final uid = await AuthService.getCurrentUserId();
+    return uid != null ? 'device_filter_$uid' : 'device_filter';
+  }
+
   Future<void> _loadDeviceFilter() async {
     final prefs = await SharedPreferences.getInstance();
-    final saved = prefs.getString('device_filter');
+    final key = await _deviceFilterKey;
+    final saved = prefs.getString(key);
     if (saved != null && mounted) {
       setState(() => _selectedDeviceId = saved);
     }
@@ -37,10 +44,11 @@ class _WorldSelectScreenState extends State<WorldSelectScreen> {
 
   Future<void> _setDeviceFilter(String? deviceId) async {
     final prefs = await SharedPreferences.getInstance();
+    final key = await _deviceFilterKey;
     if (deviceId == null) {
-      await prefs.remove('device_filter');
+      await prefs.remove(key);
     } else {
-      await prefs.setString('device_filter', deviceId);
+      await prefs.setString(key, deviceId);
     }
   }
 

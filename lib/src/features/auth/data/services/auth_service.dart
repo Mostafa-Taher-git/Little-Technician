@@ -5,8 +5,20 @@ import 'package:littletech/src/features/auth/data/models/user_model.dart';
 class AuthService {
   static const _usersKey = 'lt_users';
   static const _sessionKey = 'lt_session';
+  static SharedPreferences? _cachedPrefs;
 
-  static Future<SharedPreferences> get _prefs => SharedPreferences.getInstance();
+  static Future<SharedPreferences> get _prefs async {
+    _cachedPrefs ??= await SharedPreferences.getInstance();
+    return _cachedPrefs!;
+  }
+
+  static void init(SharedPreferences prefs) {
+    _cachedPrefs = prefs;
+  }
+
+  static int? getCachedUserId() {
+    return _cachedPrefs?.getInt('${_sessionKey}_id');
+  }
 
   // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -33,6 +45,39 @@ class AuthService {
     await prefs.setString(_usersKey, raw);
   }
 
+  // ── Migration ──────────────────────────────────────────────────────────────
+
+  static Future<void> migrateUserData(int userId) async {
+    final prefs = await _prefs;
+
+    final olds = prefs.getStringList('lt_solved_problems');
+    if (olds != null) {
+      final newKey = 'lt_solved_problems_$userId';
+      if (prefs.getStringList(newKey) == null) {
+        await prefs.setStringList(newKey, olds);
+      }
+      await prefs.remove('lt_solved_problems');
+    }
+
+    final oldSaved = prefs.getString('lt_saved_solutions');
+    if (oldSaved != null) {
+      final newKey = 'lt_saved_solutions_$userId';
+      if (prefs.getString(newKey) == null) {
+        await prefs.setString(newKey, oldSaved);
+      }
+      await prefs.remove('lt_saved_solutions');
+    }
+
+    final oldFilter = prefs.getString('device_filter');
+    if (oldFilter != null) {
+      final newKey = 'device_filter_$userId';
+      if (prefs.getString(newKey) == null) {
+        await prefs.setString(newKey, oldFilter);
+      }
+      await prefs.remove('device_filter');
+    }
+  }
+
   // ── Public API ─────────────────────────────────────────────────────────────
 
   static Future<bool> register({
@@ -50,6 +95,7 @@ class AuthService {
     final prefs = await _prefs;
     await prefs.setString(_sessionKey, username);
     await prefs.setInt('${_sessionKey}_id', newId);
+    await migrateUserData(newId);
     return true;
   }
 
@@ -63,6 +109,7 @@ class AuthService {
     final prefs = await _prefs;
     await prefs.setString(_sessionKey, match.username);
     await prefs.setInt('${_sessionKey}_id', match.id);
+    await migrateUserData(match.id);
     return true;
   }
 

@@ -53,7 +53,9 @@ class _LoginScreenState extends State<LoginScreen> {
           child: BlocListener<AuthBloc, AuthState>(
             listener: (context, state) {
               if (state is LoginSuccess) {
-                Nav.replaceAll(context, const HomeScreen());
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  if (context.mounted) Nav.replaceAll(context, const HomeScreen());
+                });
               } else if (state is AuthError) {
                 showErrorToast(context, state.message);
               }

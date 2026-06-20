@@ -218,7 +218,7 @@ SupTechAvatar(
                         color: scheme.onSurface,
                       ),
                     ),
-                    const Gap(12),
+const Gap(24),
                     Wrap(
                       spacing: 8,
                       runSpacing: 8,
@@ -227,6 +227,8 @@ SupTechAvatar(
                           label: 'Default',
                           icon: Icons.palette,
                           isActive: progress.themeId == null || progress.themeId == 'default',
+                          unlocked: true,
+                          onUnlockTap: null,
                           onTap: () => _applyTheme(context, 'default'),
                           scheme: scheme,
                         ),
@@ -234,6 +236,8 @@ SupTechAvatar(
                           label: 'Midnight',
                           icon: Icons.dark_mode,
                           isActive: progress.themeId == 'dark',
+                          unlocked: progress.earnedRewardIds.contains('theme_dark') || progress.purchasedItemIds.contains('theme_dark'),
+                          onUnlockTap: () => context.read<GameCubit>().purchaseItem('theme_dark'),
                           onTap: () => _applyTheme(context, 'dark'),
                           scheme: scheme,
                         ),
@@ -241,6 +245,8 @@ SupTechAvatar(
                           label: 'Amber',
                           icon: Icons.light_mode,
                           isActive: progress.themeId == 'amber',
+                          unlocked: progress.earnedRewardIds.contains('theme_amber') || progress.purchasedItemIds.contains('theme_amber'),
+                          onUnlockTap: () => context.read<GameCubit>().purchaseItem('theme_amber'),
                           onTap: () => _applyTheme(context, 'amber'),
                           scheme: scheme,
                         ),
@@ -248,6 +254,8 @@ SupTechAvatar(
                           label: 'Ocean',
                           icon: Icons.water_drop,
                           isActive: progress.themeId == 'ocean',
+                          unlocked: progress.earnedRewardIds.contains('theme_ocean') || progress.purchasedItemIds.contains('theme_ocean'),
+                          onUnlockTap: () => context.read<GameCubit>().purchaseItem('theme_ocean'),
                           onTap: () => _applyTheme(context, 'ocean'),
                           scheme: scheme,
                         ),
@@ -255,6 +263,8 @@ SupTechAvatar(
                           label: 'Neon',
                           icon: Icons.nights_stay,
                           isActive: progress.themeId == 'neon',
+                          unlocked: progress.earnedRewardIds.contains('theme_neon') || progress.purchasedItemIds.contains('theme_neon'),
+                          onUnlockTap: () => context.read<GameCubit>().purchaseItem('theme_neon'),
                           onTap: () => _applyTheme(context, 'neon'),
                           scheme: scheme,
                         ),
@@ -262,6 +272,8 @@ SupTechAvatar(
                           label: 'Medieval',
                           icon: Icons.castle,
                           isActive: progress.themeId == 'medieval',
+                          unlocked: progress.purchasedItemIds.contains('theme_medieval'),
+                          onUnlockTap: () => context.read<GameCubit>().purchaseItem('theme_medieval'),
                           onTap: () => _applyTheme(context, 'medieval'),
                           scheme: scheme,
                         ),
@@ -269,6 +281,8 @@ SupTechAvatar(
                           label: 'Dungeon',
                           icon: Icons.door_front_door,
                           isActive: progress.themeId == 'dungeon',
+                          unlocked: progress.purchasedItemIds.contains('theme_dungeon'),
+                          onUnlockTap: () => context.read<GameCubit>().purchaseItem('theme_dungeon'),
                           onTap: () => _applyTheme(context, 'dungeon'),
                           scheme: scheme,
                         ),
@@ -276,6 +290,8 @@ SupTechAvatar(
                           label: 'Arcane',
                           icon: Icons.auto_awesome,
                           isActive: progress.themeId == 'arcane',
+                          unlocked: progress.purchasedItemIds.contains('theme_arcane'),
+                          onUnlockTap: () => context.read<GameCubit>().purchaseItem('theme_arcane'),
                           onTap: () => _applyTheme(context, 'arcane'),
                           scheme: scheme,
                         ),
@@ -283,6 +299,8 @@ SupTechAvatar(
                           label: 'Dragon Fire',
                           icon: Icons.local_fire_department,
                           isActive: progress.themeId == 'dragon_fire',
+                          unlocked: progress.purchasedItemIds.contains('theme_dragon_fire'),
+                          onUnlockTap: () => context.read<GameCubit>().purchaseItem('theme_dragon_fire'),
                           onTap: () => _applyTheme(context, 'dragon_fire'),
                           scheme: scheme,
                         ),
@@ -589,6 +607,8 @@ class _ThemeChip extends StatelessWidget {
   final String label;
   final IconData icon;
   final bool isActive;
+  final bool unlocked;
+  final VoidCallback? onUnlockTap;
   final VoidCallback onTap;
   final ColorScheme scheme;
 
@@ -596,23 +616,32 @@ class _ThemeChip extends StatelessWidget {
     required this.label,
     required this.icon,
     required this.isActive,
+    this.unlocked = true,
+    this.onUnlockTap,
     required this.onTap,
     required this.scheme,
   });
 
   @override
   Widget build(BuildContext context) {
+    final canTap = unlocked ? onTap : onUnlockTap;
     return GestureDetector(
-      onTap: onTap,
+      onTap: canTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: BoxDecoration(
           color: isActive
               ? scheme.secondary.withValues(alpha: 0.15)
-              : scheme.surface,
+              : unlocked
+                  ? scheme.surface
+                  : scheme.surface.withValues(alpha: 0.3),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isActive ? scheme.secondary : scheme.outline.withValues(alpha: 0.3),
+            color: isActive
+                ? scheme.secondary
+                : unlocked
+                    ? scheme.outline.withValues(alpha: 0.3)
+                    : scheme.outline.withValues(alpha: 0.1),
             width: isActive ? 2 : 1,
           ),
         ),
@@ -630,9 +659,26 @@ class _ThemeChip extends StatelessWidget {
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
-                color: isActive ? scheme.secondary : scheme.onSurface,
+                color: isActive ? scheme.secondary : scheme.onSurface.withValues(alpha: 0.5),
               ),
             ),
+            if (!unlocked) ...[
+              const Gap(6),
+              GestureDetector(
+                onTap: onUnlockTap,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: scheme.secondary.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Text(
+                    'Buy',
+                    style: TextStyle(color: scheme.secondary, fontSize: 10, fontWeight: FontWeight.w700),
+                  ),
+                ),
+              ),
+            ],
           ],
         ),
       ),

@@ -1,16 +1,25 @@
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:littletech/src/features/auth/data/services/auth_service.dart';
 import 'package:littletech/src/features/solutions/data/models/saved_solution_model.dart';
 
 class SavedSolutionsService {
   static const _key = 'lt_saved_solutions';
   static int _nextId = 1;
 
+  static Future<int?> _userId() async {
+    return AuthService.getCurrentUserId();
+  }
+
+  static String _userKey(int userId) => '${_key}_$userId';
+
   static Future<SharedPreferences> get _prefs => SharedPreferences.getInstance();
 
   static Future<List<SavedSolution>> getAll() async {
+    final uid = await _userId();
+    if (uid == null) return [];
     final prefs = await _prefs;
-    final raw = prefs.getString(_key);
+    final raw = prefs.getString(_userKey(uid));
     if (raw == null) return [];
     final list = jsonDecode(raw) as List;
     final items = list.map((e) => SavedSolution.fromJson(e as Map<String, dynamic>)).toList();
@@ -23,8 +32,10 @@ class SavedSolutionsService {
   }
 
   static Future<void> _persist(List<SavedSolution> items) async {
+    final uid = await _userId();
+    if (uid == null) return;
     final prefs = await _prefs;
-    await prefs.setString(_key, jsonEncode(items.map((s) => s.toJson()).toList()));
+    await prefs.setString(_userKey(uid), jsonEncode(items.map((s) => s.toJson()).toList()));
   }
 
   static Future<void> save(SavedSolution solution) async {
