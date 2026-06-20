@@ -83,10 +83,10 @@ class _ProblemScreenState extends State<ProblemScreen> {
             return const Center(child: CircularProgressIndicator());
           }
 
-    final steps = widget.level.steps;
-    final solvedCount = widget.isReview ? steps.length : state.currentStepIndex;
-    final allSolved = solvedCount >= steps.length;
-    final progress = steps.isNotEmpty ? solvedCount / steps.length : 0.0;
+          final steps = widget.level.steps;
+          final solvedCount = widget.isReview ? steps.length : state.currentStepIndex;
+          final allSolved = solvedCount >= steps.length;
+          final progress = steps.isNotEmpty ? solvedCount / steps.length : 0.0;
 
           if (allSolved && !widget.isReview && !_navigatedToReward) {
             _navigatedToReward = true;
@@ -242,7 +242,7 @@ class _ProblemScreenState extends State<ProblemScreen> {
                           setState(() => _feedbackGiven = true);
                         },
                         icon: const Icon(Icons.thumb_down_outlined, color: Colors.red, size: 22),
-                        tooltip: 'No, it didn\'t work',
+                        tooltip: "No, it didn't work",
                       ),
                     ],
                   ),
@@ -271,6 +271,7 @@ class _ProblemScreenState extends State<ProblemScreen> {
                     ],
                   ),
                 ).animate().fadeIn(),
+              const Gap(12),
               Expanded(
                 child: ListView.builder(
                   padding: const EdgeInsets.all(16),
