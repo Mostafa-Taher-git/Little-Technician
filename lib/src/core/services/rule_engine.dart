@@ -567,6 +567,92 @@ class RuleEngine {
       'Verify the app works after adding the firewall exception.',
       'If using a third-party firewall, add the same exception in that firewall\'s settings.',
     ],
+
+    // ── Boss Battles Easy/Medium/Hard ────────────────────────────────────────────
+    'boss_bone_colossus_1': [
+      'Prepare for the Bone Colossus — a skeleton made of PC cases.',
+      'Target its weak joints with precise attacks.',
+      'Avoid its crushing blows by staying mobile.',
+      'Strike when it rears back to slam the ground.',
+      'Defeat it with focused hardware knowledge.',
+    ],
+    'boss_memory_wraith_1': [
+      'The Memory Wraith feeds on corrupted RAM.',
+      'Use memory check spells to weaken it.',
+      'Target its flickering form with data scans.',
+      'Keep your own memory stable to avoid its drain.',
+      'Purify it with a clean memory test.',
+    ],
+    'boss_lich_lord_1': [
+      'The Lich Lord rises from corrupted boot files.',
+      'Its touch freezes processes mid-execution.',
+      'Use system restore incantations.',
+      'Target its phylactery — the registry.',
+      'Banish it with proper cleanup rituals.',
+    ],
+    'boss_static_specter_1': [
+      'Static Specter crackles with audio interference.',
+      'Sound waves distort into painful shrieks.',
+      'Seek the frequency that disrupts its form.',
+      'Target its resonance with proper tuning.',
+      'Silence it with the right balance.',
+    ],
+    'boss_goblin_king_1': [
+      'Goblin King sabotages all connected devices.',
+      'Tangled cables whip out from its throne.',
+      'Cut the magical connections cleanly.',
+      'Avoid its trap-laden workshop.',
+      'Strike its crown to break its control.',
+    ],
+    'boss_glitch_1': [
+      'The Glitch corrupts reality itself.',
+      'Spells fail and code breaks mid-cast.',
+      'Use clean reinstall techniques.',
+      'Target its fragmented existence.',
+      'Patch it into submission.',
+    ],
+    'boss_dragon_whelp_1': [
+      'Dragon Whelp hoards network packets.',
+      'Its breath is pure bandwidth theft.',
+      'Cut off its connection to the router.',
+      'Use cable management to restrain it.',
+      'Seal its hoard with proper config.',
+    ],
+    'boss_void_disk_1': [
+      'Void Disk devours data on contact.',
+      'Files disappear into its endless maw.',
+      'Use backup restoration on the spot.',
+      'Target its sectors before they corrupt.',
+      'Close it with perfect partitioning.',
+    ],
+    'boss_beholder_1': [
+      "Beholder's eye rays corrupt displays.",
+      'Screen flickers under its gaze.',
+      'Use display calibration to resist.',
+      'Target each eye with proper settings.',
+      'Blind it with correct resolution.',
+    ],
+    'boss_battery_wraith_1': [
+      'Battery Wraith drains all power sources.',
+      'Devices lose charge instantly.',
+      'Use power management counterspells.',
+      'Target its energy vampires.',
+      'Restore power with proper cycling.',
+    ],
+    'boss_lag_dragon_1': [
+      'Lag Dragon drops frames with each breath.',
+      'Input delay grows exponentially.',
+      'Use performance optimization.',
+      'Target its processing bottleneck.',
+      'Freeze it with perfect timing.',
+    ],
+    'boss_malware_beast_1': [
+      'Malware Beast corrupts with viral code.',
+      'Infection spreads to all files.',
+      'Use antivirus quarantine walls.',
+      'Target its main infection vector.',
+      'Cleanse it with proper scan.',
+    ],
   };
 
   /// Find a solution for the given problem text.
@@ -598,6 +684,18 @@ class RuleEngine {
     }
     if (p.contains('boot')) {
       return ProblemSolution(problem: problem, category: 'Boot & OS', steps: _solutions["pc won't boot"]!);
+    }
+
+    // Boss battles - direct match
+    if (_solutions.containsKey(p)) {
+      return ProblemSolution(problem: problem, category: 'Boss', steps: _solutions[p]!);
+    }
+
+    // Boss battles - partial match
+    for (final entry in _solutions.entries) {
+      if (entry.key.startsWith('boss_') && (p.contains(entry.key.replaceAll('_', ' ')) || p.contains(entry.key))) {
+        return ProblemSolution(problem: problem, category: 'Boss', steps: entry.value);
+      }
     }
 
     return null;

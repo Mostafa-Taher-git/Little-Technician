@@ -149,6 +149,13 @@ class GameRepository {
     }
   }
 
+  /// Delete all progress for all users - use during testing
+  Future<void> deleteAllProgress() async {
+    await _isar.writeTxn(() async {
+      await _isar.playerProgress.where().deleteAll();
+    });
+  }
+
   /// Create a test user with all achievements unlocked
   Future<PlayerProgress> createTestProgress(int userId) async {
     // Delete any existing progress for this user

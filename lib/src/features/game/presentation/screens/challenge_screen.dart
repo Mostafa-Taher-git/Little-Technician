@@ -28,24 +28,32 @@ class ChallengeScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          _ChallengeCard(
-            title: 'Daily Quest',
-            icon: Icons.wb_sunny,
-            subtitle: daily.title,
-            description: daily.description,
-            bonusPoints: daily.bonusPoints,
-            pointsMultiplier: daily.pointsMultiplier,
-            color: Colors.orange,
-            onTap: () {
-              final level = GameData.worlds
-                  .expand((w) => w.levels)
-                  .firstWhere((l) => l.id == daily.levelId);
-              final world = GameData.worlds.firstWhere((w) => w.levels.contains(level));
-              context.read<GameCubit>()
-                ..selectLevel(level, worldOverride: world)
-                ..setPointsMultiplier(daily.pointsMultiplier)
-                ..addChallengeBonus(daily.bonusPoints);
-              Nav.push(context, ProblemScreen(world: world, level: level));
+          BlocBuilder<GameCubit, GameState>(
+            builder: (_, state) {
+              final dailyCompleted = state.progress.getDailyQuestCompleted();
+              return _ChallengeCard(
+                title: 'Daily Quest',
+                icon: Icons.wb_sunny,
+                subtitle: daily.title,
+                description: daily.description,
+                bonusPoints: daily.bonusPoints,
+                pointsMultiplier: daily.pointsMultiplier,
+                color: Colors.orange,
+                completed: dailyCompleted,
+                onTap: () {
+                  final level = GameData.worlds
+                      .expand((w) => w.levels)
+                      .where((l) => l.id == daily.levelId)
+                      .firstOrNull;
+                  if (level == null) return;
+                  final world = GameData.worlds.firstWhere((w) => w.levels.contains(level), orElse: () => GameData.worlds.first);
+                  context.read<GameCubit>()
+                    ..selectLevel(level, worldOverride: world)
+                    ..setPointsMultiplier(daily.pointsMultiplier)
+                    ..addChallengeBonus(daily.bonusPoints);
+                  Nav.push(context, ProblemScreen(world: world, level: level));
+                },
+              );
             },
           ),
           const Gap(16),
@@ -57,10 +65,11 @@ class ChallengeScreen extends StatelessWidget {
             bonusPoints: weekly.bonusPoints,
             pointsMultiplier: weekly.pointsMultiplier,
             color: Colors.red,
+            completed: false,
             onTap: () {
               final world = GameData.worlds.firstWhere(
                 (w) => w.id == weekly.categoryId,
-                orElse: () => GameData.worlds.first,
+                orElse: () => GameData.worlds.isNotEmpty ? GameData.worlds.first : throw Exception('No worlds'),
               );
               context.read<GameCubit>()
                 ..selectWorld(world)
@@ -84,6 +93,7 @@ class _ChallengeCard extends StatelessWidget {
   final int bonusPoints;
   final int pointsMultiplier;
   final Color color;
+  final bool completed;
   final VoidCallback onTap;
 
   const _ChallengeCard({
@@ -94,6 +104,7 @@ class _ChallengeCard extends StatelessWidget {
     required this.bonusPoints,
     required this.pointsMultiplier,
     required this.color,
+    required this.completed,
     required this.onTap,
   });
 
@@ -105,20 +116,27 @@ class _ChallengeCard extends StatelessWidget {
       color: Colors.transparent,
       borderRadius: BorderRadius.circular(18),
       child: InkWell(
-        onTap: onTap,
+        onTap: completed ? null : onTap,
         borderRadius: BorderRadius.circular(18),
         child: Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(18),
             gradient: LinearGradient(
               colors: [
-                color.withValues(alpha: 0.1),
-                color.withValues(alpha: 0.02),
+                completed
+                    ? Colors.grey.withValues(alpha: 0.05)
+                    : color.withValues(alpha: 0.1),
+                completed
+                    ? Colors.grey.withValues(alpha: 0.02)
+                    : color.withValues(alpha: 0.02),
               ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
-            border: Border.all(color: color.withValues(alpha: 0.2)),
+            border: Border.all(
+                color: completed
+                    ? scheme.outline.withValues(alpha: 0.1)
+                    : color.withValues(alpha: 0.2)),
           ),
           padding: const EdgeInsets.all(20),
           child: Row(
@@ -127,10 +145,13 @@ class _ChallengeCard extends StatelessWidget {
                 width: 50,
                 height: 50,
                 decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.1),
+                  color: completed
+                      ? scheme.outline.withValues(alpha: 0.1)
+                      : color.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(14),
                 ),
-                child: Icon(icon, color: color, size: 26),
+                child: Icon(icon,
+                    color: completed ? scheme.outline : color, size: 26),
               ),
               const Gap(16),
               Expanded(
@@ -142,28 +163,47 @@ class _ChallengeCard extends StatelessWidget {
                         Text(
                           title,
                           style: TextStyle(
-                            color: color,
+                            color: completed ? scheme.outline : color,
                             fontWeight: FontWeight.w800,
                             fontSize: 13,
                             letterSpacing: 1,
                           ),
                         ),
                         const Spacer(),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                          decoration: BoxDecoration(
-                            color: Colors.amber.withValues(alpha: 0.15),
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: Text(
-                            '${pointsMultiplier}x pts',
-                            style: const TextStyle(
-                              color: Colors.amber,
-                              fontSize: 11,
-                              fontWeight: FontWeight.w700,
+                        if (completed)
+                          Container(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                            decoration: BoxDecoration(
+                              color: Colors.green.withValues(alpha: 0.15),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: const Text(
+                              'Completed',
+                              style: TextStyle(
+                                color: Colors.green,
+                                fontSize: 11,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          )
+                        else
+                          Container(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                            decoration: BoxDecoration(
+                              color: Colors.amber.withValues(alpha: 0.15),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Text(
+                              '${pointsMultiplier}x pts',
+                              style: const TextStyle(
+                                color: Colors.amber,
+                                fontSize: 11,
+                                fontWeight: FontWeight.w700,
+                              ),
                             ),
                           ),
-                        ),
                       ],
                     ),
                     const Gap(4),
@@ -186,7 +226,8 @@ class _ChallengeCard extends StatelessWidget {
                   ],
                 ),
               ),
-              Icon(Icons.arrow_forward_ios, color: color, size: 16),
+              Icon(completed ? Icons.check : Icons.arrow_forward_ios,
+                  color: completed ? Colors.green : color, size: 16),
             ],
           ),
         ),

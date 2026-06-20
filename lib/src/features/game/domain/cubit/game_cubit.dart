@@ -111,6 +111,13 @@ class GameCubit extends Cubit<GameState> {
     emit(state.copyWith(pointsMultiplier: multiplier));
   }
 
+  void completeDailyQuest() {
+    final progress = state.progress;
+    progress.setDailyQuestCompleted();
+    _safePersist(() => _repository.saveProgress(progress));
+    emit(state.copyWith(progress: progress));
+  }
+
   void selectLevel(LevelDef level, {WorldDef? worldOverride}) {
     final progress = state.progress;
     final world = worldOverride ?? state.currentWorld;
@@ -219,6 +226,12 @@ class GameCubit extends Cubit<GameState> {
     } catch (_) {}
 
     _safePersist(() => _repository.recordPlayDate(progress));
+    
+    // Complete daily quest if this level was from a daily challenge
+    if (state.pointsMultiplier > 1) {
+      _safePersist(() => _repository.saveProgress(progress..setDailyQuestCompleted()));
+    }
+    
     emit(state.copyWith(
       progress: progress,
       currentStepIndex: finalStepIndex,

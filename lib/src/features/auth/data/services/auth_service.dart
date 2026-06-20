@@ -160,6 +160,8 @@ class AuthService {
   static Future<void> resetAllUsers() async {
     final prefs = await _prefs;
     await prefs.remove(_usersKey);
+    await prefs.remove(_sessionKey);
+    await prefs.remove('${_sessionKey}_id');
     _cachedPrefs?.clear();
   }
 

@@ -16,6 +16,7 @@ class LevelDef {
   final String? cause;
   final String? estimatedTime;
   final DifficultyLevel difficulty;
+  final bool isBossLevel;
 
   const LevelDef({
     required this.id,
@@ -29,6 +30,7 @@ class LevelDef {
     this.cause,
     this.estimatedTime,
     this.difficulty = DifficultyLevel.easy,
+    this.isBossLevel = false,
   });
 }
 
@@ -77,31 +79,101 @@ class GameData {
   }
 
   static WorldDef _generateWorld(CategoryDef cat) {
-    final levels = cat.problemKeys.map((pk) => _generateLevel(cat.id, pk)).toList();
+    final levels = <LevelDef>[];
+    final totalLevels = cat.levelCount;
+    final bossRewards = [200, 350, 500, 750, 1000, 1500];
+    
+    var problemIndex = 0;
+    for (var levelNum = 1; levelNum <= totalLevels; levelNum++) {
+      // Check if this is a boss level (levels 5, 10, 15, 20, 25, 30)
+      if (levelNum % 5 == 0 && cat.bossKeys.isNotEmpty) {
+        final bossStage = levelNum ~/ 5;
+        final bossIndex = (bossStage - 1).clamp(0, cat.bossKeys.length - 1);
+        final bossKey = cat.bossKeys[bossIndex];
+        final solution = RuleEngine.solve(bossKey);
+        final difficulty = bossIndex < 2 
+            ? DifficultyLevel.easy 
+            : bossIndex < 4 
+                ? DifficultyLevel.medium 
+                : DifficultyLevel.hard;
+        
+        levels.add(LevelDef(
+          id: '${cat.id}_boss_$bossStage',
+          title: 'Boss: ${cat.bossName}',
+          description: 'Defeat the ${cat.bossName}!',
+          steps: solution?.steps ?? ['Prepare for boss battle!'],
+          points: bossRewards[bossStage - 1],
+          difficulty: difficulty,
+          isBossLevel: true,
+        ));
+      }
+      
+      // Add regular problem level
+      if (problemIndex < cat.problemKeys.length) {
+        levels.add(_generateLevel(cat.id, cat.problemKeys[problemIndex], problemIndex));
+        problemIndex++;
+      }
+    }
+    
+    // If we have fewer problems than levels, fill remaining with challenges
+    while (levels.length < totalLevels) {
+      final extraIndex = levels.length;
+      levels.add(LevelDef(
+        id: '${cat.id}_challenge_$extraIndex',
+        title: 'Expert Challenge ${extraIndex + 1}',
+        description: 'Advanced troubleshooting challenge.',
+        steps: ['Apply all your knowledge to solve this advanced case.'],
+        points: 150,
+        difficulty: DifficultyLevel.hard,
+      ));
+    }
+    
+    final bossPoints = _getBossPoints(cat.id);
     return WorldDef(
       id: cat.id,
       name: cat.name,
       description: cat.description,
       icon: cat.icon,
       levels: levels,
-      boss: BossDef(name: cat.bossName, lore: cat.bossLore, hp: cat.bossHp, points: 500),
+      boss: BossDef(name: cat.bossName, lore: cat.bossLore, hp: cat.bossHp, points: bossPoints),
     );
   }
 
-  static LevelDef _generateLevel(String categoryId, String problemKey) {
+  static int _getBossPoints(String categoryId) {
+    switch (categoryId) {
+      case 'mobile':
+        return 700;
+      case 'gaming':
+        return 800;
+      case 'audio':
+      case 'smart_home':
+        return 600;
+      default:
+        return 500;
+    }
+  }
+
+  static LevelDef _generateLevel(String categoryId, String problemKey, int index) {
     final id = levelId(categoryId, problemKey);
     final solution = RuleEngine.solve(problemKey);
     final title = problemKey.split(' ').map((w) {
       if (w.isEmpty) return w;
       return w[0].toUpperCase() + w.substring(1);
     }).join(' ');
+    
+    final difficulty = index < 5 
+        ? DifficultyLevel.easy 
+        : index < 15 
+            ? DifficultyLevel.medium 
+            : DifficultyLevel.hard;
+    
     return LevelDef(
       id: id,
       title: title,
       description: 'Troubleshooting: $problemKey',
       steps: solution?.steps ?? ['Investigate the issue and apply known fixes.'],
       points: 100,
-      difficulty: DifficultyLevel.easy,
+      difficulty: difficulty,
     );
   }
 

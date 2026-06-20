@@ -9,29 +9,30 @@ class PlayerProgress {
   @Index()
   late int userId;
 
-  int points = 0;
-  int supTechUsesThisLevel = 1;
-  int extraSupTechUses = 0;
-  int currentWorldId = 0;
-  String? currentCategoryId;
-  String? currentLevelId;
-  List<String> completedLevelIds = [];
-  List<int> completedWorldIds = [];
-  List<String> completedCategoryIds = [];
-  List<String> purchasedItemIds = [];
-List<String> earnedRewardIds = [];
-  List<String> unlockedSkinIds = [];
-  String? activeSkinId;  // Currently equipped skin
-  String? activeFrameId; // Currently equipped nickname frame
-  String? themeId;
-  int levelsCleared = 0;
-  int bossesDefeated = 0;
-  List<DateTime> playDates = [];
-  DateTime? lastActiveDate;
-  int totalPlayTimeSeconds = 0;
-  int correctAnswers = 0;
-  int totalAnswers = 0;
-  List<String> prepResults = [];  // "levelId\x01json" entries
+int points = 0;
+   int supTechUsesThisLevel = 1;
+   int extraSupTechUses = 0;
+   int currentWorldId = 0;
+   String? currentCategoryId;
+   String? currentLevelId;
+   List<String> completedLevelIds = [];
+   List<int> completedWorldIds = [];
+   List<String> completedCategoryIds = [];
+   List<String> purchasedItemIds = [];
+   List<String> earnedRewardIds = [];
+   List<String> unlockedSkinIds = [];
+   String? activeSkinId;  // Currently equipped skin
+   String? activeFrameId; // Currently equipped nickname frame
+   String? themeId;
+   int levelsCleared = 0;
+   int bossesDefeated = 0;
+   List<DateTime> playDates = [];
+   DateTime? lastActiveDate;
+   int totalPlayTimeSeconds = 0;
+   int correctAnswers = 0;
+   int totalAnswers = 0;
+   List<String> prepResults = [];  // "levelId\x01json" entries
+   DateTime? lastDailyQuestDate;  // Track daily quest completion
 
   static const _sep = '\x01';
 
@@ -60,5 +61,18 @@ List<String> earnedRewardIds = [];
     playDates = List<DateTime>.from(playDates);
     prepResults = List<String>.from(prepResults);
     purchasedItemIds = List<String>.from(purchasedItemIds);
+  }
+
+  bool getDailyQuestCompleted() {
+    final today = DateTime.now();
+    final todayDate = DateTime(today.year, today.month, today.day);
+    return lastDailyQuestDate != null &&
+        lastDailyQuestDate!.year == todayDate.year &&
+        lastDailyQuestDate!.month == todayDate.month &&
+        lastDailyQuestDate!.day == todayDate.day;
+  }
+
+  void setDailyQuestCompleted() {
+    lastDailyQuestDate = DateTime.now();
   }
 }
