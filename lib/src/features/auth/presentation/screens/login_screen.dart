@@ -241,24 +241,6 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ],
                       ),
-                      const Gap(12),
-                      // Clear all users button (for testing)
-                      Center(
-                        child: TextButton(
-                          onPressed: () async {
-                            await AuthService.resetAllUsers();
-                            setState(() {
-                              _users = [];
-                            });
-                            if (context.mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('All users cleared')),
-                              );
-                            }
-                          },
-                          child: const Text('Clear All Users', style: TextStyle(color: Colors.red, fontSize: 12)),
-                        ),
-                      ),
                       const Gap(20),
                     ],
                   ),

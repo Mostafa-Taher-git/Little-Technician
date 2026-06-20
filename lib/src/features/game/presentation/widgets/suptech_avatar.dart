@@ -4,7 +4,6 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:littletech/src/features/game/constants/skin_tiers.dart';
 
 class SupTechAvatar extends StatefulWidget {
-  final int availableUses;
   final bool isGlowing;
   final double size;
   final bool showWizardHat;
@@ -14,7 +13,6 @@ class SupTechAvatar extends StatefulWidget {
 
   const SupTechAvatar({
     super.key,
-    this.availableUses = 0,
     this.isGlowing = false,
     this.size = 40,
     this.showWizardHat = false,
@@ -159,36 +157,13 @@ class _SupTechAvatarState extends State<SupTechAvatar>
           )
         : null;
 
-    final badge = widget.availableUses > 0
-        ? Positioned(
-            right: -2,
-            top: -2,
-            child: Container(
-              padding: const EdgeInsets.all(3),
-              decoration: BoxDecoration(
-                color: scheme.secondary,
-                shape: BoxShape.circle,
-              ),
-              child: Text(
-                '${widget.availableUses}',
-                style: TextStyle(
-                  fontSize: size * 0.22,
-                  fontWeight: FontWeight.w700,
-                  color: scheme.onSecondary,
-                ),
-              ),
-            ),
-          )
-        : null;
-
     final layered = Stack(
       clipBehavior: Clip.none,
+      alignment: Alignment.center,
       children: [
-        if (glowOverlay != null)
-          Center(child: glowOverlay),
+        if (glowOverlay != null) glowOverlay,
         if (particles != null) particles,
         avatar,
-        if (badge != null) badge,
       ],
     );
 

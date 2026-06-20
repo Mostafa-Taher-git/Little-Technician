@@ -28,7 +28,7 @@ class _LittleTechAppState extends State<LittleTechApp> {
   }
 
   Future<void> _loadUserId() async {
-    final userId = AuthService.getCachedUserId();
+    final userId = await AuthService.getFreshUserId();
     if (mounted) {
       setState(() => _userId = userId);
     }
@@ -49,7 +49,7 @@ class _LittleTechAppState extends State<LittleTechApp> {
       ],
       child: BlocListener<AuthBloc, AuthState>(
         listener: (_, state) {
-          if (state is LoginSuccess || state is RegisterSuccess) {
+          if (state is LoginSuccess || state is RegisterSuccess || state is LogoutSuccess) {
             _loadUserId();
           }
         },

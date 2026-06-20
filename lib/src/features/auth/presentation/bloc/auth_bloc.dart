@@ -18,6 +18,8 @@ class RegisterEvent extends AuthEvent {
   RegisterEvent({required this.username, required this.password, required this.avatarIcon});
 }
 
+class LogoutEvent extends AuthEvent {}
+
 // ── States ────────────────────────────────────────────────────────────────────
 
 abstract class AuthState {
@@ -32,6 +34,8 @@ class LoginSuccess extends AuthState {}
 
 class RegisterSuccess extends AuthState {}
 
+class LogoutSuccess extends AuthState {}
+
 class AuthError extends AuthState {
   final String message;
   const AuthError(this.message);
@@ -43,6 +47,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   AuthBloc() : super(AuthInitial()) {
     on<LoginEvent>(_onLogin);
     on<RegisterEvent>(_onRegister);
+    on<LogoutEvent>(_onLogout);
   }
 
   Future<void> _onLogin(LoginEvent event, Emitter<AuthState> emit) async {
@@ -67,5 +72,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     } else {
       emit(const AuthError('Username already exists.'));
     }
+  }
+
+  Future<void> _onLogout(LogoutEvent event, Emitter<AuthState> emit) async {
+    await AuthService.logout();
+    emit(LogoutSuccess());
   }
 }

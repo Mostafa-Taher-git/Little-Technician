@@ -9,6 +9,7 @@ import 'package:littletech/src/features/game/constants/game_data.dart';
 import 'package:littletech/src/features/game/domain/cubit/game_cubit.dart';
 import 'package:littletech/src/features/game/presentation/screens/level_select_screen.dart';
 import 'package:littletech/src/features/game/presentation/widgets/suptech_avatar.dart';
+import 'package:littletech/src/features/game/presentation/widgets/sup_tech_avatar_wrapper.dart';
 import 'package:littletech/src/features/game/presentation/widgets/device_selector.dart';
 import 'package:littletech/src/features/game/presentation/widgets/world_card.dart';
 
@@ -93,10 +94,13 @@ class _WorldSelectScreenState extends State<WorldSelectScreen> {
                       ),
                     ),
                     const Gap(6),
-                    SupTechAvatar(
-                      availableUses: state.availableSupTechUses,
+                    SupTechAvatarWrapper(
                       isGlowing: state.canUseSupTech,
                       size: 30,
+                      child: SupTechAvatar(
+                        isGlowing: state.canUseSupTech,
+                        size: 30,
+                      ),
                     ),
                     const Gap(2),
                     IconButton(

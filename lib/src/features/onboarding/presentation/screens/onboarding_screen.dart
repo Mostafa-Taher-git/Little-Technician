@@ -20,7 +20,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     _OnboardingPage(
       icon: Icons.search,
       title: 'Find Problems',
-      subtitle: 'Browse 11 hardware and software categories with instant solutions.',
     ),
     _OnboardingPage(
       icon: Icons.tips_and_updates,
@@ -88,11 +87,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             ),
                           ),
                           const Gap(16),
-                          Text(
-                            p.subtitle,
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(fontSize: 16, color: Colors.white60, height: 1.5),
-                          ),
+                          if (p.subtitle != null)
+                            Text(
+                              p.subtitle!,
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(fontSize: 16, color: Colors.white60, height: 1.5),
+                            ),
                         ],
                       ),
                     );
@@ -158,7 +158,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 class _OnboardingPage {
   final IconData icon;
   final String title;
-  final String subtitle;
+  final String? subtitle;
 
-  const _OnboardingPage({required this.icon, required this.title, required this.subtitle});
+  const _OnboardingPage({required this.icon, required this.title, this.subtitle});
 }

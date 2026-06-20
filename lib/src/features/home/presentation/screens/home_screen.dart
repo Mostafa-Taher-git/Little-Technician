@@ -13,6 +13,8 @@ import 'package:littletech/src/features/home/presentation/bloc/counter_cubit.dar
 import 'package:littletech/src/features/game/presentation/screens/world_select_screen.dart';
 import 'package:littletech/src/features/game/presentation/screens/profile_screen.dart';
 import 'package:littletech/src/features/game/presentation/widgets/suptech_avatar.dart';
+import 'package:littletech/src/features/game/presentation/widgets/sup_tech_avatar_wrapper.dart';
+import 'package:littletech/src/features/game/presentation/widgets/framed_username.dart';
 import 'package:littletech/src/features/game/presentation/widgets/challenge_banner.dart';
 import 'package:littletech/src/features/game/presentation/screens/challenge_screen.dart';
 import 'package:littletech/src/features/game/domain/cubit/game_cubit.dart';
@@ -225,44 +227,14 @@ class _Header extends StatelessWidget {
               final user = snap.data;
               return Row(
                 children: [
-                  Container(
-                    width: 44,
-                    height: 44,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          scheme.primary.withValues(alpha: 0.1),
-                          scheme.primary.withValues(alpha: 0.05),
-                        ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: scheme.outline.withValues(alpha: 0.3),
-                      ),
-                    ),
-                    alignment: Alignment.center,
-                    child: Text(
-                      user?.avatarIcon ?? '🔧',
-                      style: const TextStyle(fontSize: 22),
-                    ),
-                  ),
-                  const Gap(12),
                   Flexible(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          'Hello, ${user?.username ?? 'User'}',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                            color: scheme.onSurface,
-                            letterSpacing: -0.3,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+                        FramedUsername(
+                          username: user?.username ?? 'User',
+                          fontSize: 16,
+                          fontColor: scheme.onSurface,
                         ),
                         const Gap(2),
                         Text(
@@ -288,26 +260,13 @@ class _Header extends StatelessWidget {
         // SupTech avatar with container
         BlocBuilder<GameCubit, GameState>(
           builder: (_, state) {
-            return GestureDetector(
+            return SupTechAvatarWrapper(
+              isGlowing: state.canUseSupTech,
+              size: 56,
               onTap: () => Nav.push(context, const ProfileScreen()),
-              child: Container(
-                padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                  color: state.canUseSupTech
-                      ? scheme.secondary.withValues(alpha: 0.1)
-                      : scheme.surface,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: state.canUseSupTech
-                        ? scheme.secondary.withValues(alpha: 0.3)
-                        : scheme.outline.withValues(alpha: 0.2),
-                  ),
-                ),
-                child: SupTechAvatar(
-                  availableUses: state.availableSupTechUses,
-                  isGlowing: state.canUseSupTech,
-                  size: 32,
-                ),
+              child: SupTechAvatar(
+                isGlowing: state.canUseSupTech,
+                size: 56,
               ),
             );
           },

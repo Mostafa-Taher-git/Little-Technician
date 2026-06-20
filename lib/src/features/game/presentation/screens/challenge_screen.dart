@@ -9,6 +9,8 @@ import 'package:littletech/src/features/game/constants/game_data.dart';
 import 'package:littletech/src/features/game/domain/cubit/game_cubit.dart';
 import 'package:littletech/src/features/game/presentation/screens/level_select_screen.dart';
 import 'package:littletech/src/features/game/presentation/screens/problem_screen.dart';
+import 'package:littletech/src/features/game/presentation/widgets/suptech_badge.dart';
+import 'package:littletech/src/features/game/presentation/widgets/sup_tech_avatar_wrapper.dart';
 
 class ChallengeScreen extends StatelessWidget {
   const ChallengeScreen({super.key});
@@ -28,6 +30,14 @@ class ChallengeScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
+          const Center(
+            child: SupTechAvatarWrapper(
+              isGlowing: false,
+              size: 40,
+              child: SupTechBadge(size: 40),
+            ),
+          ),
+          const Gap(16),
           BlocBuilder<GameCubit, GameState>(
             builder: (_, state) {
               final dailyCompleted = state.progress.getDailyQuestCompleted();

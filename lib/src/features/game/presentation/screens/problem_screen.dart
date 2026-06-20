@@ -12,6 +12,7 @@ import 'package:littletech/src/features/game/presentation/screens/suptech_dialog
 import 'package:littletech/src/features/game/presentation/widgets/alt_solution_banner.dart';
 import 'package:littletech/src/features/game/presentation/widgets/step_tile.dart';
 import 'package:littletech/src/features/game/presentation/widgets/suptech_avatar.dart';
+import 'package:littletech/src/features/game/presentation/widgets/sup_tech_avatar_wrapper.dart';
 import 'package:littletech/src/features/game/presentation/widgets/visual_aid.dart';
 
 class ProblemScreen extends StatefulWidget {
@@ -332,30 +333,35 @@ class _ProblemScreenState extends State<ProblemScreen> {
                       ),
                     ],
                   ),
-                  child: Row(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      SupTechAvatar(
-                        availableUses: state.availableSupTechUses,
-                        isGlowing: state.canUseSupTech,
-                        size: 44,
-                        onTap: state.canUseSupTech
-                            ? () => _showSupTechDialog(context)
-                            : null,
+                      Center(
+                        child: SupTechAvatarWrapper(
+                          isGlowing: state.canUseSupTech,
+                          size: 44,
+                          onTap: state.canUseSupTech
+                              ? () => _showSupTechDialog(context)
+                              : null,
+                          child: SupTechAvatar(
+                            isGlowing: state.canUseSupTech,
+                            size: 44,
+                          ),
+                        ),
                       ),
-                      const Gap(16),
-                      Expanded(
-                        child: SizedBox(
-                          height: 50,
-                          child: ElevatedButton.icon(
-                            onPressed: state.currentStepIndex < steps.length
-                                ? () => context.read<GameCubit>().solveStep()
-                                : null,
-                            icon: const Icon(Icons.check_circle_outline, size: 20),
-                            label: Text(
-                              solvedCount >= steps.length
-                                  ? 'Completed!'
-                                  : 'Complete Quest Step ${solvedCount + 1}',
-                            ),
+                      const Gap(12),
+                      SizedBox(
+                        height: 50,
+                        width: double.infinity,
+                        child: ElevatedButton.icon(
+                          onPressed: state.currentStepIndex < steps.length
+                              ? () => context.read<GameCubit>().solveStep()
+                              : null,
+                          icon: const Icon(Icons.check_circle_outline, size: 20),
+                          label: Text(
+                            solvedCount >= steps.length
+                                ? 'Completed!'
+                                : 'Complete Quest Step ${solvedCount + 1}',
                           ),
                         ),
                       ),

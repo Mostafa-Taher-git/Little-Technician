@@ -173,6 +173,7 @@ class GameRepository {
       ..completedLevelIds = List<String>.from(
         CategoryManager.all.expand((c) => c.problemKeys.map((p) => GameData.levelId(c.id, p)))
       )
+      ..completedWorldIds = List<int>.generate(CategoryManager.all.length, (i) => i)
       ..earnedRewardIds = List<String>.from(RewardPool.all.map((r) => r.id))
       ..unlockedSkinIds = List<String>.from(SkinTierManager.skins.where((s) => s.isRewardSkin).map((s) => s.id))
       ..purchasedItemIds = List<String>.from(RewardPool.all.where((r) => r.type != RewardType.skin).map((r) => r.id))

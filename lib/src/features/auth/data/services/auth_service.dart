@@ -20,6 +20,13 @@ class AuthService {
     return _cachedPrefs?.getInt('${_sessionKey}_id');
   }
 
+  /// Read user ID directly from disk, bypassing in-memory cache.
+  /// Use after login/logout to get the freshest value.
+  static Future<int?> getFreshUserId() async {
+    final prefs = await _prefs;
+    return prefs.getInt('${_sessionKey}_id');
+  }
+
   // ── Helpers ────────────────────────────────────────────────────────────────
 
   static Future<List<UserModel>> _loadUsers() async {
@@ -101,11 +108,14 @@ class AuthService {
 
   static Future<bool> login({required String username, required String password}) async {
     final users = await _loadUsers();
-    final match = users.firstWhere(
-      (u) => u.username.toLowerCase() == username.toLowerCase() && u.password == password,
-      orElse: () => UserModel(id: 0, username: '', password: ''),
-    );
-    if (match.username.isEmpty) return false;
+    UserModel? match;
+    for (final u in users) {
+      if (u.username.toLowerCase() == username.toLowerCase() && u.password == password) {
+        match = u;
+        break;
+      }
+    }
+    if (match == null) return false;
     final prefs = await _prefs;
     await prefs.setString(_sessionKey, match.username);
     await prefs.setInt('${_sessionKey}_id', match.id);
@@ -121,6 +131,7 @@ class AuthService {
   static Future<void> logout() async {
     final prefs = await _prefs;
     await prefs.remove(_sessionKey);
+    await prefs.remove('${_sessionKey}_id');
   }
 
   static Future<bool> isLoggedIn() async {
@@ -133,11 +144,10 @@ class AuthService {
     final username = prefs.getString(_sessionKey);
     if (username == null) return null;
     final users = await _loadUsers();
-    try {
-      return users.firstWhere((u) => u.username == username);
-    } catch (_) {
-      return null;
+    for (final u in users) {
+      if (u.username == username) return u;
     }
+    return null;
   }
 
   static Future<List<UserModel>> getAllUsers() => _loadUsers();
@@ -162,7 +172,7 @@ class AuthService {
     await prefs.remove(_usersKey);
     await prefs.remove(_sessionKey);
     await prefs.remove('${_sessionKey}_id');
-    _cachedPrefs?.clear();
+    _cachedPrefs = null;
   }
 
   static Future<void> addPoints(String username, int delta) async {

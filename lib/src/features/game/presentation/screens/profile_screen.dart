@@ -10,6 +10,8 @@ import 'package:littletech/src/features/game/domain/cubit/game_cubit.dart';
 import 'package:littletech/src/features/game/domain/cubit/theme_cubit.dart';
 import 'package:littletech/src/features/game/presentation/widgets/reward_chip.dart';
 import 'package:littletech/src/features/game/presentation/widgets/suptech_avatar.dart';
+import 'package:littletech/src/features/game/presentation/widgets/sup_tech_avatar_wrapper.dart';
+import 'package:littletech/src/features/game/presentation/widgets/framed_username.dart';
 import 'package:littletech/src/core/navigation/nav.dart';
 import 'package:littletech/src/features/game/presentation/screens/achievements_screen.dart';
 import 'package:littletech/src/features/game/presentation/screens/challenge_screen.dart';
@@ -61,55 +63,20 @@ class ProfileScreen extends StatelessWidget {
                       ),
                         child: Column(
                           children: [
-SupTechAvatar(
-                            availableUses: state.availableSupTechUses,
+SupTechAvatarWrapper(
                             isGlowing: true,
                             size: 64,
-                            skinId: progress.activeSkinId,
+                            child: SupTechAvatar(
+                              isGlowing: true,
+                              size: 64,
+                              skinId: progress.activeSkinId,
+                            ),
                           ),
                           const Gap(12),
-                          Builder(
-                            builder: (_) {
-                              final activeFrame = progress.activeFrameId != null
-                                  ? RewardPool.byId(progress.activeFrameId!)
-                                  : null;
-                              if (activeFrame != null) {
-                                return Container(
-                                  decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                      colors: [
-                                        activeFrame.color.withValues(alpha: 0.3),
-                                        activeFrame.color.withValues(alpha: 0.1),
-                                      ],
-                                      begin: Alignment.topLeft,
-                                      end: Alignment.bottomRight,
-                                    ),
-                                    borderRadius: BorderRadius.circular(16),
-                                    border: Border.all(
-                                      color: activeFrame.color.withValues(alpha: 0.5),
-                                      width: 2,
-                                    ),
-                                  ),
-                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                                  child: Text(
-                                    user?.username ?? 'Player',
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 22,
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  ),
-                                );
-                              }
-                              return Text(
-                                user?.username ?? 'Player',
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              );
-                            },
+                          FramedUsername(
+                            username: user?.username ?? 'Player',
+                            fontSize: 22,
+                            textAlign: TextAlign.center,
                           ),
                           const Gap(4),
                           Wrap(
@@ -426,7 +393,8 @@ const Gap(24),
                       runSpacing: 8,
                       children: SkinTierManager.skins.map((skin) {
                         final purchased = progress.purchasedItemIds.contains(skin.id);
-                        final unlocked = progress.unlockedSkinIds.contains(skin.id) || purchased;
+                        final earnedAsReward = progress.earnedRewardIds.contains('skin_${skin.id}');
+                        final unlocked = progress.unlockedSkinIds.contains(skin.id) || earnedAsReward || purchased;
                         final isActive = progress.activeSkinId == skin.id;
                         return GestureDetector(
                           onTap: unlocked

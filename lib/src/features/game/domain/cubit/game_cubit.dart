@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:littletech/src/features/auth/data/services/auth_service.dart';
 import 'package:littletech/src/features/game/constants/game_data.dart';
@@ -83,18 +84,19 @@ class GameCubit extends Cubit<GameState> {
       final progress = await _repository.getOrCreateProgress(_userId);
       WorldDef? world;
       if (progress.currentCategoryId != null) {
-        try {
-          world = GameData.worlds.firstWhere((w) => w.id == progress.currentCategoryId);
-        } catch (_) {
-          if (GameData.worlds.isNotEmpty) world = GameData.worlds.first;
-        }
+        world = GameData.worlds.cast<WorldDef?>().firstWhere(
+          (w) => w!.id == progress.currentCategoryId,
+          orElse: () => GameData.worlds.isNotEmpty ? GameData.worlds.first : null,
+        );
       } else if (progress.currentWorldId < GameData.worlds.length) {
         world = GameData.worlds[progress.currentWorldId];
       } else if (GameData.worlds.isNotEmpty) {
         world = GameData.worlds.first;
       }
       emit(GameState(progress: progress, currentWorld: world));
-    } catch (_) {}
+    } catch (e, st) {
+      debugPrint('loadGame failed: $e\n$st');
+    }
   }
 
   void selectWorld(WorldDef world) {
@@ -182,7 +184,9 @@ class GameCubit extends Cubit<GameState> {
   }
 
   void _safePersist(Future<void> Function() op) {
-    op().catchError((_) {});
+    op().catchError((e, st) {
+      debugPrint('Persist error: $e');
+    });
   }
 
   void _completeLevel(PlayerProgress progress, int finalStepIndex) {
@@ -223,7 +227,9 @@ class GameCubit extends Cubit<GameState> {
       if (reward.type == RewardType.skin) {
         _safePersist(() => _repository.unlockSkin(progress, reward!.value));
       }
-    } catch (_) {}
+    } catch (e, st) {
+      debugPrint('Reward draw failed: $e\n$st');
+    }
 
     _safePersist(() => _repository.recordPlayDate(progress));
     
@@ -269,7 +275,9 @@ class GameCubit extends Cubit<GameState> {
       if (reward.type == RewardType.skin) {
         _safePersist(() => _repository.unlockSkin(progress, reward!.value));
       }
-    } catch (_) {}
+    } catch (e, st) {
+      debugPrint('Boss reward draw failed: $e\n$st');
+    }
 
     emit(state.copyWith(
       progress: progress,
@@ -399,7 +407,9 @@ class GameCubit extends Cubit<GameState> {
 
   Future<void> setActiveSkin(String? skinId) async {
     final progress = state.progress;
-    if (skinId != null && !progress.unlockedSkinIds.contains(skinId)) {
+    if (skinId != null &&
+        !progress.unlockedSkinIds.contains(skinId) &&
+        !progress.earnedRewardIds.contains('skin_$skinId')) {
       return; // Can't equip locked skin
     }
     progress.activeSkinId = skinId;
@@ -440,5 +450,10 @@ class GameCubit extends Cubit<GameState> {
 
   void resetSteps() {
     emit(state.copyWith(currentStepIndex: 0, hintText: null));
+  }
+
+  Future<void> unlockEverything() async {
+    final progress = await _repository.createTestProgress(_userId);
+    emit(GameState(progress: progress, currentWorld: state.currentWorld));
   }
 }

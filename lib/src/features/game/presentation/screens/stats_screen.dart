@@ -9,6 +9,9 @@ import 'package:littletech/src/features/game/constants/reward_pool.dart';
 import 'package:littletech/src/features/game/constants/skin_tiers.dart';
 import 'package:littletech/src/features/game/constants/streak_tracker.dart';
 import 'package:littletech/src/features/game/domain/cubit/game_cubit.dart';
+import 'package:littletech/src/features/game/presentation/widgets/framed_username.dart';
+import 'package:littletech/src/features/game/presentation/widgets/suptech_badge.dart';
+import 'package:littletech/src/features/game/presentation/widgets/sup_tech_avatar_wrapper.dart';
 
 class StatsScreen extends StatelessWidget {
   const StatsScreen({super.key});
@@ -57,13 +60,17 @@ class StatsScreen extends StatelessWidget {
                     ),
                     child: Column(
                       children: [
-                        Text(
-                          user?.username ?? 'Player',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 24,
-                            fontWeight: FontWeight.w800,
-                          ),
+                        const SupTechAvatarWrapper(
+                          isGlowing: true,
+                          size: 56,
+                          child: SupTechBadge(size: 56, isGlowing: true),
+                        ),
+                        const Gap(12),
+                        FramedUsername(
+                          username: user?.username ?? 'Player',
+                          fontSize: 24,
+                          fontWeight: FontWeight.w800,
+                          textAlign: TextAlign.center,
                         ),
                         const Gap(4),
                         if (currentSkin != null)
@@ -102,7 +109,7 @@ class StatsScreen extends StatelessWidget {
                       const Gap(10),
                       _StatSquare(icon: Icons.card_giftcard, label: 'Rewards', value: '$earnedRewards', scheme: scheme),
                       const Gap(10),
-                      _StatSquare(icon: Icons.auto_awesome, label: 'Skins', value: '${p.unlockedSkinIds.length}', scheme: scheme),
+                      _StatSquare(icon: Icons.auto_awesome, label: 'Skins', value: '${SkinTierManager.skins.where((s) => p.unlockedSkinIds.contains(s.id) || p.earnedRewardIds.contains('skin_${s.id}') || p.purchasedItemIds.contains(s.id)).length}', scheme: scheme),
                     ],
                   ),
                   const Gap(10),
@@ -146,7 +153,7 @@ class StatsScreen extends StatelessWidget {
                     final isProgression = !skin.isRewardSkin;
                     final unlocked = isProgression
                         ? p.levelsCleared >= skin.levelsRequired
-                        : p.unlockedSkinIds.contains(skin.id);
+                        : p.unlockedSkinIds.contains(skin.id) || p.earnedRewardIds.contains('skin_${skin.id}');
                     final isActive = p.activeSkinId == skin.id;
                     return GestureDetector(
                       onTap: unlocked

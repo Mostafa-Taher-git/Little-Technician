@@ -8,6 +8,7 @@ import 'package:littletech/src/features/game/constants/game_data.dart';
 import 'package:littletech/src/features/game/domain/cubit/game_cubit.dart';
 import 'package:littletech/src/features/game/presentation/screens/reward_spin_screen.dart';
 import 'package:littletech/src/features/game/presentation/widgets/suptech_avatar.dart';
+import 'package:littletech/src/features/game/presentation/widgets/sup_tech_avatar_wrapper.dart';
 
 class BossScreen extends StatefulWidget {
   final WorldDef world;
@@ -681,11 +682,16 @@ class _BossScreenState extends State<BossScreen>
                             _buildPhaseResolve(),
                           if (state.availableSupTechUses > 0 && !isDefeated) ...[
                             const Gap(16),
-                            SupTechAvatar(
-                              availableUses: state.availableSupTechUses,
-                              isGlowing: true,
-                              showWizardHat: true,
-                              size: 48,
+                            const Center(
+                              child: SupTechAvatarWrapper(
+                                isGlowing: true,
+                                size: 48,
+                                child: SupTechAvatar(
+                                  isGlowing: true,
+                                  showWizardHat: true,
+                                  size: 48,
+                                ),
+                              ),
                             ),
                           ],
                         ],

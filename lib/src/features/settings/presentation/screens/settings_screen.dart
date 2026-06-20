@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:littletech/src/core/navigation/nav.dart';
 import 'package:littletech/src/features/auth/data/models/user_model.dart';
 import 'package:littletech/src/features/auth/data/services/auth_service.dart';
+import 'package:littletech/src/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:littletech/src/features/auth/presentation/screens/login_screen.dart';
+import 'package:littletech/src/features/game/domain/cubit/game_cubit.dart';
+import 'package:littletech/src/features/game/presentation/widgets/framed_username.dart';
+import 'package:littletech/src/features/game/presentation/widgets/suptech_badge.dart';
+import 'package:littletech/src/features/game/presentation/widgets/sup_tech_avatar_wrapper.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -35,22 +41,21 @@ class SettingsScreen extends StatelessWidget {
                 ),
                 child: Row(
                   children: [
-                    Container(
-                      width: 56,
-                      height: 56,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        color: scheme.surface.withValues(alpha: 0.5),
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Text(user?.avatarIcon ?? '🔧', style: const TextStyle(fontSize: 28)),
+                    const SupTechAvatarWrapper(
+                      isGlowing: false,
+                      size: 48,
+                      child: SupTechBadge(size: 48),
                     ),
                     const Gap(16),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(user?.username ?? 'User', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: scheme.onSurface)),
+                          FramedUsername(
+                            username: user?.username ?? 'User',
+                            fontSize: 18,
+                            fontColor: scheme.onSurface,
+                          ),
                           Text('Points: ${0}', style: TextStyle(color: scheme.onSurface.withValues(alpha: 0.6), fontSize: 13)),
                         ],
                       ),
@@ -77,6 +82,38 @@ class SettingsScreen extends StatelessWidget {
             label: 'About LittleTech',
             subtitle: 'Version 2.0.0',
             onTap: () => _showAboutDialog(context),
+            scheme: scheme,
+          ),
+          const Gap(8),
+          _SettingsTile(
+            icon: Icons.lock_open,
+            label: 'Unlock Everything',
+            subtitle: 'Max points, all skins, frames, rewards',
+            onTap: () async {
+              final confirm = await showDialog<bool>(
+                context: context,
+                builder: (_) => AlertDialog(
+                  title: const Text('Unlock Everything'),
+                  content: const Text('This will give you 99999 points, all skins, frames, and rewards. Continue?'),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  actions: [
+                    TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, true),
+                      child: const Text('Unlock', style: TextStyle(color: Colors.amber)),
+                    ),
+                  ],
+                ),
+              );
+              if (confirm == true && context.mounted) {
+                await context.read<GameCubit>().unlockEverything();
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Everything unlocked!')),
+                  );
+                }
+              }
+            },
             scheme: scheme,
           ),
           const Gap(24),
@@ -106,8 +143,10 @@ class SettingsScreen extends StatelessWidget {
                 ),
               );
               if (confirm == true) {
-                await AuthService.logout();
-                if (context.mounted) Nav.replaceAll(context, const LoginScreen());
+                if (context.mounted) {
+                  context.read<AuthBloc>().add(LogoutEvent());
+                  Nav.replaceAll(context, const LoginScreen());
+                }
               }
             },
             scheme: scheme,

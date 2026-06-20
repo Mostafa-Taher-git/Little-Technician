@@ -91,10 +91,10 @@ class GameData {
         final bossIndex = (bossStage - 1).clamp(0, cat.bossKeys.length - 1);
         final bossKey = cat.bossKeys[bossIndex];
         final solution = RuleEngine.solve(bossKey);
-        final difficulty = bossIndex < 2 
-            ? DifficultyLevel.easy 
-            : bossIndex < 4 
-                ? DifficultyLevel.medium 
+        final difficulty = bossStage <= 2
+            ? DifficultyLevel.easy
+            : bossStage <= 5
+                ? DifficultyLevel.medium
                 : DifficultyLevel.hard;
         
         levels.add(LevelDef(
