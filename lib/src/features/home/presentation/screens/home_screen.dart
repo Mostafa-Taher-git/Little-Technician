@@ -261,12 +261,11 @@ class _Header extends StatelessWidget {
         BlocBuilder<GameCubit, GameState>(
           builder: (_, state) {
             return SupTechAvatarWrapper(
-              isGlowing: state.canUseSupTech,
               size: 56,
               onTap: () => Nav.push(context, const ProfileScreen()),
               child: SupTechAvatar(
-                isGlowing: state.canUseSupTech,
                 size: 56,
+                skinId: state.progress.activeSkinId,
               ),
             );
           },

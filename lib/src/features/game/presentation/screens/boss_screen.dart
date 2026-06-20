@@ -682,14 +682,13 @@ class _BossScreenState extends State<BossScreen>
                             _buildPhaseResolve(),
                           if (state.availableSupTechUses > 0 && !isDefeated) ...[
                             const Gap(16),
-                            const Center(
+                            Center(
                               child: SupTechAvatarWrapper(
-                                isGlowing: true,
                                 size: 48,
                                 child: SupTechAvatar(
-                                  isGlowing: true,
                                   showWizardHat: true,
                                   size: 48,
+                                  skinId: state.progress.activeSkinId,
                                 ),
                               ),
                             ),

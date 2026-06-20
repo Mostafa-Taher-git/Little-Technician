@@ -95,11 +95,10 @@ class _WorldSelectScreenState extends State<WorldSelectScreen> {
                     ),
                     const Gap(6),
                     SupTechAvatarWrapper(
-                      isGlowing: state.canUseSupTech,
                       size: 30,
                       child: SupTechAvatar(
-                        isGlowing: state.canUseSupTech,
                         size: 30,
+                        skinId: state.progress.activeSkinId,
                       ),
                     ),
                     const Gap(2),

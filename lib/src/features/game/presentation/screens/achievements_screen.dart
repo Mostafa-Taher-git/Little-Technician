@@ -6,8 +6,8 @@ import 'package:littletech/src/features/game/constants/achievements.dart';
 import 'package:littletech/src/features/game/constants/reward_pool.dart';
 import 'package:littletech/src/features/game/constants/streak_tracker.dart';
 import 'package:littletech/src/features/game/domain/cubit/game_cubit.dart';
-import 'package:littletech/src/features/game/presentation/widgets/suptech_badge.dart';
 import 'package:littletech/src/features/game/presentation/widgets/sup_tech_avatar_wrapper.dart';
+import 'package:littletech/src/features/game/presentation/widgets/suptech_avatar.dart';
 
 class AchievementsScreen extends StatelessWidget {
   const AchievementsScreen({super.key});
@@ -30,11 +30,13 @@ class AchievementsScreen extends StatelessWidget {
           return ListView(
             padding: const EdgeInsets.all(16),
             children: [
-              const Center(
+              Center(
                 child: SupTechAvatarWrapper(
-                  isGlowing: false,
                   size: 40,
-                  child: SupTechBadge(size: 40),
+                  child: SupTechAvatar(
+                    size: 40,
+                    skinId: progress.activeSkinId,
+                  ),
                 ),
               ),
               const Gap(12),

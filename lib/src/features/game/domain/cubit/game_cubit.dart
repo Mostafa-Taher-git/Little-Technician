@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:littletech/src/features/auth/data/services/auth_service.dart';
 import 'package:littletech/src/features/game/constants/game_data.dart';
 import 'package:littletech/src/features/game/constants/reward_pool.dart';
+import 'package:littletech/src/features/game/constants/skin_tiers.dart';
 import 'package:littletech/src/features/game/data/models/player_progress.dart';
 import 'package:littletech/src/features/game/data/repositories/game_repository.dart';
 
@@ -93,6 +94,7 @@ class GameCubit extends Cubit<GameState> {
       } else if (GameData.worlds.isNotEmpty) {
         world = GameData.worlds.first;
       }
+      _checkAndUnlockProgressionSkins();
       emit(GameState(progress: progress, currentWorld: world));
     } catch (e, st) {
       debugPrint('loadGame failed: $e\n$st');
@@ -238,6 +240,8 @@ class GameCubit extends Cubit<GameState> {
       _safePersist(() => _repository.saveProgress(progress..setDailyQuestCompleted()));
     }
     
+    _checkAndUnlockProgressionSkins();
+
     emit(state.copyWith(
       progress: progress,
       currentStepIndex: finalStepIndex,
@@ -278,6 +282,8 @@ class GameCubit extends Cubit<GameState> {
     } catch (e, st) {
       debugPrint('Boss reward draw failed: $e\n$st');
     }
+
+    _checkAndUnlockProgressionSkins();
 
     emit(state.copyWith(
       progress: progress,
@@ -405,11 +411,28 @@ class GameCubit extends Cubit<GameState> {
     emit(state.copyWith(progress: progress));
   }
 
+  void _checkAndUnlockProgressionSkins() {
+    final progress = state.progress;
+    var changed = false;
+    for (final skin in SkinTierManager.skins) {
+      if (!skin.isRewardSkin &&
+          progress.levelsCleared >= skin.levelsRequired &&
+          !progress.unlockedSkinIds.contains(skin.id)) {
+        progress.unlockedSkinIds.add(skin.id);
+        changed = true;
+      }
+    }
+    if (changed) {
+      _safePersist(() => _repository.saveProgress(progress));
+    }
+  }
+
   Future<void> setActiveSkin(String? skinId) async {
     final progress = state.progress;
     if (skinId != null &&
         !progress.unlockedSkinIds.contains(skinId) &&
-        !progress.earnedRewardIds.contains('skin_$skinId')) {
+        !progress.earnedRewardIds.contains('skin_$skinId') &&
+        !progress.purchasedItemIds.contains(skinId)) {
       return; // Can't equip locked skin
     }
     progress.activeSkinId = skinId;

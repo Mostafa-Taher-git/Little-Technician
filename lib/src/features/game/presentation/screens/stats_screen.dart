@@ -10,8 +10,8 @@ import 'package:littletech/src/features/game/constants/skin_tiers.dart';
 import 'package:littletech/src/features/game/constants/streak_tracker.dart';
 import 'package:littletech/src/features/game/domain/cubit/game_cubit.dart';
 import 'package:littletech/src/features/game/presentation/widgets/framed_username.dart';
-import 'package:littletech/src/features/game/presentation/widgets/suptech_badge.dart';
 import 'package:littletech/src/features/game/presentation/widgets/sup_tech_avatar_wrapper.dart';
+import 'package:littletech/src/features/game/presentation/widgets/suptech_avatar.dart';
 
 class StatsScreen extends StatelessWidget {
   const StatsScreen({super.key});
@@ -60,10 +60,12 @@ class StatsScreen extends StatelessWidget {
                     ),
                     child: Column(
                       children: [
-                        const SupTechAvatarWrapper(
-                          isGlowing: true,
+                        SupTechAvatarWrapper(
                           size: 56,
-                          child: SupTechBadge(size: 56, isGlowing: true),
+                          child: SupTechAvatar(
+                            size: 56,
+                            skinId: state.progress.activeSkinId,
+                          ),
                         ),
                         const Gap(12),
                         FramedUsername(

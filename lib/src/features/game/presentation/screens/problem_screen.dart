@@ -338,14 +338,13 @@ class _ProblemScreenState extends State<ProblemScreen> {
                     children: [
                       Center(
                         child: SupTechAvatarWrapper(
-                          isGlowing: state.canUseSupTech,
                           size: 44,
                           onTap: state.canUseSupTech
                               ? () => _showSupTechDialog(context)
                               : null,
                           child: SupTechAvatar(
-                            isGlowing: state.canUseSupTech,
                             size: 44,
+                            skinId: state.progress.activeSkinId,
                           ),
                         ),
                       ),

@@ -8,7 +8,7 @@ class SupTechAvatarWrapper extends StatelessWidget {
 
   const SupTechAvatarWrapper({
     super.key,
-    required this.isGlowing,
+    this.isGlowing = true,
     required this.size,
     this.onTap,
     required this.child,

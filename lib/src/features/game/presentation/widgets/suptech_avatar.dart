@@ -1,7 +1,9 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:littletech/src/features/game/constants/skin_tiers.dart';
+import 'package:littletech/src/features/game/domain/cubit/game_cubit.dart';
 
 class SupTechAvatar extends StatefulWidget {
   final bool isGlowing;
@@ -13,7 +15,7 @@ class SupTechAvatar extends StatefulWidget {
 
   const SupTechAvatar({
     super.key,
-    this.isGlowing = false,
+    this.isGlowing = true,
     this.size = 40,
     this.showWizardHat = false,
     this.isCasting = false,
@@ -90,7 +92,8 @@ class _SupTechAvatarState extends State<SupTechAvatar>
     final size = widget.size;
     final isGlowing = widget.isGlowing;
     final scheme = Theme.of(context).colorScheme;
-    final skin = SkinTierManager.getActiveSkin(widget.skinId);
+    final skinId = widget.skinId ?? context.read<GameCubit>().state.progress.activeSkinId;
+    final skin = SkinTierManager.getActiveSkin(skinId);
 
     final avatar = AnimatedBuilder(
       animation: _controller,

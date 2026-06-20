@@ -64,10 +64,8 @@ class ProfileScreen extends StatelessWidget {
                         child: Column(
                           children: [
 SupTechAvatarWrapper(
-                            isGlowing: true,
                             size: 64,
                             child: SupTechAvatar(
-                              isGlowing: true,
                               size: 64,
                               skinId: progress.activeSkinId,
                             ),

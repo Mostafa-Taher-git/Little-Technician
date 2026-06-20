@@ -8,8 +8,8 @@ import 'package:littletech/src/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:littletech/src/features/auth/presentation/screens/login_screen.dart';
 import 'package:littletech/src/features/game/domain/cubit/game_cubit.dart';
 import 'package:littletech/src/features/game/presentation/widgets/framed_username.dart';
-import 'package:littletech/src/features/game/presentation/widgets/suptech_badge.dart';
 import 'package:littletech/src/features/game/presentation/widgets/sup_tech_avatar_wrapper.dart';
+import 'package:littletech/src/features/game/presentation/widgets/suptech_avatar.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -39,28 +39,34 @@ class SettingsScreen extends StatelessWidget {
                   ),
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: Row(
-                  children: [
-                    const SupTechAvatarWrapper(
-                      isGlowing: false,
-                      size: 48,
-                      child: SupTechBadge(size: 48),
-                    ),
-                    const Gap(16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          FramedUsername(
-                            username: user?.username ?? 'User',
-                            fontSize: 18,
-                            fontColor: scheme.onSurface,
+                child: BlocBuilder<GameCubit, GameState>(
+                  builder: (_, state) {
+                    return Row(
+                      children: [
+                        SupTechAvatarWrapper(
+                          size: 48,
+                          child: SupTechAvatar(
+                            size: 48,
+                            skinId: state.progress.activeSkinId,
                           ),
-                          Text('Points: ${0}', style: TextStyle(color: scheme.onSurface.withValues(alpha: 0.6), fontSize: 13)),
-                        ],
-                      ),
-                    ),
-                  ],
+                        ),
+                        const Gap(16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              FramedUsername(
+                                username: user?.username ?? 'User',
+                                fontSize: 18,
+                                fontColor: scheme.onSurface,
+                              ),
+                              Text('Points: ${0}', style: TextStyle(color: scheme.onSurface.withValues(alpha: 0.6), fontSize: 13)),
+                            ],
+                          ),
+                        ),
+                      ],
+                    );
+                  },
                 ),
               );
             },
