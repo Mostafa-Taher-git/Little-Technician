@@ -156,6 +156,13 @@ class AuthService {
     return true;
   }
 
+  /// Reset all users for testing - call this to start fresh
+  static Future<void> resetAllUsers() async {
+    final prefs = await _prefs;
+    await prefs.remove(_usersKey);
+    _cachedPrefs?.clear();
+  }
+
   static Future<void> addPoints(String username, int delta) async {
     final users = await _loadUsers();
     final idx = users.indexWhere((u) => u.username == username);

@@ -216,9 +216,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                   : () {
                                       if (_formKey.currentState!.validate()) {
                                         context.read<AuthBloc>().add(LoginEvent(
-                                              username: _usernameCtrl.text.trim(),
-                                              password: _passwordCtrl.text,
-                                            ));
+                                            username: _usernameCtrl.text.trim(),
+                                            password: _passwordCtrl.text,
+                                          ));
                                       }
                                     },
                               child: state is AuthLoading

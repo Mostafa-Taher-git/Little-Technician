@@ -1,4 +1,8 @@
 import 'package:isar/isar.dart';
+import 'package:littletech/src/core/constants/category_manager.dart';
+import 'package:littletech/src/features/game/constants/game_data.dart';
+import 'package:littletech/src/features/game/constants/reward_pool.dart';
+import 'package:littletech/src/features/game/constants/skin_tiers.dart';
 import 'package:littletech/src/features/game/data/models/player_progress.dart';
 
 class GameRepository {
@@ -143,5 +147,37 @@ class GameRepository {
         });
       }
     }
+  }
+
+  /// Create a test user with all achievements unlocked
+  Future<PlayerProgress> createTestProgress(int userId) async {
+    // Delete any existing progress for this user
+    final existing = await loadProgress(userId);
+    if (existing != null) {
+      await _isar.writeTxn(() async {
+        await _isar.playerProgress.delete(existing.id);
+      });
+    }
+
+    final progress = PlayerProgress()
+      ..userId = userId
+      ..points = 99999
+      ..completedCategoryIds = List<String>.from(CategoryManager.all.map((c) => c.id))
+      ..completedLevelIds = List<String>.from(
+        CategoryManager.all.expand((c) => c.problemKeys.map((p) => GameData.levelId(c.id, p)))
+      )
+      ..earnedRewardIds = List<String>.from(RewardPool.all.map((r) => r.id))
+      ..unlockedSkinIds = List<String>.from(SkinTierManager.skins.where((s) => s.isRewardSkin).map((s) => s.id))
+      ..purchasedItemIds = List<String>.from(RewardPool.all.where((r) => r.type != RewardType.skin).map((r) => r.id))
+      ..levelsCleared = CategoryManager.all.length * 5
+      ..bossesDefeated = CategoryManager.all.length
+      ..supTechUsesThisLevel = 3
+      ..extraSupTechUses = 999;
+
+    await _isar.writeTxn(() async {
+      await _isar.playerProgress.put(progress);
+    });
+    progress.ensureMutableLists();
+    return progress;
   }
 }
