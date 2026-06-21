@@ -184,14 +184,29 @@ class _WorldSelectScreenState extends State<WorldSelectScreen> {
                   .where((l) => state.progress.completedLevelIds.contains(l.id))
                   .length;
               final worldIndex = GameData.worlds.indexWhere((w) => w.id == world.id);
-              final isUnlocked = worldIndex == 0 ||
-                  GameData.worlds[worldIndex - 1].levels
-                      .every((l) => state.progress.completedLevelIds.contains(l.id));
+              final prevWorld = worldIndex > 0 ? GameData.worlds[worldIndex - 1] : null;
+              final isUnlocked = prevWorld == null ||
+                  prevWorld.levels
+                      .where((l) => state.progress.completedLevelIds.contains(l.id))
+                      .length >=
+                      (prevWorld.levels.length * 0.5).ceil();
+
+              final cat = CategoryManager.byId(world.id);
+              final bosses = cat?.bosses ?? [];
+              final totalBosses = bosses.length;
+              final defeatedCount = bosses
+                  .where((b) => state.progress.defeatedBossIds.contains(b.id))
+                  .length;
+              final bossVisualType = bosses.isNotEmpty ? bosses.first.visualType : 1;
+
               return WorldCard(
                 world: world,
                 completedLevels: completed,
                 totalLevels: world.levels.length,
                 isLocked: !isUnlocked,
+                bossesDefeated: defeatedCount,
+                totalBosses: totalBosses,
+                bossVisualType: bossVisualType,
                 onTap: () {
                   context.read<GameCubit>().selectWorld(world);
                   Nav.push(context, LevelSelectScreen(world: world));
@@ -204,3 +219,4 @@ class _WorldSelectScreenState extends State<WorldSelectScreen> {
     );
   }
 }
+

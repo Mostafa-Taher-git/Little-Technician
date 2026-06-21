@@ -17,6 +17,7 @@ class LevelDef {
   final String? estimatedTime;
   final DifficultyLevel difficulty;
   final bool isBossLevel;
+  final BossEncounterDef? boss;
 
   const LevelDef({
     required this.id,
@@ -31,6 +32,7 @@ class LevelDef {
     this.estimatedTime,
     this.difficulty = DifficultyLevel.easy,
     this.isBossLevel = false,
+    this.boss,
   });
 }
 
@@ -48,6 +50,38 @@ class BossDef {
   });
 }
 
+class BossEncounterDef {
+  final String id;
+  final String name;
+  final String lore;
+  final int hp;
+  final int points;
+  final int visualType;
+  final List<String> abilities;
+  final Map<String, dynamic> diagnosis;
+  final List<Map<String, dynamic>> strategies;
+  final int armor;
+  final int challengeRating;
+  final String bossKey;
+  final DifficultyLevel difficulty;
+
+  const BossEncounterDef({
+    required this.id,
+    required this.name,
+    required this.lore,
+    required this.hp,
+    this.points = 500,
+    required this.visualType,
+    required this.abilities,
+    required this.diagnosis,
+    required this.strategies,
+    required this.armor,
+    required this.challengeRating,
+    required this.bossKey,
+    this.difficulty = DifficultyLevel.medium,
+  });
+}
+
 class WorldDef {
   final String id;
   final String name;
@@ -55,6 +89,7 @@ class WorldDef {
   final IconData icon;
   final List<LevelDef> levels;
   final BossDef boss;
+  final List<BossEncounterDef> bosses;
 
   const WorldDef({
     required this.id,
@@ -63,10 +98,13 @@ class WorldDef {
     required this.icon,
     required this.levels,
     required this.boss,
+    this.bosses = const [],
   });
 }
 
 class GameData {
+  static const bossPositions = {3, 6, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29};
+
   static List<WorldDef> get worlds {
     return CategoryManager.all.map((cat) => _generateWorld(cat)).toList();
   }
@@ -81,41 +119,33 @@ class GameData {
   static WorldDef _generateWorld(CategoryDef cat) {
     final levels = <LevelDef>[];
     final totalLevels = cat.levelCount;
-    final bossRewards = [200, 350, 500, 750, 1000, 1500];
-    
+    final bosses = cat.bosses;
+
     var problemIndex = 0;
+    var bossIndex = 0;
+
     for (var levelNum = 1; levelNum <= totalLevels; levelNum++) {
-      // Check if this is a boss level (levels 5, 10, 15, 20, 25, 30)
-      if (levelNum % 5 == 0 && cat.bossKeys.isNotEmpty) {
-        final bossStage = levelNum ~/ 5;
-        final bossIndex = (bossStage - 1).clamp(0, cat.bossKeys.length - 1);
-        final bossKey = cat.bossKeys[bossIndex];
-        final solution = RuleEngine.solve(bossKey);
-        final difficulty = bossStage <= 2
-            ? DifficultyLevel.easy
-            : bossStage <= 5
-                ? DifficultyLevel.medium
-                : DifficultyLevel.hard;
-        
+      if (bossPositions.contains(levelNum) && bossIndex < bosses.length) {
+        final boss = bosses[bossIndex];
+        final solution = RuleEngine.solve(boss.bossKey);
+
         levels.add(LevelDef(
-          id: '${cat.id}_boss_$bossStage',
-          title: 'Boss: ${cat.bossName}',
-          description: 'Defeat the ${cat.bossName}!',
+          id: '${cat.id}_boss_${bossIndex + 1}',
+          title: 'Boss: ${boss.name}',
+          description: 'Defeat the ${boss.name}!',
           steps: solution?.steps ?? ['Prepare for boss battle!'],
-          points: bossRewards[bossStage - 1],
-          difficulty: difficulty,
+          points: boss.points,
+          difficulty: boss.difficulty,
           isBossLevel: true,
+          boss: boss,
         ));
-      }
-      
-      // Add regular problem level
-      if (problemIndex < cat.problemKeys.length) {
+        bossIndex++;
+      } else if (problemIndex < cat.problemKeys.length) {
         levels.add(_generateLevel(cat.id, cat.problemKeys[problemIndex], problemIndex));
         problemIndex++;
       }
     }
-    
-    // If we have fewer problems than levels, fill remaining with challenges
+
     while (levels.length < totalLevels) {
       final extraIndex = levels.length;
       levels.add(LevelDef(
@@ -127,30 +157,20 @@ class GameData {
         difficulty: DifficultyLevel.hard,
       ));
     }
-    
-    final bossPoints = _getBossPoints(cat.id);
+
+    final primaryBoss = bosses.isNotEmpty
+        ? BossDef(name: bosses.first.name, lore: bosses.first.lore, hp: bosses.first.hp, points: bosses.first.points)
+        : BossDef(name: cat.bossName, lore: cat.bossLore, hp: cat.bossHp);
+
     return WorldDef(
       id: cat.id,
       name: cat.name,
       description: cat.description,
       icon: cat.icon,
       levels: levels,
-      boss: BossDef(name: cat.bossName, lore: cat.bossLore, hp: cat.bossHp, points: bossPoints),
+      boss: primaryBoss,
+      bosses: bosses,
     );
-  }
-
-  static int _getBossPoints(String categoryId) {
-    switch (categoryId) {
-      case 'mobile':
-        return 700;
-      case 'gaming':
-        return 800;
-      case 'audio':
-      case 'smart_home':
-        return 600;
-      default:
-        return 500;
-    }
   }
 
   static LevelDef _generateLevel(String categoryId, String problemKey, int index) {
@@ -160,13 +180,13 @@ class GameData {
       if (w.isEmpty) return w;
       return w[0].toUpperCase() + w.substring(1);
     }).join(' ');
-    
-    final difficulty = index < 5 
-        ? DifficultyLevel.easy 
-        : index < 15 
-            ? DifficultyLevel.medium 
+
+    final difficulty = index < 5
+        ? DifficultyLevel.easy
+        : index < 15
+            ? DifficultyLevel.medium
             : DifficultyLevel.hard;
-    
+
     return LevelDef(
       id: id,
       title: title,

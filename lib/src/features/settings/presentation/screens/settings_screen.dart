@@ -157,6 +157,68 @@ class SettingsScreen extends StatelessWidget {
             },
             scheme: scheme,
           ),
+          const Gap(8),
+          FutureBuilder<UserModel?>(
+            future: AuthService.getCurrentUser(),
+            builder: (_, snap) {
+              final user = snap.data;
+              final username = user?.username ?? 'User';
+              return _SettingsTile(
+                icon: Icons.delete_forever,
+                label: 'Terminate $username',
+                subtitle: 'Permanently delete this account and all progress',
+                iconColor: Colors.red.shade700,
+                textColor: Colors.red.shade700,
+                onTap: () async {
+                  final confirm1 = await showDialog<bool>(
+                    context: context,
+                    builder: (_) => AlertDialog(
+                      title: const Text('Terminate Account'),
+                      content: Text('Are you sure you want to permanently delete "$username" and ALL progress? This cannot be undone.'),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      actions: [
+                        TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
+                        TextButton(
+                          onPressed: () => Navigator.pop(context, true),
+                          child: Text('Delete', style: TextStyle(color: Colors.red.shade700)),
+                        ),
+                      ],
+                    ),
+                  );
+                  if (confirm1 == true) {
+                    if (!context.mounted) return;
+                    final confirm2 = await showDialog<bool>(
+                      context: context,
+                      builder: (_) => AlertDialog(
+                        title: const Text('Final Confirmation'),
+                        content: Text('All progress for "$username" will be lost forever.'),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                        actions: [
+                          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
+                          TextButton(
+                            onPressed: () => Navigator.pop(context, true),
+                            child: Text('Yes, Delete', style: TextStyle(color: Colors.red.shade700)),
+                          ),
+                        ],
+                      ),
+                    );
+                    if (confirm2 == true && context.mounted) {
+                      final uid = await AuthService.getCurrentUserId();
+                      if (uid != null && context.mounted) {
+                        await context.read<GameCubit>().terminateAccount();
+                        await AuthService.deleteUser(uid);
+                      }
+                      if (context.mounted) {
+                        context.read<AuthBloc>().add(LogoutEvent());
+                        Nav.replaceAll(context, const LoginScreen());
+                      }
+                    }
+                  }
+                },
+                scheme: scheme,
+              );
+            },
+          ),
         ],
       ),
     );

@@ -21,6 +21,7 @@ int points = 0;
    List<String> purchasedItemIds = [];
    List<String> earnedRewardIds = [];
    List<String> unlockedSkinIds = [];
+   List<String> defeatedBossIds = [];
    String? activeSkinId;  // Currently equipped skin
    String? activeFrameId; // Currently equipped nickname frame
    String? themeId;
@@ -58,6 +59,7 @@ int points = 0;
     completedCategoryIds = List<String>.from(completedCategoryIds);
     earnedRewardIds = List<String>.from(earnedRewardIds);
     unlockedSkinIds = List<String>.from(unlockedSkinIds);
+    defeatedBossIds = List<String>.from(defeatedBossIds);
     playDates = List<DateTime>.from(playDates);
     prepResults = List<String>.from(prepResults);
     purchasedItemIds = List<String>.from(purchasedItemIds);

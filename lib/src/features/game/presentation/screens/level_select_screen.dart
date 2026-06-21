@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:littletech/src/core/navigation/nav.dart';
+import 'package:littletech/src/core/constants/category_manager.dart';
 import 'package:littletech/src/features/game/constants/game_data.dart';
 import 'package:littletech/src/features/game/domain/cubit/game_cubit.dart';
 import 'package:littletech/src/features/game/presentation/screens/quiz_screen.dart';
 import 'package:littletech/src/features/game/presentation/screens/review_screen.dart';
 import 'package:littletech/src/features/game/presentation/screens/boss_screen.dart';
 import 'package:littletech/src/features/game/presentation/widgets/level_card.dart';
+import 'package:littletech/src/features/game/presentation/widgets/boss_visuals.dart';
 
 class LevelSelectScreen extends StatelessWidget {
   final WorldDef world;
@@ -55,6 +57,11 @@ class LevelSelectScreen extends StatelessWidget {
           final allLevelsCompleted = world.levels
               .every((l) => state.progress.completedLevelIds.contains(l.id));
 
+          final cat = CategoryManager.byId(world.id);
+          final bosses = cat?.bosses ?? [];
+          final allBossesDefeated = bosses.isNotEmpty &&
+              bosses.every((b) => state.progress.defeatedBossIds.contains(b.id));
+
           final listView = ListView(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
             children: [
@@ -91,12 +98,20 @@ class LevelSelectScreen extends StatelessWidget {
                         isCompleted: isCompleted,
                         isLocked: isLocked,
                         totalSteps: level.steps.length,
+                        isBossLevel: level.isBossLevel,
+                        bossVisualType: level.boss?.visualType ?? bosses.firstOrNull?.visualType ?? 1,
                         onTap: () {
-                          context.read<GameCubit>().selectLevel(level, worldOverride: world);
-                          if (isCompleted) {
-                            Nav.push(context, ReviewScreen(world: world, level: level));
+                          if (level.isBossLevel && level.boss != null) {
+                            context.read<GameCubit>().selectWorld(world);
+                            context.read<GameCubit>().startBoss(level.boss!);
+                            Nav.push(context, BossScreen(boss: level.boss!));
                           } else {
-                            Nav.push(context, QuizScreen(world: world, level: level));
+                            context.read<GameCubit>().selectLevel(level, worldOverride: world);
+                            if (isCompleted) {
+                              Nav.push(context, ReviewScreen(world: world, level: level));
+                            } else {
+                              Nav.push(context, QuizScreen(world: world, level: level));
+                            }
                           }
                         },
                       ),
@@ -106,13 +121,17 @@ class LevelSelectScreen extends StatelessWidget {
               }),
               const Gap(32),
               _BossDungeonDoor(
-                boss: world.boss,
+                boss: cat?.bosses.firstOrNull,
                 isUnlocked: allLevelsCompleted,
+                isDefeated: allBossesDefeated,
                 points: state.totalPoints,
+                bossVisualType: bosses.firstOrNull?.visualType ?? 1,
                 onEnter: () {
+                  final boss = cat?.bosses.firstOrNull;
+                  if (boss == null) return;
                   context.read<GameCubit>().selectWorld(world);
-                  context.read<GameCubit>().startBoss();
-                  Nav.push(context, BossScreen(world: world));
+                  context.read<GameCubit>().startBoss(boss);
+                  Nav.push(context, BossScreen(boss: boss));
                 },
               ),
             ],
@@ -255,15 +274,19 @@ class _ConnectorLinePainter extends CustomPainter {
 }
 
 class _BossDungeonDoor extends StatelessWidget {
-  final BossDef boss;
+  final BossEncounterDef? boss;
   final bool isUnlocked;
+  final bool isDefeated;
   final int points;
+  final int bossVisualType;
   final VoidCallback onEnter;
 
   const _BossDungeonDoor({
     required this.boss,
     required this.isUnlocked,
+    this.isDefeated = false,
     required this.points,
+    this.bossVisualType = 1,
     required this.onEnter,
   });
 
@@ -271,32 +294,38 @@ class _BossDungeonDoor extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
+    final bossColor = BossVisuals.color(bossVisualType);
 
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
         gradient: isUnlocked
-            ? const LinearGradient(
+            ? LinearGradient(
                 colors: [
-                  Color(0xFF1A1A2E),
-                  Color(0xFF2D2D44),
-                  Color(0xFF1A1A2E),
+                  isDefeated
+                      ? bossColor.withValues(alpha: 0.15)
+                      : const Color(0xFF1A1A2E),
+                  isDefeated
+                      ? bossColor.withValues(alpha: 0.08)
+                      : const Color(0xFF2D2D44),
+                  isDefeated
+                      ? bossColor.withValues(alpha: 0.15)
+                      : const Color(0xFF1A1A2E),
                 ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               )
             : LinearGradient(
-                colors: [
-                  scheme.surface,
-                  scheme.surface,
-                ],
+                colors: [scheme.surface, scheme.surface],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
         boxShadow: isUnlocked
             ? [
                 BoxShadow(
-                  color: Colors.red.withValues(alpha: 0.3),
+                  color: isDefeated
+                      ? const Color(0xFFFFD700).withValues(alpha: 0.25)
+                      : Colors.red.withValues(alpha: 0.3),
                   blurRadius: 20,
                   spreadRadius: 3,
                 ),
@@ -304,7 +333,9 @@ class _BossDungeonDoor extends StatelessWidget {
             : null,
         border: Border.all(
           color: isUnlocked
-              ? const Color(0xFF4A4A6A).withValues(alpha: 0.6)
+              ? isDefeated
+                  ? const Color(0xFFDAA520).withValues(alpha: 0.7)
+                  : bossColor.withValues(alpha: 0.5)
               : scheme.outline.withValues(alpha: 0.15),
           width: 2,
         ),
@@ -319,13 +350,17 @@ class _BossDungeonDoor extends StatelessWidget {
             padding: const EdgeInsets.all(20),
             child: Row(
               children: [
-                CustomPaint(
-                  size: const Size(56, 56),
-                  painter: _IronGatePainter(
-                    isUnlocked: isUnlocked,
-                    scheme: scheme,
+                if (isDefeated)
+                  const BossDefeatedBadge(size: 56)
+                else
+                  CustomPaint(
+                    size: const Size(56, 56),
+                    painter: _IronGatePainter(
+                      isUnlocked: isUnlocked,
+                      scheme: scheme,
+                      bossColor: bossColor,
+                    ),
                   ),
-                ),
                 const Gap(16),
                 Expanded(
                   child: Column(
@@ -334,11 +369,13 @@ class _BossDungeonDoor extends StatelessWidget {
                       Row(
                         children: [
                           Text(
-                            'BOSS',
+                            isDefeated ? 'DEFEATED' : 'BOSS',
                             style: TextStyle(
-                              color: isUnlocked
-                                  ? const Color(0xFFDC143C)
-                                  : scheme.onSurface.withValues(alpha: 0.2),
+                              color: isDefeated
+                                  ? const Color(0xFFFFD700)
+                                  : isUnlocked
+                                      ? bossColor
+                                      : scheme.onSurface.withValues(alpha: 0.2),
                               fontSize: 11,
                               fontWeight: FontWeight.w800,
                               letterSpacing: 2,
@@ -350,11 +387,17 @@ class _BossDungeonDoor extends StatelessWidget {
                                 size: 14,
                                 color: scheme.onSurface.withValues(alpha: 0.2)),
                           ],
+                          if (isDefeated) ...[
+                            const Gap(8),
+                            const Icon(Icons.emoji_events,
+                                size: 14,
+                                color: Color(0xFFFFD700)),
+                          ],
                         ],
                       ),
                       const Gap(4),
                       Text(
-                        boss.name,
+                        boss?.name ?? 'Boss',
                         style: TextStyle(
                           color: isUnlocked
                               ? Colors.white
@@ -365,7 +408,7 @@ class _BossDungeonDoor extends StatelessWidget {
                       ),
                       const Gap(2),
                       Text(
-                        '${boss.hp} HP  •  ${boss.points} pts',
+                        '${boss?.hp ?? 5} HP  •  ${boss?.points ?? 500} pts',
                         style: TextStyle(
                           color: isUnlocked
                               ? Colors.white.withValues(alpha: 0.6)
@@ -402,13 +445,14 @@ class _BossDungeonDoor extends StatelessWidget {
 class _IronGatePainter extends CustomPainter {
   final bool isUnlocked;
   final ColorScheme scheme;
+  final Color bossColor;
 
-  _IronGatePainter({required this.isUnlocked, required this.scheme});
+  _IronGatePainter({required this.isUnlocked, required this.scheme, this.bossColor = const Color(0xFFDC143C)});
 
   @override
   void paint(Canvas canvas, Size size) {
     final color = isUnlocked
-        ? const Color(0xFF4A4A6A)
+        ? bossColor.withValues(alpha: 0.6)
         : scheme.outline.withValues(alpha: 0.2);
     final paint = Paint()
       ..color = color
@@ -431,7 +475,7 @@ class _IronGatePainter extends CustomPainter {
     );
 
     final skullColor = isUnlocked
-        ? const Color(0xFFDC143C).withValues(alpha: 0.6)
+        ? bossColor.withValues(alpha: 0.6)
         : scheme.outline.withValues(alpha: 0.15);
     canvas.drawCircle(
       Offset(size.width / 2, size.height * 0.35),
@@ -442,7 +486,7 @@ class _IronGatePainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _IronGatePainter old) =>
-      old.isUnlocked != isUnlocked;
+      old.isUnlocked != isUnlocked || old.bossColor != bossColor;
 }
 
 

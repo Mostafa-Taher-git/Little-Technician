@@ -291,7 +291,7 @@ const Gap(24),
                         final isActive = progress.activeFrameId == frame.id;
                         return GestureDetector(
                           onTap: unlocked
-                              ? () => context.read<GameCubit>().setActiveFrame(frame.id)
+                              ? () => context.read<GameCubit>().setActiveFrame(isActive ? null : frame.id)
                               : null,
                           child: AnimatedContainer(
                             duration: const Duration(milliseconds: 200),

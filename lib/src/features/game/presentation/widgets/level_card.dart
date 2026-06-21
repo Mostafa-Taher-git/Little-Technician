@@ -3,12 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:gap/gap.dart';
 import 'package:littletech/src/features/game/constants/game_data.dart';
+import 'package:littletech/src/features/game/presentation/widgets/boss_visuals.dart';
 
 class LevelCard extends StatelessWidget {
   final LevelDef level;
   final bool isCompleted;
   final bool isLocked;
   final int totalSteps;
+  final bool isBossLevel;
+  final int bossVisualType;
   final VoidCallback onTap;
 
   const LevelCard({
@@ -17,6 +20,8 @@ class LevelCard extends StatelessWidget {
     this.isCompleted = false,
     this.isLocked = false,
     this.totalSteps = 1,
+    this.isBossLevel = false,
+    this.bossVisualType = 1,
     required this.onTap,
   });
 
@@ -24,6 +29,7 @@ class LevelCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
+    final bossColor = BossVisuals.color(bossVisualType);
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 4),
@@ -34,18 +40,30 @@ class LevelCard extends StatelessWidget {
             decoration: BoxDecoration(
               color: isLocked
                   ? scheme.surface.withValues(alpha: 0.3)
-                  : scheme.surface,
+                  : isBossLevel
+                      ? bossColor.withValues(alpha: 0.05)
+                      : scheme.surface,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: isCompleted
-                    ? scheme.secondary.withValues(alpha: 0.3)
-                    : isLocked
-                        ? scheme.outline.withValues(alpha: 0.2)
-                        : scheme.outline.withValues(alpha: 0.4),
-                width: 1.5,
+                color: isBossLevel && !isLocked
+                    ? isCompleted
+                        ? bossColor.withValues(alpha: 0.5)
+                        : bossColor.withValues(alpha: 0.25)
+                    : isCompleted
+                        ? scheme.secondary.withValues(alpha: 0.3)
+                        : isLocked
+                            ? scheme.outline.withValues(alpha: 0.2)
+                            : scheme.outline.withValues(alpha: 0.4),
+                width: isBossLevel ? 1.5 : 1,
               ),
               boxShadow: [
-                if (!isLocked)
+                if (!isLocked && isBossLevel)
+                  BoxShadow(
+                    color: bossColor.withValues(alpha: 0.12),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                if (!isLocked && !isBossLevel)
                   BoxShadow(
                     color: scheme.shadow.withValues(alpha: 0.06),
                     blurRadius: 8,
@@ -61,11 +79,20 @@ class LevelCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(16),
                 child: Row(
                   children: [
-                    const Gap(4),
-                    _DungeonDoor(
-                      isCompleted: isCompleted,
-                      isLocked: isLocked,
-                    ),
+                    if (isBossLevel) ...[
+                      const Gap(2),
+                      _BossDoor(
+                        visualType: bossVisualType,
+                        isCompleted: isCompleted,
+                        isLocked: isLocked,
+                      ),
+                    ] else ...[
+                      const Gap(4),
+                      _DungeonDoor(
+                        isCompleted: isCompleted,
+                        isLocked: isLocked,
+                      ),
+                    ],
                     const Gap(12),
                     Expanded(
                       child: Column(
@@ -74,7 +101,10 @@ class LevelCard extends StatelessWidget {
                         children: [
                           Row(
                             children: [
-                              if (isCompleted)
+                              if (isCompleted && isBossLevel)
+                                Icon(Icons.emoji_events,
+                                    size: 16, color: bossColor),
+                              if (isCompleted && !isBossLevel)
                                 Icon(Icons.check_circle,
                                     size: 16, color: scheme.secondary),
                               if (isCompleted) const Gap(6),
@@ -84,7 +114,12 @@ class LevelCard extends StatelessWidget {
                                   style: theme.textTheme.titleSmall?.copyWith(
                                     color: isLocked
                                         ? scheme.onSurface.withValues(alpha: 0.3)
-                                        : scheme.onSurface,
+                                        : isBossLevel
+                                            ? bossColor
+                                            : scheme.onSurface,
+                                    fontWeight: isBossLevel
+                                        ? FontWeight.w800
+                                        : null,
                                   ),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
@@ -99,16 +134,18 @@ class LevelCard extends StatelessWidget {
                                   size: 14,
                                   color: scheme.onSurface.withValues(alpha: 0.3)),
                               const Gap(2),
-                              Text(
-                                level.description,
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  color: isLocked
-                                      ? scheme.onSurface.withValues(alpha: 0.2)
-                                      : scheme.onSurface.withValues(alpha: 0.5),
+                              Flexible(
+                                child: Text(
+                                  level.description,
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    color: isLocked
+                                        ? scheme.onSurface.withValues(alpha: 0.2)
+                                        : scheme.onSurface.withValues(alpha: 0.5),
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
                                 ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
                               ),
                             ],
                           ),
@@ -116,23 +153,32 @@ class LevelCard extends StatelessWidget {
                       ),
                     ),
                     const Gap(4),
-                    _DungeonTorch(isLit: !isLocked && !isCompleted),
-                    const Gap(4),
+                    if (!isBossLevel) ...[
+                      _DungeonTorch(isLit: !isLocked && !isCompleted),
+                      const Gap(4),
+                    ],
                     Container(
                       width: 28,
                       height: 28,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        gradient: const RadialGradient(
-                          colors: [Color(0xFFFFD700), Color(0xFFB8860B)],
-                        ),
+                        gradient: isBossLevel
+                            ? RadialGradient(
+                                colors: [bossColor, bossColor.withValues(alpha: 0.6)],
+                              )
+                            : const RadialGradient(
+                                colors: [Color(0xFFFFD700), Color(0xFFB8860B)],
+                              ),
                         border: Border.all(
-                          color: const Color(0xFFDAA520),
+                          color: isBossLevel
+                              ? bossColor.withValues(alpha: 0.7)
+                              : const Color(0xFFDAA520),
                           width: 1.5,
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: scheme.secondary.withValues(alpha: 0.3),
+                            color: (isBossLevel ? bossColor : scheme.secondary)
+                                .withValues(alpha: 0.3),
                             blurRadius: 4,
                           ),
                         ],
@@ -140,10 +186,12 @@ class LevelCard extends StatelessWidget {
                       alignment: Alignment.center,
                       child: Text(
                         '${level.points}',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 10,
                           fontWeight: FontWeight.w800,
-                          color: Color(0xFF3E2723),
+                          color: isBossLevel
+                              ? Colors.white
+                              : const Color(0xFF3E2723),
                         ),
                       ),
                     ),
@@ -154,8 +202,8 @@ class LevelCard extends StatelessWidget {
             ),
           ),
           if (!isLocked)
-            ..._buildRivets(scheme.outline),
-          if (!isLocked)
+            ..._buildRivets(isBossLevel ? bossColor : scheme.outline),
+          if (!isLocked && !isBossLevel)
             Positioned.fill(
               child: IgnorePointer(
                 child: CustomPaint(
@@ -296,6 +344,49 @@ class _DungeonDoor extends StatelessWidget {
   }
 }
 
+class _BossDoor extends StatelessWidget {
+  final int visualType;
+  final bool isCompleted;
+  final bool isLocked;
+
+  const _BossDoor({
+    required this.visualType,
+    required this.isCompleted,
+    required this.isLocked,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final bossColor = BossVisuals.color(visualType);
+
+    return Container(
+      width: 48,
+      height: 64,
+      decoration: BoxDecoration(
+        color: isCompleted
+            ? bossColor.withValues(alpha: 0.15)
+            : isLocked
+                ? Colors.grey.withValues(alpha: 0.05)
+                : bossColor.withValues(alpha: 0.06),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: isLocked
+              ? Colors.grey.withValues(alpha: 0.2)
+              : bossColor.withValues(alpha: isCompleted ? 0.5 : 0.3),
+          width: 1.5,
+        ),
+      ),
+      child: CustomPaint(
+        painter: _BossDoorPainter(
+          visualType: visualType,
+          isCompleted: isCompleted,
+          isLocked: isLocked,
+        ),
+      ),
+    );
+  }
+}
+
 class _DoorArchPainter extends CustomPainter {
   final Color doorColor;
   final bool isCompleted;
@@ -402,6 +493,115 @@ class _DoorArchPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant _DoorArchPainter old) =>
       old.doorColor != doorColor || old.isCompleted != isCompleted;
+}
+
+class _BossDoorPainter extends CustomPainter {
+  final int visualType;
+  final bool isCompleted;
+  final bool isLocked;
+
+  _BossDoorPainter({
+    required this.visualType,
+    required this.isCompleted,
+    required this.isLocked,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final color = BossVisuals.color(visualType);
+    final paint = Paint()
+      ..color = isLocked
+          ? Colors.grey.withValues(alpha: 0.2)
+          : color.withValues(alpha: isCompleted ? 0.8 : 0.5)
+      ..style = PaintingStyle.fill;
+
+    final cx = size.width / 2;
+    final cy = size.height / 2;
+    final s = size.width / 48;
+
+    if (isCompleted) {
+      // Trophy icon
+      final cupPaint = Paint()
+        ..color = const Color(0xFFFFD700)
+        ..style = PaintingStyle.fill;
+      canvas.drawRRect(
+        RRect.fromRectAndRadius(
+          Rect.fromCenter(center: Offset(cx, cy - 2 * s), width: 16 * s, height: 14 * s),
+          Radius.circular(3 * s),
+        ),
+        cupPaint,
+      );
+      // Cup handle left
+      canvas.drawArc(
+        Rect.fromCenter(center: Offset(cx - 10 * s, cy - 2 * s), width: 6 * s, height: 8 * s),
+        -pi * 0.5, pi, false,
+        Paint()
+          ..color = const Color(0xFFFFD700)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 2 * s,
+      );
+      // Cup handle right
+      canvas.drawArc(
+        Rect.fromCenter(center: Offset(cx + 10 * s, cy - 2 * s), width: 6 * s, height: 8 * s),
+        pi * 0.5, pi, false,
+        Paint()
+          ..color = const Color(0xFFFFD700)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 2 * s,
+      );
+      // Stem
+      paint
+        ..color = const Color(0xFFB8860B)
+        ..strokeWidth = 2 * s
+        ..strokeCap = StrokeCap.round;
+      canvas.drawLine(Offset(cx, cy + 5 * s), Offset(cx, cy + 10 * s), paint);
+      // Base
+      canvas.drawLine(Offset(cx - 6 * s, cy + 10 * s), Offset(cx + 6 * s, cy + 10 * s), paint);
+      // Star
+      paint
+        ..color = Colors.white.withValues(alpha: 0.8)
+        ..style = PaintingStyle.fill;
+      canvas.drawCircle(Offset(cx, cy - 3 * s), 2.5 * s, paint);
+    } else {
+      // Monster skull
+      paint.color = isLocked ? Colors.grey.withValues(alpha: 0.15) : color;
+      // Skull shape
+      canvas.drawOval(
+        Rect.fromCenter(center: Offset(cx, cy - 3 * s), width: 14 * s, height: 16 * s),
+        paint,
+      );
+      // Jaw
+      paint.color = isLocked ? Colors.grey.withValues(alpha: 0.12) : color.withValues(alpha: 0.7);
+      canvas.drawRRect(
+        RRect.fromRectAndRadius(
+          Rect.fromCenter(center: Offset(cx, cy + 8 * s), width: 10 * s, height: 6 * s),
+          Radius.circular(2 * s),
+        ),
+        paint,
+      );
+      // Eyes
+      final eyePaint = Paint()
+        ..color = isLocked
+            ? Colors.grey.withValues(alpha: 0.2)
+            : isCompleted
+                ? const Color(0xFFFFD700)
+                : Colors.white
+        ..style = PaintingStyle.fill;
+      canvas.drawCircle(Offset(cx - 3 * s, cy - 5 * s), 2 * s, eyePaint);
+      canvas.drawCircle(Offset(cx + 3 * s, cy - 5 * s), 2 * s, eyePaint);
+      // Nose
+      final nosePaint = Paint()
+        ..color = isLocked ? Colors.black.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.3)
+        ..style = PaintingStyle.fill;
+      canvas.drawCircle(Offset(cx, cy), 1 * s, nosePaint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _BossDoorPainter old) =>
+      old.visualType != visualType ||
+      old.isCompleted != isCompleted ||
+      old.isLocked != isLocked;
 }
 
 class _DungeonTorch extends StatefulWidget {

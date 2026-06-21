@@ -3,12 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:gap/gap.dart';
 import 'package:littletech/src/features/game/constants/game_data.dart';
+import 'package:littletech/src/features/game/presentation/widgets/boss_visuals.dart';
 
 class WorldCard extends StatelessWidget {
   final WorldDef world;
   final int completedLevels;
   final int totalLevels;
   final bool isLocked;
+  final int bossesDefeated;
+  final int totalBosses;
+  final int bossVisualType;
   final VoidCallback onTap;
 
   const WorldCard({
@@ -17,6 +21,9 @@ class WorldCard extends StatelessWidget {
     required this.completedLevels,
     required this.totalLevels,
     this.isLocked = false,
+    this.bossesDefeated = 0,
+    this.totalBosses = 14,
+    this.bossVisualType = 1,
     required this.onTap,
   });
 
@@ -24,6 +31,9 @@ class WorldCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final progress = totalLevels > 0 ? completedLevels / totalLevels : 0.0;
+    final bossColor = BossVisuals.color(bossVisualType);
+    final allBossesDefeated = bossesDefeated >= totalBosses && totalBosses > 0;
+    final hasBossProgress = bossesDefeated > 0;
 
     return Material(
       color: Colors.transparent,
@@ -37,100 +47,168 @@ class WorldCard extends StatelessWidget {
             border: Border.all(
               color: isLocked
                   ? scheme.outline.withValues(alpha: 0.15)
-                  : scheme.secondary.withValues(alpha: 0.3),
+                  : allBossesDefeated
+                      ? bossColor.withValues(alpha: 0.6)
+                      : hasBossProgress
+                          ? bossColor.withValues(alpha: 0.3)
+                          : scheme.secondary.withValues(alpha: 0.3),
+              width: allBossesDefeated ? 2 : 1,
             ),
+            boxShadow: [
+              if (!isLocked && hasBossProgress)
+                BoxShadow(
+                  color: bossColor.withValues(alpha: allBossesDefeated ? 0.25 : 0.1),
+                  blurRadius: allBossesDefeated ? 16 : 8,
+                  spreadRadius: allBossesDefeated ? 2 : 0,
+                ),
+            ],
           ),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(19),
             child: CustomPaint(
               painter: _ParchmentTexturePainter(
                 color: scheme.surface,
-                accent: scheme.secondary.withValues(alpha: 0.05),
+                accent: hasBossProgress
+                    ? bossColor.withValues(alpha: 0.05)
+                    : scheme.secondary.withValues(alpha: 0.05),
               ),
               foregroundPainter: _ScrollEdgePainter(
                 color: scheme.outline.withValues(alpha: 0.15),
                 shadow: scheme.shadow.withValues(alpha: 0.06),
               ),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            color: isLocked
-                                ? Colors.grey.withValues(alpha: 0.1)
-                                : scheme.secondary.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(12),
+              child: Stack(
+                children: [
+                  Positioned.fill(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                  color: isLocked
+                                      ? Colors.grey.withValues(alpha: 0.1)
+                                      : hasBossProgress
+                                          ? bossColor.withValues(alpha: 0.12)
+                                          : scheme.secondary.withValues(alpha: 0.1),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Icon(
+                                  world.icon,
+                                  color: isLocked
+                                      ? Colors.grey
+                                      : hasBossProgress
+                                          ? bossColor
+                                          : scheme.secondary,
+                                  size: 24,
+                                ),
+                              ),
+                              const Spacer(),
+                              CustomPaint(
+                                size: const Size(28, 28),
+                                painter: _CompassRosePainter(
+                                  primary: hasBossProgress
+                                      ? bossColor
+                                      : scheme.secondary,
+                                  faded: scheme.outline.withValues(alpha: 0.3),
+                                ),
+                              ),
+                            ],
                           ),
-                          child: Icon(
-                            world.icon,
-                            color: isLocked ? Colors.grey : scheme.secondary,
-                            size: 24,
+                          const Gap(12),
+                          Text(
+                            world.name,
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w700,
+                              color: isLocked
+                                  ? scheme.onSurface.withValues(alpha: 0.3)
+                                  : scheme.onSurface,
+                            ),
                           ),
-                        ),
-                        const Spacer(),
-                        CustomPaint(
-                          size: const Size(28, 28),
-                          painter: _CompassRosePainter(
-                            primary: scheme.secondary,
-                            faded: scheme.outline.withValues(alpha: 0.3),
+                          const Gap(4),
+                          Text(
+                            world.description,
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: isLocked
+                                  ? scheme.onSurface.withValues(alpha: 0.2)
+                                  : scheme.onSurface.withValues(alpha: 0.5),
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
                           ),
-                        ),
-                      ],
-                    ),
-                    const Gap(12),
-                    Text(
-                      world.name,
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w700,
-                        color: isLocked
-                            ? scheme.onSurface.withValues(alpha: 0.3)
-                            : scheme.onSurface,
+                          const Gap(12),
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(6),
+                            child: LinearProgressIndicator(
+                              value: progress,
+                              backgroundColor:
+                                  scheme.outline.withValues(alpha: 0.2),
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                isLocked
+                                    ? Colors.grey
+                                    : hasBossProgress
+                                        ? bossColor
+                                        : scheme.secondary,
+                              ),
+                              minHeight: 5,
+                            ),
+                          ),
+                          const Gap(4),
+                          Text(
+                            '$completedLevels / $totalLevels',
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w600,
+                              color: isLocked
+                                  ? scheme.onSurface.withValues(alpha: 0.2)
+                                  : scheme.onSurface.withValues(alpha: 0.5),
+                            ),
+                          ),
+                          if (totalBosses > 0) ...[
+                            const Gap(6),
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.shield,
+                                  size: 12,
+                                  color: isLocked
+                                      ? Colors.grey.withValues(alpha: 0.3)
+                                      : bossColor.withValues(alpha: 0.7),
+                                ),
+                                const Gap(4),
+                                Text(
+                                  '$bossesDefeated / $totalBosses bosses',
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w600,
+                                    color: isLocked
+                                        ? scheme.onSurface.withValues(alpha: 0.2)
+                                        : allBossesDefeated
+                                            ? bossColor
+                                            : scheme.onSurface
+                                                .withValues(alpha: 0.5),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ],
                       ),
                     ),
-                    const Gap(4),
-                    Text(
-                      world.description,
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: isLocked
-                            ? scheme.onSurface.withValues(alpha: 0.2)
-                            : scheme.onSurface.withValues(alpha: 0.5),
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
+                  ),
+                  if (allBossesDefeated && !isLocked)
+                    const Positioned(
+                      top: 8,
+                      right: 8,
+                      child: BossDefeatedBadge(size: 24),
                     ),
-                    const Gap(12),
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(6),
-                      child: LinearProgressIndicator(
-                        value: progress,
-                        backgroundColor: scheme.outline.withValues(alpha: 0.2),
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                          isLocked ? Colors.grey : scheme.secondary,
-                        ),
-                        minHeight: 5,
-                      ),
-                    ),
-                    const Gap(4),
-                    Text(
-                      '$completedLevels / $totalLevels',
-                      style: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w600,
-                        color: isLocked
-                            ? scheme.onSurface.withValues(alpha: 0.2)
-                            : scheme.onSurface.withValues(alpha: 0.5),
-                      ),
-                    ),
-                  ],
-                ),
+                ],
               ),
             ),
           ),

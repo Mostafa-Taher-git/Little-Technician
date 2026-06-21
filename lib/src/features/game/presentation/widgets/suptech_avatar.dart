@@ -8,7 +8,6 @@ import 'package:littletech/src/features/game/domain/cubit/game_cubit.dart';
 class SupTechAvatar extends StatefulWidget {
   final bool isGlowing;
   final double size;
-  final bool showWizardHat;
   final bool isCasting;
   final VoidCallback? onTap;
   final String? skinId;
@@ -17,7 +16,6 @@ class SupTechAvatar extends StatefulWidget {
     super.key,
     this.isGlowing = true,
     this.size = 40,
-    this.showWizardHat = false,
     this.isCasting = false,
     this.onTap,
     this.skinId,
@@ -105,7 +103,6 @@ class _SupTechAvatarState extends State<SupTechAvatar>
             painter: _SupTechBodyPainter(
               scheme: scheme,
               isGlowing: isGlowing,
-              showWizardHat: widget.showWizardHat,
               isCasting: widget.isCasting,
               skin: skin,
               anim: _AnimationState(
@@ -202,7 +199,6 @@ class _AnimationState {
 class _SupTechBodyPainter extends CustomPainter {
   final ColorScheme scheme;
   final bool isGlowing;
-  final bool showWizardHat;
   final bool isCasting;
   final SkinDefinition skin;
   final _AnimationState anim;
@@ -210,7 +206,6 @@ class _SupTechBodyPainter extends CustomPainter {
   _SupTechBodyPainter({
     required this.scheme,
     required this.isGlowing,
-    this.showWizardHat = false,
     this.isCasting = false,
     SkinDefinition? skin,
     _AnimationState? anim,
@@ -229,11 +224,17 @@ class _SupTechBodyPainter extends CustomPainter {
     canvas.save();
     canvas.translate(cx, cy);
 
+    if (skin.hasCape) _drawCape(canvas, s);
     _drawRobe(canvas, s);
+    if (skin.hasGearEmblem) _drawGearEmblem(canvas, s);
     _drawWandArm(canvas, s);
     _drawHead(canvas, s);
+    if (skin.hasScarf) _drawScarf(canvas, s);
+    if (skin.hasVisor) _drawVisor(canvas, s);
     _drawEyes(canvas, s);
-    if (showWizardHat) _drawHat(canvas, s);
+    if (skin.hasWizardHat) _drawHat(canvas, s);
+    if (skin.hasCrown) _drawCrown(canvas, s);
+    if (skin.hasAntenna) _drawAntenna(canvas, s);
     if (isCasting) _drawSpellCharge(canvas, s);
 
     canvas.restore();
@@ -362,10 +363,120 @@ class _SupTechBodyPainter extends CustomPainter {
     }
   }
 
+  void _drawCape(Canvas canvas, double s) {
+    final capePaint = Paint()
+      ..color = skin.trimColor.withValues(alpha: 0.6)
+      ..style = PaintingStyle.fill;
+
+    final capePath = Path()
+      ..moveTo(-14 * s, -12 * s)
+      ..quadraticBezierTo(-20 * s, 0, -18 * s + anim.robeFlutter * s, 18 * s)
+      ..quadraticBezierTo(-14 * s, 22 * s, -10 * s, 18 * s - anim.robeFlutter * 0.5 * s)
+      ..lineTo(-10 * s, -8 * s)
+      ..close();
+
+    canvas.drawPath(capePath, capePaint);
+  }
+
+  void _drawAntenna(Canvas canvas, double s) {
+    final antennaPaint = Paint()
+      ..color = skin.trimColor
+      ..strokeWidth = 1.5 * s
+      ..strokeCap = StrokeCap.round;
+    canvas.drawLine(Offset(0, -24 * s), Offset(0, -32 * s), antennaPaint);
+
+    final ledPaint = Paint()
+      ..color = skin.eyeColor.withValues(alpha: 0.6 + 0.4 * anim.blinkPhase)
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 2);
+    canvas.drawCircle(Offset(0, -33 * s), 2 * s, ledPaint);
+  }
+
+  void _drawScarf(Canvas canvas, double s) {
+    final scarfPaint = Paint()
+      ..color = skin.trimColor.withValues(alpha: 0.8)
+      ..style = PaintingStyle.fill;
+
+    final scarfPath = Path()
+      ..moveTo(-8 * s, -12 * s)
+      ..quadraticBezierTo(-10 * s, -10 * s, -12 * s, -8 * s + anim.robeFlutter * 0.3 * s)
+      ..lineTo(-14 * s, -4 * s + anim.robeFlutter * 0.5 * s)
+      ..lineTo(-10 * s, -6 * s)
+      ..lineTo(10 * s, -6 * s)
+      ..lineTo(14 * s, -4 * s + anim.robeFlutter * 0.5 * s)
+      ..lineTo(12 * s, -8 * s + anim.robeFlutter * 0.3 * s)
+      ..quadraticBezierTo(10 * s, -10 * s, 8 * s, -12 * s)
+      ..close();
+
+    canvas.drawPath(scarfPath, scarfPaint);
+  }
+
+  void _drawCrown(Canvas canvas, double s) {
+    final crownPaint = Paint()
+      ..color = skin.trimColor
+      ..style = PaintingStyle.fill;
+
+    final crownPath = Path()
+      ..moveTo(-8 * s, -23 * s)
+      ..lineTo(-6 * s, -30 * s)
+      ..lineTo(-2 * s, -26 * s)
+      ..lineTo(0, -32 * s)
+      ..lineTo(2 * s, -26 * s)
+      ..lineTo(6 * s, -30 * s)
+      ..lineTo(8 * s, -23 * s)
+      ..close();
+
+    canvas.drawPath(crownPath, crownPaint);
+
+    final jewelPaint = Paint()
+      ..color = skin.eyeColor;
+    canvas.drawCircle(Offset(0, -28 * s), 1.5 * s, jewelPaint);
+  }
+
+  void _drawVisor(Canvas canvas, double s) {
+    final visorPaint = Paint()
+      ..color = skin.trimColor.withValues(alpha: 0.8)
+      ..style = PaintingStyle.fill;
+    canvas.drawRect(Rect.fromLTWH(-8 * s, -19 * s, 16 * s, 3.5 * s), visorPaint);
+
+    final glowPaint = Paint()
+      ..color = skin.eyeColor.withValues(alpha: 0.3)
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3);
+    canvas.drawRect(Rect.fromLTWH(-8 * s, -19 * s, 16 * s, 3.5 * s), glowPaint);
+  }
+
+  void _drawGearEmblem(Canvas canvas, double s) {
+    final gearPaint = Paint()
+      ..color = skin.trimColor.withValues(alpha: 0.7)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.5 * s;
+
+    const teeth = 6;
+    final outerR = 4 * s;
+    final innerR = 2.5 * s;
+    final gearPath = Path();
+    for (var i = 0; i < teeth; i++) {
+      final a1 = i * 2 * pi / teeth;
+      final a2 = a1 + pi / teeth * 0.6;
+      final a3 = a1 + pi / teeth;
+      final a4 = a3 + pi / teeth * 0.6;
+      if (i == 0) {
+        gearPath.moveTo(cos(a1) * outerR, sin(a1) * outerR - 2 * s);
+      }
+      gearPath.lineTo(cos(a2) * outerR, sin(a2) * outerR - 2 * s);
+      gearPath.lineTo(cos(a3) * innerR, sin(a3) * innerR - 2 * s);
+      gearPath.lineTo(cos(a4) * innerR, sin(a4) * innerR - 2 * s);
+    }
+    gearPath.close();
+    canvas.drawPath(gearPath, gearPaint);
+
+    final centerPaint = Paint()
+      ..color = skin.trimColor.withValues(alpha: 0.5);
+    canvas.drawCircle(Offset(0, -2 * s), 1.5 * s, centerPaint);
+  }
+
   @override
   bool shouldRepaint(covariant _SupTechBodyPainter oldDelegate) {
     return oldDelegate.isGlowing != isGlowing ||
-        oldDelegate.showWizardHat != showWizardHat ||
         oldDelegate.isCasting != isCasting ||
         oldDelegate.skin.id != skin.id ||
         oldDelegate.anim.castPhase != anim.castPhase ||

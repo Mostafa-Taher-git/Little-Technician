@@ -13,6 +13,13 @@ class SkinDefinition {
   final Color robeColor;
   final Color trimColor;
   final Color eyeColor;
+  final bool hasAntenna;
+  final bool hasScarf;
+  final bool hasWizardHat;
+  final bool hasCrown;
+  final bool hasVisor;
+  final bool hasGearEmblem;
+  final bool hasCape;
 
   const SkinDefinition({
     required this.id,
@@ -25,6 +32,13 @@ class SkinDefinition {
     required this.robeColor,
     required this.trimColor,
     required this.eyeColor,
+    this.hasAntenna = false,
+    this.hasScarf = false,
+    this.hasWizardHat = false,
+    this.hasCrown = false,
+    this.hasVisor = false,
+    this.hasGearEmblem = false,
+    this.hasCape = false,
   });
 
   Color get color {
@@ -78,6 +92,7 @@ class SkinTierManager {
       robeColor: Color(0xFF1565C0),
       trimColor: Color(0xFF42A5F5),
       eyeColor: Color(0xFF42A5F5),
+      hasAntenna: true,
     ),
     SkinDefinition(
       id: 'ninja',
@@ -89,6 +104,7 @@ class SkinTierManager {
       robeColor: Color(0xFF6A1B9A),
       trimColor: Color(0xFFAB47BC),
       eyeColor: Color(0xFFCE93D8),
+      hasScarf: true,
     ),
     SkinDefinition(
       id: 'wizard',
@@ -100,6 +116,7 @@ class SkinTierManager {
       robeColor: Color(0xFF5D4037),
       trimColor: Color(0xFFFFB300),
       eyeColor: Color(0xFFFFB300),
+      hasWizardHat: true,
     ),
     SkinDefinition(
       id: 'golden',
@@ -111,6 +128,7 @@ class SkinTierManager {
       robeColor: Color(0xFFBF360C),
       trimColor: Color(0xFFFFD700),
       eyeColor: Color(0xFFFFD700),
+      hasCrown: true,
     ),
     // Reward skins (unlocked from dungeon rewards)
     SkinDefinition(
@@ -124,6 +142,7 @@ class SkinTierManager {
       robeColor: Color(0xFF1B5E20),
       trimColor: Color(0xFF00E676),
       eyeColor: Color(0xFF00E676),
+      hasVisor: true,
     ),
     SkinDefinition(
       id: 'engineer',
@@ -136,6 +155,7 @@ class SkinTierManager {
       robeColor: Color(0xFF311B92),
       trimColor: Color(0xFF7C4DFF),
       eyeColor: Color(0xFFB388FF),
+      hasGearEmblem: true,
     ),
     SkinDefinition(
       id: 'grandmaster',
@@ -148,6 +168,7 @@ class SkinTierManager {
       robeColor: Color(0xFFF57F17),
       trimColor: Color(0xFFFFD700),
       eyeColor: Color(0xFFFFEB3B),
+      hasCape: true,
     ),
   ];
 

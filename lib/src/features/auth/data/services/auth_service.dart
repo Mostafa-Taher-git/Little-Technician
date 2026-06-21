@@ -166,6 +166,19 @@ class AuthService {
     return true;
   }
 
+  /// Delete a user completely — removes from users list, clears per-user prefs, clears session
+  static Future<void> deleteUser(int userId) async {
+    final users = await _loadUsers();
+    users.removeWhere((u) => u.id == userId);
+    await _saveUsers(users);
+    final prefs = await _prefs;
+    await prefs.remove('lt_solved_problems_$userId');
+    await prefs.remove('lt_saved_solutions_$userId');
+    await prefs.remove('device_filter_$userId');
+    await prefs.remove(_sessionKey);
+    await prefs.remove('${_sessionKey}_id');
+  }
+
   /// Reset all users for testing - call this to start fresh
   static Future<void> resetAllUsers() async {
     final prefs = await _prefs;

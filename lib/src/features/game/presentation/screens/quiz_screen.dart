@@ -750,6 +750,216 @@ class _QuizScreenState extends State<QuizScreen> {
         'explanation': 'Most smart home apps let you run automations manually and show an activity log to confirm each step executed.',
       },
     ],
+    'networking_dns_lookup_failing': [
+      {
+        'question': 'What command flushes the DNS cache on Windows?',
+        'options': ['ipconfig /flushdns', 'netsh winsock reset', 'ping 8.8.8.8', 'tracert google.com'],
+        'correct': 0,
+        'explanation': 'ipconfig /flushdns clears the local DNS resolver cache, forcing the system to re-query DNS servers.',
+      },
+      {
+        'question': 'Which public DNS server is operated by Cloudflare?',
+        'options': ['1.1.1.1', '8.8.8.8', '4.2.2.1', '192.168.1.1'],
+        'correct': 0,
+        'explanation': 'Cloudflare operates 1.1.1.1 as a fast, privacy-focused public DNS resolver.',
+      },
+    ],
+    'networking_dhcp_not_assigning_ip': [
+      {
+        'question': 'What command forces a device to request a new IP from DHCP?',
+        'options': ['ipconfig /renew', 'ipconfig /flushdns', 'ping -t 192.168.1.1', 'netstat -an'],
+        'correct': 0,
+        'explanation': 'ipconfig /renew sends a DHCP request to obtain a new IP address from the DHCP server.',
+      },
+      {
+        'question': 'What can cause DHCP to run out of IP addresses to assign?',
+        'options': ['The DHCP scope range is too small for all devices', 'The DNS server is down', 'The firewall is blocking HTTP', 'The printer is offline'],
+        'correct': 0,
+        'explanation': 'If the DHCP scope has fewer addresses than devices on the network, some devices cannot get an IP.',
+      },
+    ],
+    'networking_vpn_tunnel_drops': [
+      {
+        'question': 'Which VPN protocol is known for speed and modern security?',
+        'options': ['WireGuard', 'PPTP', 'L2TP without IPsec', 'SSTP'],
+        'correct': 0,
+        'explanation': 'WireGuard is a lightweight, fast VPN protocol with strong encryption and minimal codebase.',
+      },
+      {
+        'question': 'What setting helps prevent VPN tunnels from dropping on unstable connections?',
+        'options': ['Keep-alive or dead peer detection', 'MTU set to 1500', 'DNS set to automatic', 'Proxy enabled'],
+        'correct': 0,
+        'explanation': 'Keep-alive packets maintain the tunnel by detecting when the peer is still reachable.',
+      },
+    ],
+    'networking_port_scan_detected': [
+      {
+        'question': 'What tool is commonly used to detect port scans on a network?',
+        'options': ['Intrusion Detection System (IDS)', 'Disk Cleanup', 'Task Manager', 'Event Viewer'],
+        'correct': 0,
+        'explanation': 'An IDS monitors network traffic patterns and alerts when it detects port scanning behavior.',
+      },
+      {
+        'question': 'What is the first step when a port scan is detected?',
+        'options': ['Block the source IP in the firewall', 'Restart the printer', 'Reinstall Windows', 'Buy a new router'],
+        'correct': 0,
+        'explanation': 'Blocking the scanning IP immediately stops the reconnaissance and protects exposed services.',
+      },
+    ],
+    'networking_firewall_rule_corruption': [
+      {
+        'question': 'What command resets Windows Firewall to its default state?',
+        'options': ['netsh advfirewall reset', 'ipconfig /flushdns', 'sfc /scannow', 'ping localhost'],
+        'correct': 0,
+        'explanation': 'netsh advfirewall reset removes all custom rules and restores the default firewall configuration.',
+      },
+      {
+        'question': 'Why should you export firewall rules before making changes?',
+        'options': ['To restore them if the new configuration causes problems', 'To share them on social media', 'To sell them online', 'To print them for decoration'],
+        'correct': 0,
+        'explanation': 'Having a backup lets you quickly revert to a known-good state if the new rules break connectivity.',
+      },
+    ],
+    'networking_nat_translation_error': [
+      {
+        'question': 'What does NAT stand for in networking?',
+        'options': ['Network Address Translation', 'Network Access Terminal', 'Node Authorization Table', 'Network Adapter Type'],
+        'correct': 0,
+        'explanation': 'NAT translates private IP addresses to a public IP, allowing multiple devices to share one internet connection.',
+      },
+      {
+        'question': 'What can cause NAT translations to fail?',
+        'options': ['A full NAT table due to too many connections', 'Low printer ink', 'A dirty monitor', 'Weak Wi-Fi signal'],
+        'correct': 0,
+        'explanation': 'When the NAT table is full, new connection attempts cannot be translated and are dropped.',
+      },
+    ],
+    'networking_bandwidth_being_drained': [
+      {
+        'question': 'What tool captures and analyzes network traffic to find bandwidth hogs?',
+        'options': ['Wireshark', 'Disk Cleanup', 'Paint', 'Calculator'],
+        'correct': 0,
+        'explanation': 'Wireshark captures packet-level data showing exactly which applications and IPs are consuming bandwidth.',
+      },
+      {
+        'question': 'What router feature lets you prioritize certain types of traffic?',
+        'options': ['Quality of Service (QoS)', 'NAT', 'DHCP', 'DNS'],
+        'correct': 0,
+        'explanation': 'QoS allows you to allocate bandwidth to critical traffic like VoIP or video over less important traffic.',
+      },
+    ],
+    'networking_routing_loop_detected': [
+      {
+        'question': 'What symptom indicates a routing loop in a network?',
+        'options': ['Packets keep circling and TTL expires', 'Printers stop working', 'Monitors flicker', 'Keyboards lock up'],
+        'correct': 0,
+        'explanation': 'In a routing loop, packets circulate between routers until the TTL counter reaches zero and they are discarded.',
+      },
+      {
+        'question': 'What protocol prevents switching loops in a LAN?',
+        'options': ['Spanning Tree Protocol (STP)', 'DHCP', 'NAT', 'FTP'],
+        'correct': 0,
+        'explanation': 'STP detects and blocks redundant paths in a switched network to prevent broadcast storms.',
+      },
+    ],
+    'networking_wifi_signal_disappearing': [
+      {
+        'question': 'What causes Wi-Fi signal to drop in a busy office?',
+        'options': ['Channel interference from neighboring access points', 'The keyboard is broken', 'The printer is offline', 'The monitor is too dim'],
+        'correct': 0,
+        'explanation': 'Multiple access points on overlapping channels cause interference that degrades Wi-Fi signal strength.',
+      },
+      {
+        'question': 'Which Wi-Fi band typically has less interference from other devices?',
+        'options': ['5 GHz', '2.4 GHz', 'Both are equal', 'Bluetooth band'],
+        'correct': 0,
+        'explanation': 'The 5 GHz band has more channels and fewer non-Wi-Fi devices competing for airtime.',
+      },
+    ],
+    'networking_bgp_route_hijacked': [
+      {
+        'question': 'What is BGP route hijacking?',
+        'options': ['Unauthorized announcement of IP prefixes to divert internet traffic', 'A virus that deletes routing tables', 'A physical cable being cut', 'A DNS server going offline'],
+        'correct': 0,
+        'explanation': 'BGP hijacking occurs when an autonomous system announces prefixes it does not own, redirecting traffic.',
+      },
+      {
+        'question': 'What technology validates BGP route origins to prevent hijacking?',
+        'options': ['RPKI (Resource Public Key Infrastructure)', 'DHCP', 'NAT', 'FTP'],
+        'correct': 0,
+        'explanation': 'RPKI uses cryptographic certificates to verify that an AS is authorized to announce a given prefix.',
+      },
+    ],
+    'networking_iot_botnet_infection': [
+      {
+        'question': 'What is the first step when you suspect an IoT device is in a botnet?',
+        'options': ['Isolate it from the network immediately', 'Reboot your computer', 'Buy a new router', 'Change the wallpaper'],
+        'correct': 0,
+        'explanation': 'Isolating the device stops it from attacking others or communicating with the command-and-control server.',
+      },
+      {
+        'question': 'What prevents IoT devices from being recruited into botnets?',
+        'options': ['Change default passwords and keep firmware updated', 'Use a brighter monitor', 'Buy more RAM', 'Restart the printer'],
+        'correct': 0,
+        'explanation': 'Default credentials and unpatched firmware are the primary ways IoT botnets recruit new devices.',
+      },
+    ],
+    'networking_protocol_stack_corruption': [
+      {
+        'question': 'What command resets the TCP/IP stack on Windows?',
+        'options': ['netsh int ip reset', 'ipconfig /flushdns', 'sfc /scannow', 'chkdsk /f'],
+        'correct': 0,
+        'explanation': 'netsh int ip reset rewrites TCP/IP registry keys to fix corruption in the protocol stack.',
+      },
+      {
+        'question': 'What command resets the Winsock catalog?',
+        'options': ['netsh winsock reset', 'ipconfig /renew', 'ping localhost', 'tracert google.com'],
+        'correct': 0,
+        'explanation': 'Winsock reset restores the network programming interface to its default state after malware or corruption.',
+      },
+    ],
+    'networking_network_total_lockdown': [
+      {
+        'question': 'What is the first step when the entire network is locked down?',
+        'options': ['Check physical connections — cables, switches, and patch panels', 'Buy new monitors', 'Reinstall Windows', 'Replace all keyboards'],
+        'correct': 0,
+        'explanation': 'Physical layer issues like disconnected cables or faulty switches cause total network outages.',
+      },
+      {
+        'question': 'What protocol prevents loops that can lock down a switched network?',
+        'options': ['Spanning Tree Protocol (STP)', 'DHCP', 'NAT', 'DNS'],
+        'correct': 0,
+        'explanation': 'STP detects redundant links and places blocking states on ports to prevent switching loops.',
+      },
+    ],
+    'networking_switch_loop_detected': [
+      {
+        'question': 'What symptom indicates a switch loop?',
+        'options': ['Broadcast storms and high CPU usage on switches', 'Printer offline', 'Monitor flicker', 'Low battery'],
+        'correct': 0,
+        'explanation': 'A switch loop multiplies broadcast frames exponentially, causing storms that overwhelm switch resources.',
+      },
+      {
+        'question': 'What feature limits the number of MAC addresses per switch port?',
+        'options': ['Port security', 'QoS', 'NAT', 'DHCP'],
+        'correct': 0,
+        'explanation': 'Port security prevents rogue devices and loops by limiting how many MAC addresses can be learned on a port.',
+      },
+    ],
+    'networking_cable_certification_failed': [
+      {
+        'question': 'What tool tests whether a network cable meets its category rating?',
+        'options': ['Cable certifier', 'Speed test website', 'Task Manager', 'Disk Cleanup'],
+        'correct': 0,
+        'explanation': 'A cable certifier measures crosstalk, attenuation, and impedance to verify the cable meets standards.',
+      },
+      {
+        'question': 'Which cable termination standard is commonly used for Ethernet?',
+        'options': ['T568A or T568B', 'RS-232', 'USB-C', 'HDMI'],
+        'correct': 0,
+        'explanation': 'T568A and T568B define the wire color order for RJ45 connectors used in Ethernet cabling.',
+      },
+    ],
   };
 
   List<Map<String, dynamic>> get _levelQuestions {

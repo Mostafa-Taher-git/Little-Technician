@@ -22,7 +22,13 @@ class GameRepository {
   Future<PlayerProgress> getOrCreateProgress(int userId) async {
     final existing = await loadProgress(userId);
     if (existing != null) return existing;
-    final progress = PlayerProgress()..userId = userId;
+    final progress = PlayerProgress()
+      ..userId = userId
+      ..activeSkinId = null
+      ..activeFrameId = null
+      ..themeId = null
+      ..unlockedSkinIds = ['default']
+      ..earnedRewardIds = ['skin_default'];
     await _isar.writeTxn(() async {
       await _isar.playerProgress.put(progress);
     });
@@ -34,6 +40,15 @@ class GameRepository {
     await _isar.writeTxn(() async {
       await _isar.playerProgress.put(progress);
     });
+  }
+
+  Future<void> deleteProgress(int userId) async {
+    final progress = await loadProgress(userId);
+    if (progress != null) {
+      await _isar.writeTxn(() async {
+        await _isar.playerProgress.delete(progress.id);
+      });
+    }
   }
 
   Future<void> addPoints(PlayerProgress progress, int points) async {
@@ -77,9 +92,12 @@ class GameRepository {
     await saveProgress(progress);
   }
 
-  Future<void> defeatBoss(PlayerProgress progress) async {
+  Future<void> defeatBoss(PlayerProgress progress, {String? bossId}) async {
     progress.bossesDefeated++;
     progress.extraSupTechUses++;
+    if (bossId != null && !progress.defeatedBossIds.contains(bossId)) {
+      progress.defeatedBossIds.add(bossId);
+    }
     await saveProgress(progress);
   }
 
@@ -171,14 +189,24 @@ class GameRepository {
       ..points = 99999
       ..completedCategoryIds = List<String>.from(CategoryManager.all.map((c) => c.id))
       ..completedLevelIds = List<String>.from(
-        CategoryManager.all.expand((c) => c.problemKeys.map((p) => GameData.levelId(c.id, p)))
+        CategoryManager.all.expand((c) => c.bosses.asMap().entries.map(
+          (e) => '${c.id}_boss_${e.key + 1}',
+        ).followedBy(
+          c.problemKeys.map((p) => GameData.levelId(c.id, p)),
+        ))
       )
       ..completedWorldIds = List<int>.generate(CategoryManager.all.length, (i) => i)
       ..earnedRewardIds = List<String>.from(RewardPool.all.map((r) => r.id))
       ..unlockedSkinIds = List<String>.from(SkinTierManager.skins.map((s) => s.id))
       ..purchasedItemIds = List<String>.from(RewardPool.all.where((r) => r.type != RewardType.skin).map((r) => r.id))
-      ..levelsCleared = CategoryManager.all.length * 5
-      ..bossesDefeated = CategoryManager.all.length
+      ..levelsCleared = CategoryManager.all.length * 29
+      ..bossesDefeated = CategoryManager.all.length * 14
+      ..defeatedBossIds = List<String>.from(
+        CategoryManager.all.expand((c) => c.bosses.map((b) => b.id))
+      )
+      ..activeSkinId = null
+      ..activeFrameId = null
+      ..themeId = null
       ..supTechUsesThisLevel = 3
       ..extraSupTechUses = 999;
 

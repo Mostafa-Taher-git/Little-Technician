@@ -19,6 +19,7 @@ class GameState {
   final bool isBossMode;
   final String? hintText;
   final int pointsMultiplier;
+  final BossEncounterDef? currentBoss;
 
   const GameState({
     required this.progress,
@@ -31,6 +32,7 @@ class GameState {
     this.isBossMode = false,
     this.hintText,
     this.pointsMultiplier = 1,
+    this.currentBoss,
   });
 
   GameState copyWith({
@@ -44,6 +46,7 @@ class GameState {
     bool? isBossMode,
     String? hintText,
     int? pointsMultiplier,
+    BossEncounterDef? currentBoss,
   }) {
     return GameState(
       progress: progress ?? this.progress,
@@ -56,6 +59,7 @@ class GameState {
       isBossMode: isBossMode ?? this.isBossMode,
       hintText: hintText ?? this.hintText,
       pointsMultiplier: pointsMultiplier ?? this.pointsMultiplier,
+      currentBoss: currentBoss ?? this.currentBoss,
     );
   }
 
@@ -156,13 +160,11 @@ class GameCubit extends Cubit<GameState> {
     emit(state.copyWith(progress: p));
   }
 
-  void startBoss() {
-    final world = state.currentWorld;
-    if (world == null) return;
-    final boss = world.boss;
+  void startBoss(BossEncounterDef boss) {
     emit(state.copyWith(
       isBossMode: true,
       currentBossHp: boss.hp * state.bossHpMultiplier,
+      currentBoss: boss,
       hintText: null,
     ));
   }
@@ -265,11 +267,10 @@ class GameCubit extends Cubit<GameState> {
   }
 
   void _defeatBoss(PlayerProgress progress) {
-    final world = state.currentWorld;
-    if (world == null) return;
-    final boss = world.boss;
-    _safePersist(() => _repository.addPoints(progress, boss.points * state.pointsMultiplier));
-    _safePersist(() => _repository.defeatBoss(progress));
+    final boss = state.currentBoss;
+    final bossPoints = boss?.points ?? state.currentWorld?.boss.points ?? 500;
+    _safePersist(() => _repository.addPoints(progress, bossPoints * state.pointsMultiplier));
+    _safePersist(() => _repository.defeatBoss(progress, bossId: boss?.id));
     _safePersist(() => _repository.recordPlayDate(progress));
 
     RewardDef? reward;
@@ -478,5 +479,10 @@ class GameCubit extends Cubit<GameState> {
   Future<void> unlockEverything() async {
     final progress = await _repository.createTestProgress(_userId);
     emit(GameState(progress: progress, currentWorld: state.currentWorld));
+  }
+
+  Future<void> terminateAccount() async {
+    await _repository.deleteProgress(_userId);
+    emit(GameState(progress: PlayerProgress()..userId = _userId));
   }
 }
