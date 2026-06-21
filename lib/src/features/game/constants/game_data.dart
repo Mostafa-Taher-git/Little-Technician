@@ -57,13 +57,15 @@ class BossEncounterDef {
   final int hp;
   final int points;
   final int visualType;
-  final List<String> abilities;
+  final List<Map<String, dynamic>> abilities;
   final Map<String, dynamic> diagnosis;
   final List<Map<String, dynamic>> strategies;
   final int armor;
   final int challengeRating;
   final String bossKey;
   final DifficultyLevel difficulty;
+  final String introText;
+  final String phaseShiftText;
 
   const BossEncounterDef({
     required this.id,
@@ -79,6 +81,8 @@ class BossEncounterDef {
     required this.challengeRating,
     required this.bossKey,
     this.difficulty = DifficultyLevel.medium,
+    this.introText = '',
+    this.phaseShiftText = '',
   });
 }
 

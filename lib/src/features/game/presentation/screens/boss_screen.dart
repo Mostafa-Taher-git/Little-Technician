@@ -579,6 +579,22 @@ class _BossScreenState extends State<BossScreen>
                         ),
                       ),
                     ).animate().fadeIn(delay: 400.ms),
+                    if (boss.introText.isNotEmpty) ...[
+                      const Gap(12),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 32),
+                        child: Text(
+                          boss.introText,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Colors.white.withValues(alpha: 0.7),
+                            fontSize: 12,
+                            fontStyle: FontStyle.italic,
+                            height: 1.4,
+                          ),
+                        ),
+                      ).animate().fadeIn(delay: 600.ms).slideY(begin: 0.05),
+                    ],
                     const Gap(24),
                     _HitDiceBar(
                       hpLeft: hpLeft,
@@ -594,6 +610,31 @@ class _BossScreenState extends State<BossScreen>
                       challengeRating: boss.challengeRating,
                       difficulty: boss.difficulty,
                     ).animate().fadeIn(delay: 700.ms).slideY(begin: 0.1),
+                    if (!isDefeated && boss.phaseShiftText.isNotEmpty && hpLeft <= (boss.hp / 2).ceil()) ...[
+                      const Gap(12),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 32),
+                        child: Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.red.withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: Colors.red.withValues(alpha: 0.3)),
+                          ),
+                          child: Text(
+                            boss.phaseShiftText,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: Colors.red.shade200,
+                              fontSize: 12,
+                              fontStyle: FontStyle.italic,
+                              height: 1.4,
+                            ),
+                          ),
+                        ),
+                      ).animate().fadeIn().slideY(begin: 0.1),
+                    ],
                     const Gap(24),
                     Padding(
                       padding: const EdgeInsets.fromLTRB(24, 0, 24, 32),
@@ -743,7 +784,7 @@ class _HitDiceBar extends StatelessWidget {
 class _MonsterStatBlock extends StatelessWidget {
   final int armorClass;
   final String hpDisplay;
-  final List<String> abilities;
+  final List<Map<String, dynamic>> abilities;
   final bool isDefeated;
   final int challengeRating;
   final DifficultyLevel difficulty;
@@ -827,14 +868,31 @@ class _MonsterStatBlock extends StatelessWidget {
           ...abilities.map((a) => Padding(
                 padding: const EdgeInsets.only(bottom: 4),
                 child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Icon(Icons.circle, size: 4, color: Colors.white.withValues(alpha: 0.3)),
                     const Gap(8),
-                    Text(
-                      a,
-                      style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.6),
-                        fontSize: 12,
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            a['name'] as String,
+                            style: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.8),
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          if (a['description'] != null && (a['description'] as String).isNotEmpty)
+                            Text(
+                              a['description'] as String,
+                              style: TextStyle(
+                                color: Colors.white.withValues(alpha: 0.4),
+                                fontSize: 10,
+                              ),
+                            ),
+                        ],
                       ),
                     ),
                   ],
