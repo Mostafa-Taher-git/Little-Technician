@@ -77,7 +77,15 @@ class _LoginScreenState extends State<LoginScreen> {
                             color: Colors.white.withValues(alpha: 0.08),
                             borderRadius: BorderRadius.circular(24),
                           ),
-                          child: const Icon(Icons.build_circle_rounded, size: 56, color: AppColors.accent),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(16),
+                            child: Image.asset(
+                              'assets/icon/icon.png',
+                              width: 56,
+                              height: 56,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
                         ),
                       ).animate().scale(duration: 500.ms, curve: Curves.easeOutBack),
                       const Gap(20),

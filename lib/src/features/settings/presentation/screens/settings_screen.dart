@@ -238,7 +238,15 @@ class SettingsScreen extends StatelessWidget {
                 color: scheme.surface,
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: const Icon(Icons.build_circle_rounded, color: Colors.white70, size: 20),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(6),
+                child: Image.asset(
+                  'assets/icon/icon.png',
+                  width: 20,
+                  height: 20,
+                  fit: BoxFit.cover,
+                ),
+              ),
             ),
             const Gap(10),
             const Text('LittleTech'),

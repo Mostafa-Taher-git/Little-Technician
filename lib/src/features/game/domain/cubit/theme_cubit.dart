@@ -34,28 +34,28 @@ class ThemeCubit extends Cubit<ThemeData> {
         useMaterial3: true,
         brightness: Brightness.light,
         colorScheme: const ColorScheme.light(
-          primary: Color(0xFF000000),
+          primary: Color(0xFF4A9BA8),
           onPrimary: Color(0xFFFFFFFF),
-          secondary: Color(0xFFF59E0B),
-          onSecondary: Color(0xFF1A1A1A),
-          tertiary: Color(0xFF3B82F6),
+          secondary: Color(0xFFE8C840),
+          onSecondary: Color(0xFF1A3A3E),
+          tertiary: Color(0xFF80E0E0),
           surface: Color(0xFFFFFFFF),
-          onSurface: Color(0xFF1A1A1A),
+          onSurface: Color(0xFF1A3A3E),
           error: Color(0xFFEF4444),
-          outline: Color(0xFFE5E7EB),
+          outline: Color(0xFFB8D8DC),
           shadow: Color(0xFF000000),
         ),
         textTheme: GoogleFonts.interTextTheme(),
-        scaffoldBackgroundColor: const Color(0xFFF5F5F5),
+        scaffoldBackgroundColor: const Color(0xFFE8F4F6),
         appBarTheme: AppBarTheme(
           backgroundColor: const Color(0xFFFFFFFF),
-          foregroundColor: const Color(0xFF1A1A1A),
+          foregroundColor: const Color(0xFF1A3A3E),
           elevation: 0,
           centerTitle: false,
           titleTextStyle: GoogleFonts.inter(
             fontSize: 20,
             fontWeight: FontWeight.w700,
-            color: const Color(0xFF1A1A1A),
+            color: const Color(0xFF1A3A3E),
           ),
         ),
         cardTheme: CardThemeData(
@@ -63,12 +63,12 @@ class ThemeCubit extends Cubit<ThemeData> {
           elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
-            side: const BorderSide(color: Color(0xFFE5E7EB)),
+            side: const BorderSide(color: Color(0xFFB8D8DC)),
           ),
         ),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF000000),
+            backgroundColor: const Color(0xFF4A9BA8),
             foregroundColor: const Color(0xFFFFFFFF),
             elevation: 0,
             padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 32),
@@ -83,8 +83,8 @@ class ThemeCubit extends Cubit<ThemeData> {
         ),
         outlinedButtonTheme: OutlinedButtonThemeData(
           style: OutlinedButton.styleFrom(
-            foregroundColor: const Color(0xFF1A1A1A),
-            side: const BorderSide(color: Color(0xFFE5E7EB)),
+            foregroundColor: const Color(0xFF1A3A3E),
+            side: const BorderSide(color: Color(0xFFB8D8DC)),
             padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 32),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(14),
@@ -102,15 +102,15 @@ class ThemeCubit extends Cubit<ThemeData> {
           contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 20),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(14),
-            borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+            borderSide: const BorderSide(color: Color(0xFFB8D8DC)),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(14),
-            borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+            borderSide: const BorderSide(color: Color(0xFFB8D8DC)),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(14),
-            borderSide: const BorderSide(color: Color(0xFF000000), width: 2),
+            borderSide: const BorderSide(color: Color(0xFF4A9BA8), width: 2),
           ),
         ),
       );
