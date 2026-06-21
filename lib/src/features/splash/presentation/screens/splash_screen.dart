@@ -50,7 +50,15 @@ class _SplashScreenState extends State<SplashScreen> {
                 color: Colors.white.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(30),
               ),
-              child: const Icon(Icons.build_circle_rounded, size: 80, color: AppColors.accent),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(20),
+                child: Image.asset(
+                  'assets/icon/icon.png',
+                  width: 80,
+                  height: 80,
+                  fit: BoxFit.cover,
+                ),
+              ),
             ).animate().scale(duration: 600.ms, curve: Curves.easeOutBack),
             const Gap(24),
             Animate(
