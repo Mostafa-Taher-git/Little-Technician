@@ -74,15 +74,6 @@ class AuthService {
       }
       await prefs.remove('lt_saved_solutions');
     }
-
-    final oldFilter = prefs.getString('device_filter');
-    if (oldFilter != null) {
-      final newKey = 'device_filter_$userId';
-      if (prefs.getString(newKey) == null) {
-        await prefs.setString(newKey, oldFilter);
-      }
-      await prefs.remove('device_filter');
-    }
   }
 
   // ── Public API ─────────────────────────────────────────────────────────────
@@ -174,7 +165,6 @@ class AuthService {
     final prefs = await _prefs;
     await prefs.remove('lt_solved_problems_$userId');
     await prefs.remove('lt_saved_solutions_$userId');
-    await prefs.remove('device_filter_$userId');
     await prefs.remove(_sessionKey);
     await prefs.remove('${_sessionKey}_id');
   }
