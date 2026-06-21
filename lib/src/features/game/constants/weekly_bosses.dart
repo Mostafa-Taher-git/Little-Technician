@@ -1,7 +1,7 @@
 import 'package:littletech/src/features/game/constants/game_data.dart';
 
 class WeeklyBossManager {
-  static final List<BossEncounterDef> _bosses = [
+  static const List<BossEncounterDef> _bosses = [
     BossEncounterDef(
       id: 'weekly_boss_1',
       name: 'The Cache Titan',
