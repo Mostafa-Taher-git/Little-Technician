@@ -71,21 +71,11 @@ class _LoginScreenState extends State<LoginScreen> {
                       const Gap(20),
                       // Logo
                       Center(
-                        child: Container(
-                          padding: const EdgeInsets.all(20),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.08),
-                            borderRadius: BorderRadius.circular(24),
-                          ),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(16),
-                            child: Image.asset(
-                              'assets/icon/icon.png',
-                              width: 56,
-                              height: 56,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
+                        child: Image.asset(
+                          'assets/icon/icon.png',
+                          width: 56,
+                          height: 56,
+                          fit: BoxFit.cover,
                         ),
                       ).animate().scale(duration: 500.ms, curve: Curves.easeOutBack),
                       const Gap(20),

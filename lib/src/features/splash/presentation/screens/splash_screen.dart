@@ -44,21 +44,11 @@ class _SplashScreenState extends State<SplashScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.08),
-                borderRadius: BorderRadius.circular(30),
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(20),
-                child: Image.asset(
-                  'assets/icon/icon.png',
-                  width: 80,
-                  height: 80,
-                  fit: BoxFit.cover,
-                ),
-              ),
+            Image.asset(
+              'assets/icon/icon.png',
+              width: 80,
+              height: 80,
+              fit: BoxFit.cover,
             ).animate().scale(duration: 600.ms, curve: Curves.easeOutBack),
             const Gap(24),
             Animate(
