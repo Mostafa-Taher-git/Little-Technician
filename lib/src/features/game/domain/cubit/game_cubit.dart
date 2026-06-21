@@ -2,11 +2,13 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:littletech/src/features/auth/data/services/auth_service.dart';
+import 'package:littletech/src/features/game/constants/achievements.dart';
 import 'package:littletech/src/features/game/constants/game_data.dart';
 import 'package:littletech/src/features/game/constants/reward_pool.dart';
 import 'package:littletech/src/features/game/constants/skin_tiers.dart';
 import 'package:littletech/src/features/game/data/models/player_progress.dart';
 import 'package:littletech/src/features/game/data/repositories/game_repository.dart';
+import 'package:littletech/src/features/game/constants/streak_tracker.dart';
 
 class GameState {
   final PlayerProgress progress;
@@ -20,6 +22,7 @@ class GameState {
   final String? hintText;
   final int pointsMultiplier;
   final BossEncounterDef? currentBoss;
+  final List<Achievement> newlyUnlockedAchievements;
 
   const GameState({
     required this.progress,
@@ -33,6 +36,7 @@ class GameState {
     this.hintText,
     this.pointsMultiplier = 1,
     this.currentBoss,
+    this.newlyUnlockedAchievements = const [],
   });
 
   GameState copyWith({
@@ -47,6 +51,7 @@ class GameState {
     String? hintText,
     int? pointsMultiplier,
     BossEncounterDef? currentBoss,
+    List<Achievement>? newlyUnlockedAchievements,
   }) {
     return GameState(
       progress: progress ?? this.progress,
@@ -60,6 +65,7 @@ class GameState {
       hintText: hintText ?? this.hintText,
       pointsMultiplier: pointsMultiplier ?? this.pointsMultiplier,
       currentBoss: currentBoss ?? this.currentBoss,
+      newlyUnlockedAchievements: newlyUnlockedAchievements ?? this.newlyUnlockedAchievements,
     );
   }
 
@@ -99,7 +105,11 @@ class GameCubit extends Cubit<GameState> {
         world = GameData.worlds.first;
       }
       _checkAndUnlockProgressionSkins();
-      emit(GameState(progress: progress, currentWorld: world));
+      final pending = progress.pendingAchievementIds
+          .map((id) => AchievementManager.all.firstWhere((a) => a.id == id))
+          .toList();
+      _safePersist(() => _repository.clearPendingAchievements(progress));
+      emit(GameState(progress: progress, currentWorld: world, newlyUnlockedAchievements: pending));
     } catch (e, st) {
       debugPrint('loadGame failed: $e\n$st');
     }
@@ -122,6 +132,13 @@ class GameCubit extends Cubit<GameState> {
   void completeDailyQuest() {
     final progress = state.progress;
     progress.setDailyQuestCompleted();
+    _safePersist(() => _repository.saveProgress(progress));
+    emit(state.copyWith(progress: progress));
+  }
+
+  void completeWeeklyBoss() {
+    final progress = state.progress;
+    progress.setWeeklyBossCompleted();
     _safePersist(() => _repository.saveProgress(progress));
     emit(state.copyWith(progress: progress));
   }
@@ -243,6 +260,7 @@ class GameCubit extends Cubit<GameState> {
     }
     
     _checkAndUnlockProgressionSkins();
+    final newAchievements = _checkAchievements();
 
     emit(state.copyWith(
       progress: progress,
@@ -250,6 +268,7 @@ class GameCubit extends Cubit<GameState> {
       lastDrawnReward: reward,
       hintText: null,
       pointsMultiplier: 1,
+      newlyUnlockedAchievements: newAchievements,
     ));
   }
 
@@ -273,6 +292,10 @@ class GameCubit extends Cubit<GameState> {
     _safePersist(() => _repository.defeatBoss(progress, bossId: boss?.id));
     _safePersist(() => _repository.recordPlayDate(progress));
 
+    if (boss?.id.startsWith('weekly_') == true) {
+      _safePersist(() => _repository.saveProgress(progress..setWeeklyBossCompleted()));
+    }
+
     RewardDef? reward;
     try {
       reward = RewardPool.draw();
@@ -285,12 +308,14 @@ class GameCubit extends Cubit<GameState> {
     }
 
     _checkAndUnlockProgressionSkins();
+    final newAchievements = _checkAchievements();
 
     emit(state.copyWith(
       progress: progress,
       currentBossHp: 0,
       lastDrawnReward: reward,
       pointsMultiplier: 1,
+      newlyUnlockedAchievements: newAchievements,
     ));
   }
 
@@ -426,6 +451,27 @@ class GameCubit extends Cubit<GameState> {
     if (changed) {
       _safePersist(() => _repository.saveProgress(progress));
     }
+  }
+
+  List<Achievement> _checkAchievements() {
+    final progress = state.progress;
+    final catsDone = progress.completedCategoryIds.length;
+    final newAchievements = AchievementManager.checkNew(
+      levelsCleared: progress.levelsCleared,
+      bossesDefeated: progress.bossesDefeated,
+      points: progress.points,
+      rewardsEarned: progress.earnedRewardIds.length,
+      streak: StreakTracker.calculateStreak(progress.playDates),
+      categoriesCompleted: catsDone,
+      alreadyUnlockedIds: progress.unlockedAchievementIds,
+    );
+    for (final a in newAchievements) {
+      _safePersist(() => _repository.unlockAchievement(progress, a.id));
+      for (final reward in a.rewards) {
+        _safePersist(() => _repository.unlockRewardFromAchievement(progress, reward.rewardId));
+      }
+    }
+    return newAchievements;
   }
 
   Future<void> setActiveSkin(String? skinId) async {

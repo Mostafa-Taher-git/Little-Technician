@@ -136,9 +136,15 @@ class HomeScreen extends StatelessWidget {
               const Gap(20),
 
               // Challenge banner
-              ChallengeBanner(
-                onDailyTap: () => Nav.push(context, const ChallengeScreen()),
-                onWeeklyTap: () => Nav.push(context, const ChallengeScreen()),
+              BlocBuilder<GameCubit, GameState>(
+                builder: (_, state) {
+                  final streak = StreakTracker.calculateStreak(state.progress.playDates);
+                  return ChallengeBanner(
+                    streak: streak,
+                    onDailyTap: () => Nav.push(context, const ChallengeScreen()),
+                    onWeeklyTap: () => Nav.push(context, const ChallengeScreen()),
+                  );
+                },
               ),
               const Gap(24),
 

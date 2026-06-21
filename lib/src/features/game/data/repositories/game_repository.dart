@@ -1,5 +1,6 @@
 import 'package:isar/isar.dart';
 import 'package:littletech/src/core/constants/category_manager.dart';
+import 'package:littletech/src/features/game/constants/achievements.dart';
 import 'package:littletech/src/features/game/constants/game_data.dart';
 import 'package:littletech/src/features/game/constants/reward_pool.dart';
 import 'package:littletech/src/features/game/constants/skin_tiers.dart';
@@ -156,6 +157,34 @@ class GameRepository {
     await saveProgress(progress);
   }
 
+  Future<void> unlockAchievement(PlayerProgress progress, String achievementId) async {
+    if (!progress.unlockedAchievementIds.contains(achievementId)) {
+      progress.unlockedAchievementIds.add(achievementId);
+    }
+    if (!progress.pendingAchievementIds.contains(achievementId)) {
+      progress.pendingAchievementIds.add(achievementId);
+    }
+    await saveProgress(progress);
+  }
+
+  Future<void> unlockRewardFromAchievement(PlayerProgress progress, String rewardId) async {
+    if (!progress.earnedRewardIds.contains(rewardId)) {
+      progress.earnedRewardIds.add(rewardId);
+    }
+    final reward = RewardPool.byId(rewardId);
+    if (reward != null && reward.type == RewardType.skin) {
+      if (!progress.unlockedSkinIds.contains(reward.value)) {
+        progress.unlockedSkinIds.add(reward.value);
+      }
+    }
+    await saveProgress(progress);
+  }
+
+  Future<void> clearPendingAchievements(PlayerProgress progress) async {
+    progress.pendingAchievementIds = [];
+    await saveProgress(progress);
+  }
+
   Future<void> cleanupOrphanedProgress(List<int> validUserIds) async {
     final allProgress = await _isar.playerProgress.where().findAll();
     for (final progress in allProgress) {
@@ -207,6 +236,8 @@ class GameRepository {
       ..activeSkinId = null
       ..activeFrameId = null
       ..themeId = null
+      ..unlockedAchievementIds = List<String>.from(AchievementManager.all.map((a) => a.id))
+      ..pendingAchievementIds = []
       ..supTechUsesThisLevel = 3
       ..extraSupTechUses = 999;
 

@@ -174,8 +174,9 @@ class _RewardSpinScreenState extends State<RewardSpinScreen>
   }
 
   void _navigateToComplete(BuildContext context) {
-    final world = context.read<GameCubit>().state.currentWorld;
-    final level = context.read<GameCubit>().state.currentLevel;
+    final cubit = context.read<GameCubit>();
+    final world = cubit.state.currentWorld;
+    final level = cubit.state.currentLevel;
     if (world != null && level != null) {
       Nav.pushReplacement(
         context,
@@ -183,6 +184,7 @@ class _RewardSpinScreenState extends State<RewardSpinScreen>
           world: world,
           level: level,
           reward: widget.reward,
+          newAchievements: cubit.state.newlyUnlockedAchievements,
         ),
       );
     } else {

@@ -1,22 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:littletech/src/core/constants/category_manager.dart';
 import 'package:littletech/src/features/game/constants/challenges.dart';
+import 'package:littletech/src/features/game/constants/weekly_bosses.dart';
 
 class ChallengeBanner extends StatelessWidget {
   final VoidCallback onDailyTap;
   final VoidCallback onWeeklyTap;
+  final int streak;
 
   const ChallengeBanner({
     super.key,
     required this.onDailyTap,
     required this.onWeeklyTap,
+    this.streak = 0,
   });
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final daily = ChallengeManager.getDailyChallenge();
+    final daily = ChallengeManager.getDailyChallenge(streak: streak);
     final weekly = ChallengeManager.getWeeklyBoss();
 
     return Container(
@@ -41,7 +43,7 @@ class ChallengeBanner extends StatelessWidget {
             iconColor: const Color(0xFFF59E0B),
             iconBgColor: const Color(0xFFF59E0B).withValues(alpha: 0.12),
             title: daily.title,
-            subtitle: '+${daily.bonusPoints} pts bonus',
+            subtitle: '${daily.pointsMultiplier}x pts bonus',
             subtitleColor: const Color(0xFFF59E0B),
             onTap: onDailyTap,
           ),
@@ -55,8 +57,8 @@ class ChallengeBanner extends StatelessWidget {
             icon: Icons.calendar_month_rounded,
             iconColor: const Color(0xFFEF4444),
             iconBgColor: const Color(0xFFEF4444).withValues(alpha: 0.1),
-            title: 'Weekly Raid: ${CategoryManager.byId(weekly.categoryId)?.name ?? 'Unknown'}',
-            subtitle: '+${weekly.bonusPoints} pts • ${weekly.specialRule}',
+            title: weekly.title,
+            subtitle: WeeklyBossManager.getCurrent().name,
             subtitleColor: scheme.onSurface.withValues(alpha: 0.5),
             onTap: onWeeklyTap,
           ),

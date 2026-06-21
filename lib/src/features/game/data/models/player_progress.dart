@@ -32,8 +32,11 @@ int points = 0;
    int totalPlayTimeSeconds = 0;
    int correctAnswers = 0;
    int totalAnswers = 0;
-   List<String> prepResults = [];  // "levelId\x01json" entries
-   DateTime? lastDailyQuestDate;  // Track daily quest completion
+    List<String> prepResults = [];  // "levelId\x01json" entries
+     DateTime? lastDailyQuestDate;  // Track daily quest completion
+     DateTime? lastWeeklyBossDate;  // Track weekly boss completion
+     List<String> unlockedAchievementIds = [];  // Persisted achievement unlocks
+    List<String> pendingAchievementIds = [];   // Temporary: newly unlocked, shown on Level Complete
 
   static const _sep = '\x01';
 
@@ -63,6 +66,8 @@ int points = 0;
     playDates = List<DateTime>.from(playDates);
     prepResults = List<String>.from(prepResults);
     purchasedItemIds = List<String>.from(purchasedItemIds);
+    unlockedAchievementIds = List<String>.from(unlockedAchievementIds);
+    pendingAchievementIds = List<String>.from(pendingAchievementIds);
   }
 
   bool getDailyQuestCompleted() {
@@ -76,5 +81,19 @@ int points = 0;
 
   void setDailyQuestCompleted() {
     lastDailyQuestDate = DateTime.now();
+  }
+
+  bool getWeeklyBossCompleted() {
+    if (lastWeeklyBossDate == null) return false;
+    final now = DateTime.now();
+    final monday = now.subtract(Duration(days: now.weekday - 1));
+    final weekStart = DateTime(monday.year, monday.month, monday.day);
+    final weekEnd = weekStart.add(const Duration(days: 7));
+    return lastWeeklyBossDate!.isAfter(weekStart.subtract(const Duration(seconds: 1))) &&
+        lastWeeklyBossDate!.isBefore(weekEnd);
+  }
+
+  void setWeeklyBossCompleted() {
+    lastWeeklyBossDate = DateTime.now();
   }
 }

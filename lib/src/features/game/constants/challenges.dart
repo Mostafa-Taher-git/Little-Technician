@@ -22,6 +22,8 @@ class DailyChallenge {
 
 class WeeklyBoss {
   final String categoryId;
+  final String title;
+  final String description;
   final int bonusPoints;
   final int pointsMultiplier;
   final DateTime weekStart;
@@ -29,6 +31,8 @@ class WeeklyBoss {
 
   const WeeklyBoss({
     required this.categoryId,
+    this.title = 'Weekly Boss',
+    this.description = 'harder problem, bigger reward',
     this.bonusPoints = 200,
     this.pointsMultiplier = 3,
     required this.weekStart,
@@ -37,7 +41,7 @@ class WeeklyBoss {
 }
 
 class ChallengeManager {
-  static DailyChallenge getDailyChallenge() {
+  static DailyChallenge getDailyChallenge({int streak = 0}) {
     final today = DateTime.now();
     final seed = today.year * 10000 + today.month * 100 + today.day;
     final rng = Random(seed);
@@ -48,15 +52,13 @@ class ChallengeManager {
         .toList();
 
     final levelId = allLevelIds[rng.nextInt(allLevelIds.length)];
-    final level = GameData.worlds
-        .expand((w) => w.levels)
-        .firstWhere((l) => l.id == levelId);
 
     return DailyChallenge(
       levelId: levelId,
-      title: 'Daily: ${level.title}',
-      description: 'Complete "${level.title}" for bonus points!',
+      title: 'Daily Challenge',
+      description: 'Daily Challenge — one new tech problem every day',
       bonusPoints: 50,
+      pointsMultiplier: streak >= 7 ? 3 : 2,
       date: today,
     );
   }

@@ -58,7 +58,8 @@ class AchievementsScreen extends StatelessWidget {
                   AchievementType.worlds => progress.completedWorldIds.length,
                   AchievementType.categories => progress.completedCategoryIds.length,
                 };
-                final isDone = progressVal >= a.requirement;
+                final isDone = progress.unlockedAchievementIds.contains(a.id);
+                final progressFraction = (progressVal / a.requirement).clamp(0.0, 1.0);
 
                 return Container(
                   margin: const EdgeInsets.only(bottom: 10),
@@ -76,59 +77,120 @@ class AchievementsScreen extends StatelessWidget {
                           : scheme.outline.withValues(alpha: 0.2),
                     ),
                   ),
-                  child: Row(
+                  child: Column(
                     children: [
-                      Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          color: isDone
-                              ? Colors.green.withValues(alpha: 0.1)
-                              : scheme.primary.withValues(alpha: 0.05),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Icon(
-                          a.icon,
-                          color: isDone ? Colors.green : scheme.onSurface.withValues(alpha: 0.4),
-                          size: 20,
-                        ),
-                      ),
-                      const Gap(12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              a.name,
-                              style: TextStyle(
-                                color: isDone
-                                    ? Colors.green.shade300
-                                    : scheme.onSurface,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 14,
-                              ),
+                      Row(
+                        children: [
+                          Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              color: isDone
+                                  ? Colors.green.withValues(alpha: 0.1)
+                                  : scheme.primary.withValues(alpha: 0.05),
+                              borderRadius: BorderRadius.circular(10),
                             ),
+                            child: Icon(
+                              a.icon,
+                              color: isDone ? Colors.green : scheme.onSurface.withValues(alpha: 0.4),
+                              size: 20,
+                            ),
+                          ),
+                          const Gap(12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  a.name,
+                                  style: TextStyle(
+                                    color: isDone
+                                        ? Colors.green.shade300
+                                        : scheme.onSurface,
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                                Text(
+                                  a.description,
+                                  style: TextStyle(
+                                    color: scheme.onSurface.withValues(alpha: 0.5),
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          if (isDone)
+                            Icon(Icons.check_circle, color: Colors.green.shade400, size: 22)
+                          else
                             Text(
-                              a.description,
+                              '$progressVal/${a.requirement}',
                               style: TextStyle(
-                                color: scheme.onSurface.withValues(alpha: 0.5),
+                                color: scheme.onSurface.withValues(alpha: 0.4),
                                 fontSize: 12,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
-                          ],
-                        ),
+                        ],
                       ),
-                      if (isDone)
-                        Icon(Icons.check_circle, color: Colors.green.shade400, size: 22)
-                      else
-                        Text(
-                          '$progressVal/${a.requirement}',
-                          style: TextStyle(
-                            color: scheme.onSurface.withValues(alpha: 0.4),
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
+                      if (!isDone) ...[
+                        const Gap(8),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(4),
+                          child: LinearProgressIndicator(
+                            value: progressFraction,
+                            minHeight: 4,
+                            backgroundColor: scheme.outline.withValues(alpha: 0.15),
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              isDone ? Colors.green : scheme.primary.withValues(alpha: 0.5),
+                            ),
                           ),
                         ),
+                      ],
+                      if (a.rewards.isNotEmpty) ...[
+                        const Gap(8),
+                        Wrap(
+                          spacing: 6,
+                          runSpacing: 4,
+                          children: a.rewards.map((r) {
+                            final rewardDef = RewardPool.byId(r.rewardId);
+                            final isUnlocked = progress.earnedRewardIds.contains(r.rewardId);
+                            return Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                              decoration: BoxDecoration(
+                                color: isUnlocked
+                                    ? (rewardDef?.color ?? Colors.green).withValues(alpha: 0.1)
+                                    : scheme.outline.withValues(alpha: 0.08),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    rewardDef?.icon ?? Icons.card_giftcard,
+                                    size: 12,
+                                    color: isUnlocked
+                                        ? (rewardDef?.color ?? Colors.green)
+                                        : scheme.onSurface.withValues(alpha: 0.3),
+                                  ),
+                                  const Gap(4),
+                                  Text(
+                                    rewardDef?.displayName ?? r.rewardId,
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w600,
+                                      color: isUnlocked
+                                          ? (rewardDef?.color ?? Colors.green)
+                                          : scheme.onSurface.withValues(alpha: 0.3),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ],
                     ],
                   ),
                 ).animate().fadeIn(delay: (30 * AchievementManager.all.indexOf(a)).ms);

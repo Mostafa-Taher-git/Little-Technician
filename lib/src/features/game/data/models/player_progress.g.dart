@@ -92,58 +92,73 @@ const PlayerProgressSchema = CollectionSchema(
       name: r'lastDailyQuestDate',
       type: IsarType.dateTime,
     ),
-    r'levelsCleared': PropertySchema(
+    r'lastWeeklyBossDate': PropertySchema(
       id: 15,
+      name: r'lastWeeklyBossDate',
+      type: IsarType.dateTime,
+    ),
+    r'levelsCleared': PropertySchema(
+      id: 16,
       name: r'levelsCleared',
       type: IsarType.long,
     ),
+    r'pendingAchievementIds': PropertySchema(
+      id: 17,
+      name: r'pendingAchievementIds',
+      type: IsarType.stringList,
+    ),
     r'playDates': PropertySchema(
-      id: 16,
+      id: 18,
       name: r'playDates',
       type: IsarType.dateTimeList,
     ),
     r'points': PropertySchema(
-      id: 17,
+      id: 19,
       name: r'points',
       type: IsarType.long,
     ),
     r'prepResults': PropertySchema(
-      id: 18,
+      id: 20,
       name: r'prepResults',
       type: IsarType.stringList,
     ),
     r'purchasedItemIds': PropertySchema(
-      id: 19,
+      id: 21,
       name: r'purchasedItemIds',
       type: IsarType.stringList,
     ),
     r'supTechUsesThisLevel': PropertySchema(
-      id: 20,
+      id: 22,
       name: r'supTechUsesThisLevel',
       type: IsarType.long,
     ),
     r'themeId': PropertySchema(
-      id: 21,
+      id: 23,
       name: r'themeId',
       type: IsarType.string,
     ),
     r'totalAnswers': PropertySchema(
-      id: 22,
+      id: 24,
       name: r'totalAnswers',
       type: IsarType.long,
     ),
     r'totalPlayTimeSeconds': PropertySchema(
-      id: 23,
+      id: 25,
       name: r'totalPlayTimeSeconds',
       type: IsarType.long,
     ),
+    r'unlockedAchievementIds': PropertySchema(
+      id: 26,
+      name: r'unlockedAchievementIds',
+      type: IsarType.stringList,
+    ),
     r'unlockedSkinIds': PropertySchema(
-      id: 24,
+      id: 27,
       name: r'unlockedSkinIds',
       type: IsarType.stringList,
     ),
     r'userId': PropertySchema(
-      id: 25,
+      id: 28,
       name: r'userId',
       type: IsarType.long,
     )
@@ -235,6 +250,13 @@ int _playerProgressEstimateSize(
       bytesCount += value.length * 3;
     }
   }
+  bytesCount += 3 + object.pendingAchievementIds.length * 3;
+  {
+    for (var i = 0; i < object.pendingAchievementIds.length; i++) {
+      final value = object.pendingAchievementIds[i];
+      bytesCount += value.length * 3;
+    }
+  }
   bytesCount += 3 + object.playDates.length * 8;
   bytesCount += 3 + object.prepResults.length * 3;
   {
@@ -254,6 +276,13 @@ int _playerProgressEstimateSize(
     final value = object.themeId;
     if (value != null) {
       bytesCount += 3 + value.length * 3;
+    }
+  }
+  bytesCount += 3 + object.unlockedAchievementIds.length * 3;
+  {
+    for (var i = 0; i < object.unlockedAchievementIds.length; i++) {
+      final value = object.unlockedAchievementIds[i];
+      bytesCount += value.length * 3;
     }
   }
   bytesCount += 3 + object.unlockedSkinIds.length * 3;
@@ -287,17 +316,20 @@ void _playerProgressSerialize(
   writer.writeLong(offsets[12], object.extraSupTechUses);
   writer.writeDateTime(offsets[13], object.lastActiveDate);
   writer.writeDateTime(offsets[14], object.lastDailyQuestDate);
-  writer.writeLong(offsets[15], object.levelsCleared);
-  writer.writeDateTimeList(offsets[16], object.playDates);
-  writer.writeLong(offsets[17], object.points);
-  writer.writeStringList(offsets[18], object.prepResults);
-  writer.writeStringList(offsets[19], object.purchasedItemIds);
-  writer.writeLong(offsets[20], object.supTechUsesThisLevel);
-  writer.writeString(offsets[21], object.themeId);
-  writer.writeLong(offsets[22], object.totalAnswers);
-  writer.writeLong(offsets[23], object.totalPlayTimeSeconds);
-  writer.writeStringList(offsets[24], object.unlockedSkinIds);
-  writer.writeLong(offsets[25], object.userId);
+  writer.writeDateTime(offsets[15], object.lastWeeklyBossDate);
+  writer.writeLong(offsets[16], object.levelsCleared);
+  writer.writeStringList(offsets[17], object.pendingAchievementIds);
+  writer.writeDateTimeList(offsets[18], object.playDates);
+  writer.writeLong(offsets[19], object.points);
+  writer.writeStringList(offsets[20], object.prepResults);
+  writer.writeStringList(offsets[21], object.purchasedItemIds);
+  writer.writeLong(offsets[22], object.supTechUsesThisLevel);
+  writer.writeString(offsets[23], object.themeId);
+  writer.writeLong(offsets[24], object.totalAnswers);
+  writer.writeLong(offsets[25], object.totalPlayTimeSeconds);
+  writer.writeStringList(offsets[26], object.unlockedAchievementIds);
+  writer.writeStringList(offsets[27], object.unlockedSkinIds);
+  writer.writeLong(offsets[28], object.userId);
 }
 
 PlayerProgress _playerProgressDeserialize(
@@ -323,17 +355,20 @@ PlayerProgress _playerProgressDeserialize(
   object.id = id;
   object.lastActiveDate = reader.readDateTimeOrNull(offsets[13]);
   object.lastDailyQuestDate = reader.readDateTimeOrNull(offsets[14]);
-  object.levelsCleared = reader.readLong(offsets[15]);
-  object.playDates = reader.readDateTimeList(offsets[16]) ?? [];
-  object.points = reader.readLong(offsets[17]);
-  object.prepResults = reader.readStringList(offsets[18]) ?? [];
-  object.purchasedItemIds = reader.readStringList(offsets[19]) ?? [];
-  object.supTechUsesThisLevel = reader.readLong(offsets[20]);
-  object.themeId = reader.readStringOrNull(offsets[21]);
-  object.totalAnswers = reader.readLong(offsets[22]);
-  object.totalPlayTimeSeconds = reader.readLong(offsets[23]);
-  object.unlockedSkinIds = reader.readStringList(offsets[24]) ?? [];
-  object.userId = reader.readLong(offsets[25]);
+  object.lastWeeklyBossDate = reader.readDateTimeOrNull(offsets[15]);
+  object.levelsCleared = reader.readLong(offsets[16]);
+  object.pendingAchievementIds = reader.readStringList(offsets[17]) ?? [];
+  object.playDates = reader.readDateTimeList(offsets[18]) ?? [];
+  object.points = reader.readLong(offsets[19]);
+  object.prepResults = reader.readStringList(offsets[20]) ?? [];
+  object.purchasedItemIds = reader.readStringList(offsets[21]) ?? [];
+  object.supTechUsesThisLevel = reader.readLong(offsets[22]);
+  object.themeId = reader.readStringOrNull(offsets[23]);
+  object.totalAnswers = reader.readLong(offsets[24]);
+  object.totalPlayTimeSeconds = reader.readLong(offsets[25]);
+  object.unlockedAchievementIds = reader.readStringList(offsets[26]) ?? [];
+  object.unlockedSkinIds = reader.readStringList(offsets[27]) ?? [];
+  object.userId = reader.readLong(offsets[28]);
   return object;
 }
 
@@ -375,26 +410,32 @@ P _playerProgressDeserializeProp<P>(
     case 14:
       return (reader.readDateTimeOrNull(offset)) as P;
     case 15:
-      return (reader.readLong(offset)) as P;
+      return (reader.readDateTimeOrNull(offset)) as P;
     case 16:
-      return (reader.readDateTimeList(offset) ?? []) as P;
+      return (reader.readLong(offset)) as P;
     case 17:
-      return (reader.readLong(offset)) as P;
+      return (reader.readStringList(offset) ?? []) as P;
     case 18:
-      return (reader.readStringList(offset) ?? []) as P;
+      return (reader.readDateTimeList(offset) ?? []) as P;
     case 19:
-      return (reader.readStringList(offset) ?? []) as P;
-    case 20:
       return (reader.readLong(offset)) as P;
+    case 20:
+      return (reader.readStringList(offset) ?? []) as P;
     case 21:
-      return (reader.readStringOrNull(offset)) as P;
+      return (reader.readStringList(offset) ?? []) as P;
     case 22:
       return (reader.readLong(offset)) as P;
     case 23:
-      return (reader.readLong(offset)) as P;
+      return (reader.readStringOrNull(offset)) as P;
     case 24:
-      return (reader.readStringList(offset) ?? []) as P;
+      return (reader.readLong(offset)) as P;
     case 25:
+      return (reader.readLong(offset)) as P;
+    case 26:
+      return (reader.readStringList(offset) ?? []) as P;
+    case 27:
+      return (reader.readStringList(offset) ?? []) as P;
+    case 28:
       return (reader.readLong(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -2694,6 +2735,80 @@ extension PlayerProgressQueryFilter
   }
 
   QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      lastWeeklyBossDateIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'lastWeeklyBossDate',
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      lastWeeklyBossDateIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'lastWeeklyBossDate',
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      lastWeeklyBossDateEqualTo(DateTime? value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'lastWeeklyBossDate',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      lastWeeklyBossDateGreaterThan(
+    DateTime? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'lastWeeklyBossDate',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      lastWeeklyBossDateLessThan(
+    DateTime? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'lastWeeklyBossDate',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      lastWeeklyBossDateBetween(
+    DateTime? lower,
+    DateTime? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'lastWeeklyBossDate',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
       levelsClearedEqualTo(int value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
@@ -2746,6 +2861,233 @@ extension PlayerProgressQueryFilter
         upper: upper,
         includeUpper: includeUpper,
       ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      pendingAchievementIdsElementEqualTo(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'pendingAchievementIds',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      pendingAchievementIdsElementGreaterThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'pendingAchievementIds',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      pendingAchievementIdsElementLessThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'pendingAchievementIds',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      pendingAchievementIdsElementBetween(
+    String lower,
+    String upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'pendingAchievementIds',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      pendingAchievementIdsElementStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'pendingAchievementIds',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      pendingAchievementIdsElementEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'pendingAchievementIds',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      pendingAchievementIdsElementContains(String value,
+          {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'pendingAchievementIds',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      pendingAchievementIdsElementMatches(String pattern,
+          {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'pendingAchievementIds',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      pendingAchievementIdsElementIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'pendingAchievementIds',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      pendingAchievementIdsElementIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'pendingAchievementIds',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      pendingAchievementIdsLengthEqualTo(int length) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'pendingAchievementIds',
+        length,
+        true,
+        length,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      pendingAchievementIdsIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'pendingAchievementIds',
+        0,
+        true,
+        0,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      pendingAchievementIdsIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'pendingAchievementIds',
+        0,
+        false,
+        999999,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      pendingAchievementIdsLengthLessThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'pendingAchievementIds',
+        0,
+        true,
+        length,
+        include,
+      );
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      pendingAchievementIdsLengthGreaterThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'pendingAchievementIds',
+        length,
+        include,
+        999999,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      pendingAchievementIdsLengthBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'pendingAchievementIds',
+        lower,
+        includeLower,
+        upper,
+        includeUpper,
+      );
     });
   }
 
@@ -3725,6 +4067,233 @@ extension PlayerProgressQueryFilter
   }
 
   QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      unlockedAchievementIdsElementEqualTo(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'unlockedAchievementIds',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      unlockedAchievementIdsElementGreaterThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'unlockedAchievementIds',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      unlockedAchievementIdsElementLessThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'unlockedAchievementIds',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      unlockedAchievementIdsElementBetween(
+    String lower,
+    String upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'unlockedAchievementIds',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      unlockedAchievementIdsElementStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'unlockedAchievementIds',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      unlockedAchievementIdsElementEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'unlockedAchievementIds',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      unlockedAchievementIdsElementContains(String value,
+          {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'unlockedAchievementIds',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      unlockedAchievementIdsElementMatches(String pattern,
+          {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'unlockedAchievementIds',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      unlockedAchievementIdsElementIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'unlockedAchievementIds',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      unlockedAchievementIdsElementIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'unlockedAchievementIds',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      unlockedAchievementIdsLengthEqualTo(int length) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'unlockedAchievementIds',
+        length,
+        true,
+        length,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      unlockedAchievementIdsIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'unlockedAchievementIds',
+        0,
+        true,
+        0,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      unlockedAchievementIdsIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'unlockedAchievementIds',
+        0,
+        false,
+        999999,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      unlockedAchievementIdsLengthLessThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'unlockedAchievementIds',
+        0,
+        true,
+        length,
+        include,
+      );
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      unlockedAchievementIdsLengthGreaterThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'unlockedAchievementIds',
+        length,
+        include,
+        999999,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
+      unlockedAchievementIdsLengthBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'unlockedAchievementIds',
+        lower,
+        includeLower,
+        upper,
+        includeUpper,
+      );
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterFilterCondition>
       unlockedSkinIdsElementEqualTo(
     String value, {
     bool caseSensitive = true,
@@ -4157,6 +4726,20 @@ extension PlayerProgressQuerySortBy
   }
 
   QueryBuilder<PlayerProgress, PlayerProgress, QAfterSortBy>
+      sortByLastWeeklyBossDate() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'lastWeeklyBossDate', Sort.asc);
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterSortBy>
+      sortByLastWeeklyBossDateDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'lastWeeklyBossDate', Sort.desc);
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterSortBy>
       sortByLevelsCleared() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'levelsCleared', Sort.asc);
@@ -4407,6 +4990,20 @@ extension PlayerProgressQuerySortThenBy
   }
 
   QueryBuilder<PlayerProgress, PlayerProgress, QAfterSortBy>
+      thenByLastWeeklyBossDate() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'lastWeeklyBossDate', Sort.asc);
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterSortBy>
+      thenByLastWeeklyBossDateDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'lastWeeklyBossDate', Sort.desc);
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QAfterSortBy>
       thenByLevelsCleared() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'levelsCleared', Sort.asc);
@@ -4613,9 +5210,23 @@ extension PlayerProgressQueryWhereDistinct
   }
 
   QueryBuilder<PlayerProgress, PlayerProgress, QDistinct>
+      distinctByLastWeeklyBossDate() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'lastWeeklyBossDate');
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QDistinct>
       distinctByLevelsCleared() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'levelsCleared');
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QDistinct>
+      distinctByPendingAchievementIds() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'pendingAchievementIds');
     });
   }
 
@@ -4671,6 +5282,13 @@ extension PlayerProgressQueryWhereDistinct
       distinctByTotalPlayTimeSeconds() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'totalPlayTimeSeconds');
+    });
+  }
+
+  QueryBuilder<PlayerProgress, PlayerProgress, QDistinct>
+      distinctByUnlockedAchievementIds() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'unlockedAchievementIds');
     });
   }
 
@@ -4798,9 +5416,23 @@ extension PlayerProgressQueryProperty
     });
   }
 
+  QueryBuilder<PlayerProgress, DateTime?, QQueryOperations>
+      lastWeeklyBossDateProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'lastWeeklyBossDate');
+    });
+  }
+
   QueryBuilder<PlayerProgress, int, QQueryOperations> levelsClearedProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'levelsCleared');
+    });
+  }
+
+  QueryBuilder<PlayerProgress, List<String>, QQueryOperations>
+      pendingAchievementIdsProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'pendingAchievementIds');
     });
   }
 
@@ -4854,6 +5486,13 @@ extension PlayerProgressQueryProperty
       totalPlayTimeSecondsProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'totalPlayTimeSeconds');
+    });
+  }
+
+  QueryBuilder<PlayerProgress, List<String>, QQueryOperations>
+      unlockedAchievementIdsProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'unlockedAchievementIds');
     });
   }
 

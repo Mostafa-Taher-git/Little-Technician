@@ -3,11 +3,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:gap/gap.dart';
 import 'package:littletech/src/core/navigation/nav.dart';
-import 'package:littletech/src/core/constants/category_manager.dart';
 import 'package:littletech/src/features/game/constants/challenges.dart';
 import 'package:littletech/src/features/game/constants/game_data.dart';
+import 'package:littletech/src/features/game/constants/streak_tracker.dart';
+import 'package:littletech/src/features/game/constants/weekly_bosses.dart';
 import 'package:littletech/src/features/game/domain/cubit/game_cubit.dart';
-import 'package:littletech/src/features/game/presentation/screens/level_select_screen.dart';
+import 'package:littletech/src/features/game/presentation/screens/boss_screen.dart';
 import 'package:littletech/src/features/game/presentation/screens/problem_screen.dart';
 import 'package:littletech/src/features/game/presentation/widgets/sup_tech_avatar_wrapper.dart';
 import 'package:littletech/src/features/game/presentation/widgets/suptech_avatar.dart';
@@ -18,8 +19,6 @@ class ChallengeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final daily = ChallengeManager.getDailyChallenge();
-    final weekly = ChallengeManager.getWeeklyBoss();
 
     return Scaffold(
       backgroundColor: scheme.surface,
@@ -47,20 +46,22 @@ class ChallengeScreen extends StatelessWidget {
           BlocBuilder<GameCubit, GameState>(
             builder: (_, state) {
               final dailyCompleted = state.progress.getDailyQuestCompleted();
+              final streak = StreakTracker.calculateStreak(state.progress.playDates);
+              final daily = ChallengeManager.getDailyChallenge(streak: streak);
+              final level = GameData.worlds
+                  .expand((w) => w.levels)
+                  .where((l) => l.id == daily.levelId)
+                  .firstOrNull;
               return _ChallengeCard(
-                title: 'Daily Quest',
+                title: 'Daily Challenge',
                 icon: Icons.wb_sunny,
-                subtitle: daily.title,
+                subtitle: level?.title ?? daily.levelId,
                 description: daily.description,
                 bonusPoints: daily.bonusPoints,
                 pointsMultiplier: daily.pointsMultiplier,
                 color: Colors.orange,
                 completed: dailyCompleted,
                 onTap: () {
-                  final level = GameData.worlds
-                      .expand((w) => w.levels)
-                      .where((l) => l.id == daily.levelId)
-                      .firstOrNull;
                   if (level == null) return;
                   final world = GameData.worlds.firstWhere((w) => w.levels.contains(level), orElse: () => GameData.worlds.first);
                   context.read<GameCubit>()
@@ -73,26 +74,29 @@ class ChallengeScreen extends StatelessWidget {
             },
           ),
           const Gap(16),
-          _ChallengeCard(
-            title: 'Weekly Raid',
-            icon: Icons.calendar_month,
-            subtitle: CategoryManager.byId(weekly.categoryId)?.name ?? 'Unknown',
-            description: weekly.specialRule,
-            bonusPoints: weekly.bonusPoints,
-            pointsMultiplier: weekly.pointsMultiplier,
-            color: Colors.red,
-            completed: false,
-            onTap: () {
-              final world = GameData.worlds.firstWhere(
-                (w) => w.id == weekly.categoryId,
-                orElse: () => GameData.worlds.isNotEmpty ? GameData.worlds.first : throw Exception('No worlds'),
+          BlocBuilder<GameCubit, GameState>(
+            builder: (_, state) {
+              final weeklyCompleted = state.progress.getWeeklyBossCompleted();
+              final weeklyBoss = WeeklyBossManager.getCurrent();
+              final weeklyInfo = ChallengeManager.getWeeklyBoss();
+              return _ChallengeCard(
+                title: weeklyInfo.title,
+                icon: Icons.calendar_month,
+                subtitle: weeklyBoss.name,
+                description: weeklyInfo.description,
+                bonusPoints: weeklyInfo.bonusPoints,
+                pointsMultiplier: weeklyInfo.pointsMultiplier,
+                color: Colors.red,
+                completed: weeklyCompleted,
+                onTap: () {
+                  context.read<GameCubit>()
+                    ..setBossMultiplier(2)
+                    ..setPointsMultiplier(weeklyInfo.pointsMultiplier)
+                    ..addChallengeBonus(weeklyInfo.bonusPoints)
+                    ..startBoss(weeklyBoss);
+                  Nav.push(context, BossScreen(boss: weeklyBoss));
+                },
               );
-              context.read<GameCubit>()
-                ..selectWorld(world)
-                ..setBossMultiplier(2)
-                ..setPointsMultiplier(weekly.pointsMultiplier)
-                ..addChallengeBonus(weekly.bonusPoints);
-              Nav.push(context, LevelSelectScreen(world: world));
             },
           ),
         ],

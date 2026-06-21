@@ -22,6 +22,7 @@ class BossScreen extends StatefulWidget {
 class _BossScreenState extends State<BossScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _bossController;
+  late AnimationController _entranceController;
   late Animation<double> _breathAnimation;
   late Animation<double> _glowPulse;
   late Animation<double> _entranceAnimation;
@@ -44,25 +45,28 @@ class _BossScreenState extends State<BossScreen>
       duration: 2000.ms,
     )..repeat(reverse: true);
 
+    _entranceController = AnimationController(
+      vsync: this,
+      duration: 800.ms,
+    )..forward();
+
     _breathAnimation = Tween<double>(begin: 0.95, end: 1.05).animate(
       CurvedAnimation(parent: _bossController, curve: Curves.easeInOutSine),
     );
 
-    _glowPulse = Tween<double>(begin: 0.4, end: 0.8).animate(
+    _glowPulse = Tween<double>(begin: 0.4, end: 0.9).animate(
       CurvedAnimation(parent: _bossController, curve: Curves.easeInOutSine),
     );
 
     _entranceAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _bossController,
-        curve: const Interval(0.0, 0.3, curve: Curves.easeOutBack),
-      ),
+      CurvedAnimation(parent: _entranceController, curve: Curves.easeOutBack),
     );
   }
 
   @override
   void dispose() {
     _bossController.dispose();
+    _entranceController.dispose();
     super.dispose();
   }
 
@@ -114,6 +118,16 @@ class _BossScreenState extends State<BossScreen>
         _currentPhase = 2;
       });
     }
+  }
+
+  Color _bossColor(int visualType) {
+    const colors = [
+      Color(0xFFE94560), Color(0xFF6BB5FF), Color(0xFF7B2D8B), Color(0xFF4A90D9),
+      Color(0xFF2D6A4F), Color(0xFFFF6B35), Color(0xFF8B0000), Color(0xFFFFD700),
+      Color(0xFF9B30FF), Color(0xFF00E5FF), Color(0xFFFF6B35), Color(0xFF00E5FF),
+      Color(0xFFFF00FF), Color(0xFF00FF88),
+    ];
+    return colors[(visualType - 1).clamp(0, 13)];
   }
 
   Widget _buildDefeatedButton() {
@@ -461,10 +475,10 @@ class _BossScreenState extends State<BossScreen>
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
     final boss = widget.boss;
+    final bossColor = _bossColor(boss.visualType);
     return Scaffold(
-      backgroundColor: scheme.surface,
+      backgroundColor: Colors.black,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -490,6 +504,22 @@ class _BossScreenState extends State<BossScreen>
 
           return Stack(
             children: [
+              Positioned.fill(
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        bossColor.withValues(alpha: 0.15),
+                        const Color(0xFF0D0D0D),
+                        Colors.black,
+                      ],
+                      stops: const [0.0, 0.4, 1.0],
+                    ),
+                  ),
+                ),
+              ),
               Positioned.fill(
                 child: CustomPaint(
                   painter: _ArenaParticlePainter(
@@ -903,9 +933,9 @@ class _MonsterPainter extends CustomPainter {
 
   void _drawAura(Canvas canvas, double cx, double cy, double s) {
     final auraPaint = Paint()
-      ..color = Colors.red.withValues(alpha: 0.08 * glowIntensity)
-      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 20);
-    canvas.drawCircle(Offset(cx, cy), 60 * s, auraPaint);
+      ..color = Colors.red.withValues(alpha: 0.18 * glowIntensity)
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 30);
+    canvas.drawCircle(Offset(cx, cy), 85 * s, auraPaint);
   }
 
   void _drawBoneColossus(Canvas canvas, double cx, double cy, double s) {
@@ -1348,19 +1378,18 @@ class _ArenaParticlePainter extends CustomPainter {
     ];
     final baseColor = colors[(visualType - 1).clamp(0, 13)];
 
-    for (var i = 0; i < 15; i++) {
-      final driftX = sin(phase * 1.5 + i * 0.7) * 15;
-      final driftY = cos(phase * 1.2 + i * 0.5) * 10;
+    for (var i = 0; i < 30; i++) {
+      final driftX = sin(phase * 1.5 + i * 0.7) * 20;
+      final driftY = cos(phase * 1.2 + i * 0.5) * 15;
       final x = (rng.nextDouble() * size.width + driftX) % size.width;
       final y = (rng.nextDouble() * size.height + phase * 40 + driftY) % size.height;
-      final radius = rng.nextDouble() * 2.0 + 0.5;
-      final alpha = ((rng.nextDouble() * 30 + 10) * (0.4 + 0.4 * sin(phase * 2 + i))).toInt();
+      final radius = rng.nextDouble() * 3.0 + 1.0;
+      final alpha = ((rng.nextDouble() * 80 + 40) * (0.4 + 0.4 * sin(phase * 2 + i))).toInt();
 
-      canvas.drawCircle(
-        Offset(x, y),
-        radius,
-        Paint()..color = baseColor.withValues(alpha: alpha / 255),
-      );
+      final paint = Paint()
+        ..color = baseColor.withValues(alpha: alpha / 255)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 2);
+      canvas.drawCircle(Offset(x, y), radius, paint);
     }
   }
 

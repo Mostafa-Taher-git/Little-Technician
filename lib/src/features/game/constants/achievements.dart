@@ -1,6 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:littletech/src/features/game/constants/reward_pool.dart';
 
 enum AchievementType { levels, bosses, points, rewards, streak, worlds, categories }
+
+class AchievementReward {
+  final String rewardId;
+  final RewardType type;
+
+  const AchievementReward({required this.rewardId, required this.type});
+}
 
 class Achievement {
   final String id;
@@ -10,6 +18,7 @@ class Achievement {
   final int requirement;
   final int rewardPoints;
   final IconData icon;
+  final List<AchievementReward> rewards;
 
   const Achievement({
     required this.id,
@@ -19,11 +28,13 @@ class Achievement {
     required this.requirement,
     required this.rewardPoints,
     required this.icon,
+    this.rewards = const [],
   });
 }
 
 class AchievementManager {
   static const List<Achievement> all = [
+    // ── Levels ──────────────────────────────────────────────────────────────
     Achievement(
       id: 'first_level',
       name: 'First Steps',
@@ -50,6 +61,7 @@ class AchievementManager {
       requirement: 10,
       rewardPoints: 50,
       icon: Icons.star,
+      rewards: [AchievementReward(rewardId: 'title_fixer', type: RewardType.title)],
     ),
     Achievement(
       id: 'twenty_levels',
@@ -59,7 +71,10 @@ class AchievementManager {
       requirement: 20,
       rewardPoints: 100,
       icon: Icons.workspace_premium,
+      rewards: [AchievementReward(rewardId: 'frame_tech', type: RewardType.nicknameFrame)],
     ),
+
+    // ── Bosses ──────────────────────────────────────────────────────────────
     Achievement(
       id: 'first_boss',
       name: 'First Boss Down',
@@ -81,12 +96,15 @@ class AchievementManager {
     Achievement(
       id: 'all_bosses',
       name: 'Overlord',
-      description: 'Defeat all bosses',
+      description: 'Defeat a boss in every category',
       type: AchievementType.bosses,
-      requirement: 8,
+      requirement: 14,
       rewardPoints: 200,
       icon: Icons.shield_moon,
+      rewards: [AchievementReward(rewardId: 'skin_hacker', type: RewardType.skin)],
     ),
+
+    // ── Points ──────────────────────────────────────────────────────────────
     Achievement(
       id: 'hundred_points',
       name: 'Point Collector',
@@ -104,6 +122,7 @@ class AchievementManager {
       requirement: 1000,
       rewardPoints: 50,
       icon: Icons.monetization_on,
+      rewards: [AchievementReward(rewardId: 'theme_dark', type: RewardType.theme)],
     ),
     Achievement(
       id: 'five_thousand_points',
@@ -113,7 +132,10 @@ class AchievementManager {
       requirement: 5000,
       rewardPoints: 200,
       icon: Icons.account_balance_wallet,
+      rewards: [AchievementReward(rewardId: 'skin_grandmaster', type: RewardType.skin)],
     ),
+
+    // ── Rewards ─────────────────────────────────────────────────────────────
     Achievement(
       id: 'first_reward',
       name: 'Lucky Draw',
@@ -140,7 +162,10 @@ class AchievementManager {
       requirement: 10,
       rewardPoints: 75,
       icon: Icons.inventory,
+      rewards: [AchievementReward(rewardId: 'frame_legendary', type: RewardType.nicknameFrame)],
     ),
+
+    // ── Streak ──────────────────────────────────────────────────────────────
     Achievement(
       id: 'three_day_streak',
       name: 'Consistent',
@@ -158,6 +183,7 @@ class AchievementManager {
       requirement: 7,
       rewardPoints: 100,
       icon: Icons.whatshot,
+      rewards: [AchievementReward(rewardId: 'theme_amber', type: RewardType.theme)],
     ),
     Achievement(
       id: 'thirty_day_streak',
@@ -167,7 +193,10 @@ class AchievementManager {
       requirement: 30,
       rewardPoints: 500,
       icon: Icons.auto_awesome,
+      rewards: [AchievementReward(rewardId: 'theme_neon', type: RewardType.theme)],
     ),
+
+    // ── Categories ──────────────────────────────────────────────────────────
     Achievement(
       id: 'complete_world',
       name: 'World Explorer',
@@ -185,44 +214,58 @@ class AchievementManager {
       requirement: 3,
       rewardPoints: 100,
       icon: Icons.travel_explore,
+      rewards: [AchievementReward(rewardId: 'frame_cyber', type: RewardType.nicknameFrame)],
     ),
     Achievement(
       id: 'all_worlds',
       name: 'Conqueror',
-      description: 'Complete all category campaigns',
+      description: 'Complete all 14 category campaigns',
       type: AchievementType.categories,
-      requirement: 13,
+      requirement: 14,
       rewardPoints: 500,
       icon: Icons.flag,
+      rewards: [AchievementReward(rewardId: 'skin_engineer', type: RewardType.skin)],
     ),
+
+    // ── Category-specific ───────────────────────────────────────────────────
     Achievement(
       id: 'virus_hunter',
       name: 'Virus Hunter',
-      description: 'Complete all security-related levels',
+      description: 'Complete all security levels',
       type: AchievementType.levels,
       requirement: 15,
       rewardPoints: 75,
       icon: Icons.shield,
+      rewards: [AchievementReward(rewardId: 'icon_robot', type: RewardType.icon)],
     ),
     Achievement(
       id: 'network_fixer',
       name: 'Network Fixer',
       description: 'Complete all networking levels',
       type: AchievementType.levels,
-      requirement: 10,
+      requirement: 15,
       rewardPoints: 75,
       icon: Icons.wifi,
+      rewards: [AchievementReward(rewardId: 'icon_laptop', type: RewardType.icon)],
     ),
     Achievement(
       id: 'boot_doctor',
       name: 'Boot Doctor',
-      description: 'Complete all OS and boot-related levels',
+      description: 'Complete all OS levels',
       type: AchievementType.levels,
-      requirement: 10,
+      requirement: 15,
       rewardPoints: 75,
       icon: Icons.desktop_windows,
+      rewards: [AchievementReward(rewardId: 'icon_server', type: RewardType.icon)],
     ),
   ];
+
+  static Achievement? byId(String id) {
+    for (final a in all) {
+      if (a.id == id) return a;
+    }
+    return null;
+  }
 
   static List<Achievement> checkNew({
     required int levelsCleared,
@@ -230,7 +273,6 @@ class AchievementManager {
     required int points,
     required int rewardsEarned,
     required int streak,
-    required int worldsCompleted,
     int categoriesCompleted = 0,
     List<String> alreadyUnlockedIds = const [],
   }) {
@@ -244,7 +286,7 @@ class AchievementManager {
         AchievementType.points => points,
         AchievementType.rewards => rewardsEarned,
         AchievementType.streak => streak,
-        AchievementType.worlds => worldsCompleted,
+        AchievementType.worlds => categoriesCompleted,
         AchievementType.categories => categoriesCompleted,
       };
       if (progress >= a.requirement) {
