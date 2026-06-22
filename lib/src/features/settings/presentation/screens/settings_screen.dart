@@ -256,12 +256,12 @@ class SettingsScreen extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Expert Troubleshooting System', style: TextStyle(fontWeight: FontWeight.w600)),
+            Text('You Are The Only Expert', style: TextStyle(fontWeight: FontWeight.w600)),
             Gap(4),
             Text('Version 2.0.0', style: TextStyle(color: Colors.white60, fontSize: 13)),
             Gap(12),
             Text(
-              'LittleTech helps you solve common computer hardware and software problems with step-by-step solutions across 11 categories.',
+              'It was Developed by : www.linkedin.com/in/mostafa-taher-ahmed-59b60b318',
               style: TextStyle(fontSize: 14, height: 1.5),
             ),
           ],

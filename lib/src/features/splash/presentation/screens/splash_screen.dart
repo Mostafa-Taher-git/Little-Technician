@@ -70,7 +70,7 @@ class _SplashScreenState extends State<SplashScreen> {
             Animate(
               effects: [FadeEffect(delay: 500.ms)],
               child: const Text(
-                'Expert Troubleshooting',
+                'You Are The Only Expert',
                 style: TextStyle(fontSize: 14, color: Colors.white54, letterSpacing: 2),
               ),
             ),
