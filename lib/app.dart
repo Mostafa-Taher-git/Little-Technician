@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:isar/isar.dart';
+import 'package:littletech/src/core/navigation/nav.dart';
 import 'package:littletech/src/features/auth/data/services/auth_service.dart';
 import 'package:littletech/src/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:littletech/src/features/auth/presentation/screens/login_screen.dart';
 import 'package:littletech/src/features/home/presentation/bloc/counter_cubit.dart';
+import 'package:littletech/src/features/home/presentation/screens/home_screen.dart';
 import 'package:littletech/src/features/splash/presentation/screens/splash_screen.dart';
 import 'package:littletech/src/features/game/data/repositories/game_repository.dart';
 import 'package:littletech/src/features/game/domain/cubit/game_cubit.dart';
@@ -34,6 +37,20 @@ class _LittleTechAppState extends State<LittleTechApp> {
     }
   }
 
+  void _onAuthChanged() {
+    _loadUserId().then((_) {
+      if (!mounted) return;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        if (_userId != null) {
+          Nav.replaceAll(context, const HomeScreen());
+        } else {
+          Nav.replaceAll(context, const LoginScreen());
+        }
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
@@ -56,24 +73,24 @@ class _LittleTechAppState extends State<LittleTechApp> {
           BlocListener<AuthCubit, AuthState>(
             listener: (_, state) {
               if (state is LoginSuccess || state is RegisterSuccess || state is LogoutSuccess) {
-                final userId = AuthService.getCachedUserId();
-                if (mounted) setState(() => _userId = userId);
+                _onAuthChanged();
               }
             },
           ),
-          BlocListener<GameCubit, GameState>(
-            listenWhen: (prev, curr) =>
-                prev.progress.themeId != curr.progress.themeId ||
-                (prev.progress.userId != curr.progress.userId),
-            listener: (context, state) {
-              final themeId = state.progress.themeId;
-              if (themeId != null) {
-                context.read<ThemeCubit>().applyTheme(themeId);
-              } else {
-                context.read<ThemeCubit>().resetToDefault();
-              }
-            },
-          ),
+          if (_userId != null)
+            BlocListener<GameCubit, GameState>(
+              listenWhen: (prev, curr) =>
+                  prev.progress.themeId != curr.progress.themeId ||
+                  (prev.progress.userId != curr.progress.userId),
+              listener: (context, state) {
+                final themeId = state.progress.themeId;
+                if (themeId != null) {
+                  context.read<ThemeCubit>().applyTheme(themeId);
+                } else {
+                  context.read<ThemeCubit>().resetToDefault();
+                }
+              },
+            ),
         ],
         child: BlocBuilder<ThemeCubit, ThemeData>(
           builder: (_, theme) => MaterialApp(
