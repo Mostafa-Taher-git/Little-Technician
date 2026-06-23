@@ -38,7 +38,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       body: Container(
         decoration: const BoxDecoration(gradient: AppColors.darkGradient),
         child: SafeArea(
-          child: BlocListener<AuthBloc, AuthState>(
+          child: BlocListener<AuthCubit, AuthState>(
             listener: (context, state) {
               if (state is RegisterSuccess) {
                 Nav.pushReplacement(context, const LoginScreen());
@@ -170,7 +170,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                       const Gap(32),
 
-                      BlocBuilder<AuthBloc, AuthState>(
+                      BlocBuilder<AuthCubit, AuthState>(
                         builder: (_, state) {
                           return SizedBox(
                             width: double.infinity,
@@ -185,11 +185,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   ? null
                                   : () {
                                       if (_formKey.currentState!.validate()) {
-                                        context.read<AuthBloc>().add(RegisterEvent(
+                                        context.read<AuthCubit>().register(
                                               username: _usernameCtrl.text.trim(),
                                               password: _passwordCtrl.text,
                                               avatarIcon: _icon,
-                                            ));
+                                            );
                                       }
                                     },
                               child: state is AuthLoading

@@ -808,8 +808,4 @@ class RuleEngine {
     return null;
   }
 
-  static List<String>? solutionsForProblem(String problem) {
-    final result = solve(problem);
-    return result?.steps;
-  }
 }

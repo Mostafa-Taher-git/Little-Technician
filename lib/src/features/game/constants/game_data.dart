@@ -11,10 +11,6 @@ class LevelDef {
   final List<String> steps;
   final int points;
   final String? imageUrl;
-  final String? deviceType;
-  final String? symptoms;
-  final String? cause;
-  final String? estimatedTime;
   final DifficultyLevel difficulty;
   final bool isBossLevel;
   final BossEncounterDef? boss;
@@ -26,10 +22,6 @@ class LevelDef {
     required this.steps,
     this.points = 100,
     this.imageUrl,
-    this.deviceType,
-    this.symptoms,
-    this.cause,
-    this.estimatedTime,
     this.difficulty = DifficultyLevel.easy,
     this.isBossLevel = false,
     this.boss,
@@ -210,19 +202,6 @@ class GameData {
       ]);
     })),
   );
-
-  static final Map<String, String> solutionIdMap = Map.fromEntries(
-    CategoryManager.all.expand((cat) => cat.problemKeys.map((pk) {
-      final id = levelId(cat.id, pk);
-      final title = pk.split(' ').map((w) {
-        if (w.isEmpty) return w;
-        return w[0].toUpperCase() + w.substring(1);
-      }).join(' ');
-      return MapEntry(id, title);
-    })),
-  );
-
-  static String? solutionForLevel(String levelId) => solutionIdMap[levelId];
 
   static bool isWorldComplete(WorldDef world, List<String> completedLevelIds) {
     return world.levels.every((level) => completedLevelIds.contains(level.id));

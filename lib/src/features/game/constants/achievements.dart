@@ -16,7 +16,6 @@ class Achievement {
   final String description;
   final AchievementType type;
   final int requirement;
-  final int rewardPoints;
   final IconData icon;
   final List<AchievementReward> rewards;
 
@@ -26,7 +25,6 @@ class Achievement {
     required this.description,
     required this.type,
     required this.requirement,
-    required this.rewardPoints,
     required this.icon,
     this.rewards = const [],
   });
@@ -41,7 +39,7 @@ class AchievementManager {
       description: 'Complete your first level',
       type: AchievementType.levels,
       requirement: 1,
-      rewardPoints: 10,
+
       icon: Icons.star_border,
     ),
     Achievement(
@@ -50,7 +48,7 @@ class AchievementManager {
       description: 'Complete 5 levels',
       type: AchievementType.levels,
       requirement: 5,
-      rewardPoints: 25,
+
       icon: Icons.star_half,
     ),
     Achievement(
@@ -59,7 +57,7 @@ class AchievementManager {
       description: 'Complete 10 levels',
       type: AchievementType.levels,
       requirement: 10,
-      rewardPoints: 50,
+
       icon: Icons.star,
       rewards: [AchievementReward(rewardId: 'title_fixer', type: RewardType.title)],
     ),
@@ -69,7 +67,7 @@ class AchievementManager {
       description: 'Complete 20 levels',
       type: AchievementType.levels,
       requirement: 20,
-      rewardPoints: 100,
+
       icon: Icons.workspace_premium,
       rewards: [AchievementReward(rewardId: 'frame_tech', type: RewardType.nicknameFrame)],
     ),
@@ -81,7 +79,7 @@ class AchievementManager {
       description: 'Defeat your first boss',
       type: AchievementType.bosses,
       requirement: 1,
-      rewardPoints: 20,
+
       icon: Icons.shield,
     ),
     Achievement(
@@ -90,7 +88,7 @@ class AchievementManager {
       description: 'Defeat 3 bosses',
       type: AchievementType.bosses,
       requirement: 3,
-      rewardPoints: 50,
+
       icon: Icons.shield_outlined,
     ),
     Achievement(
@@ -99,7 +97,7 @@ class AchievementManager {
       description: 'Defeat a boss in every category',
       type: AchievementType.bosses,
       requirement: 14,
-      rewardPoints: 200,
+
       icon: Icons.shield_moon,
       rewards: [AchievementReward(rewardId: 'skin_hacker', type: RewardType.skin)],
     ),
@@ -111,7 +109,7 @@ class AchievementManager {
       description: 'Earn 100 points',
       type: AchievementType.points,
       requirement: 100,
-      rewardPoints: 10,
+
       icon: Icons.monetization_on,
     ),
     Achievement(
@@ -120,7 +118,7 @@ class AchievementManager {
       description: 'Earn 1000 points',
       type: AchievementType.points,
       requirement: 1000,
-      rewardPoints: 50,
+
       icon: Icons.monetization_on,
       rewards: [AchievementReward(rewardId: 'theme_dark', type: RewardType.theme)],
     ),
@@ -130,7 +128,7 @@ class AchievementManager {
       description: 'Earn 5000 points',
       type: AchievementType.points,
       requirement: 5000,
-      rewardPoints: 200,
+
       icon: Icons.account_balance_wallet,
       rewards: [AchievementReward(rewardId: 'skin_grandmaster', type: RewardType.skin)],
     ),
@@ -142,7 +140,7 @@ class AchievementManager {
       description: 'Earn your first reward',
       type: AchievementType.rewards,
       requirement: 1,
-      rewardPoints: 10,
+
       icon: Icons.card_giftcard,
     ),
     Achievement(
@@ -151,7 +149,7 @@ class AchievementManager {
       description: 'Earn 5 rewards',
       type: AchievementType.rewards,
       requirement: 5,
-      rewardPoints: 30,
+
       icon: Icons.card_giftcard,
     ),
     Achievement(
@@ -160,7 +158,7 @@ class AchievementManager {
       description: 'Earn 10 rewards',
       type: AchievementType.rewards,
       requirement: 10,
-      rewardPoints: 75,
+
       icon: Icons.inventory,
       rewards: [AchievementReward(rewardId: 'frame_legendary', type: RewardType.nicknameFrame)],
     ),
@@ -172,7 +170,7 @@ class AchievementManager {
       description: 'Achieve a 3-day streak',
       type: AchievementType.streak,
       requirement: 3,
-      rewardPoints: 30,
+
       icon: Icons.local_fire_department,
     ),
     Achievement(
@@ -181,7 +179,7 @@ class AchievementManager {
       description: 'Achieve a 7-day streak',
       type: AchievementType.streak,
       requirement: 7,
-      rewardPoints: 100,
+
       icon: Icons.whatshot,
       rewards: [AchievementReward(rewardId: 'theme_amber', type: RewardType.theme)],
     ),
@@ -191,7 +189,7 @@ class AchievementManager {
       description: 'Achieve a 30-day streak',
       type: AchievementType.streak,
       requirement: 30,
-      rewardPoints: 500,
+
       icon: Icons.auto_awesome,
       rewards: [AchievementReward(rewardId: 'theme_neon', type: RewardType.theme)],
     ),
@@ -203,7 +201,7 @@ class AchievementManager {
       description: 'Complete a category campaign',
       type: AchievementType.categories,
       requirement: 1,
-      rewardPoints: 50,
+
       icon: Icons.public,
     ),
     Achievement(
@@ -212,7 +210,7 @@ class AchievementManager {
       description: 'Complete 3 category campaigns',
       type: AchievementType.categories,
       requirement: 3,
-      rewardPoints: 100,
+
       icon: Icons.travel_explore,
       rewards: [AchievementReward(rewardId: 'frame_cyber', type: RewardType.nicknameFrame)],
     ),
@@ -222,7 +220,7 @@ class AchievementManager {
       description: 'Complete all 14 category campaigns',
       type: AchievementType.categories,
       requirement: 14,
-      rewardPoints: 500,
+
       icon: Icons.flag,
       rewards: [AchievementReward(rewardId: 'skin_engineer', type: RewardType.skin)],
     ),
@@ -234,7 +232,7 @@ class AchievementManager {
       description: 'Complete all security levels',
       type: AchievementType.levels,
       requirement: 15,
-      rewardPoints: 75,
+
       icon: Icons.shield,
       rewards: [AchievementReward(rewardId: 'icon_robot', type: RewardType.icon)],
     ),
@@ -244,7 +242,7 @@ class AchievementManager {
       description: 'Complete all networking levels',
       type: AchievementType.levels,
       requirement: 15,
-      rewardPoints: 75,
+
       icon: Icons.wifi,
       rewards: [AchievementReward(rewardId: 'icon_laptop', type: RewardType.icon)],
     ),
@@ -254,18 +252,11 @@ class AchievementManager {
       description: 'Complete all OS levels',
       type: AchievementType.levels,
       requirement: 15,
-      rewardPoints: 75,
+
       icon: Icons.desktop_windows,
       rewards: [AchievementReward(rewardId: 'icon_server', type: RewardType.icon)],
     ),
   ];
-
-  static Achievement? byId(String id) {
-    for (final a in all) {
-      if (a.id == id) return a;
-    }
-    return null;
-  }
 
   static List<Achievement> checkNew({
     required int levelsCleared,

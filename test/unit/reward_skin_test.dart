@@ -23,11 +23,6 @@ void main() {
       final badges = RewardPool.badges;
       expect(badges.every((b) => b.type == RewardType.icon || b.type == RewardType.title), isTrue);
     });
-
-    test('byRarity returns correct rewards', () {
-      final common = RewardPool.byRarity(Rarity.common);
-      expect(common.every((r) => r.rarity == Rarity.common), isTrue);
-    });
   });
 
   group('SkinTierManager Tests', () {

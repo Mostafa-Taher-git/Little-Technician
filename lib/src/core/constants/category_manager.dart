@@ -11,9 +11,7 @@ class CategoryDef {
   final int levelCount;
   final String bossName;
   final String bossLore;
-  final Set<String> deviceTypes;
   final int bossHp;
-  final List<String> bossKeys;
   final List<BossEncounterDef> bosses;
 
   const CategoryDef({
@@ -25,9 +23,7 @@ class CategoryDef {
     this.levelCount = 29,
     this.bossName = '',
     this.bossLore = '',
-    this.deviceTypes = const {},
     this.bossHp = 5,
-    this.bossKeys = const [],
     this.bosses = const [],
   });
 }
@@ -69,7 +65,6 @@ class CategoryManager {
       levelCount: 29,
       bossName: 'The Bone Colossus',
       bossLore: 'A towering skeleton giant assembled from broken PC cases and failed hardware.',
-      deviceTypes: {'desktop', 'laptop'},
       bossHp: 5,
       bosses: coreComponentsBosses,
     ),
@@ -98,7 +93,6 @@ class CategoryManager {
       levelCount: 29,
       bossName: 'The Memory Wraith',
       bossLore: 'A ghostly entity that corrupts memory addresses and shreds data.',
-      deviceTypes: {'desktop', 'laptop'},
       bossHp: 5,
       bosses: ramBosses,
     ),
@@ -127,7 +121,6 @@ class CategoryManager {
       levelCount: 29,
       bossName: 'The Lich Lord',
       bossLore: 'An undead sorcerer of corrupted system files.',
-      deviceTypes: {'desktop', 'laptop'},
       bossHp: 6,
       bosses: operatingSystemBosses,
     ),
@@ -156,7 +149,6 @@ class CategoryManager {
       levelCount: 29,
       bossName: 'The Static Specter',
       bossLore: 'A ghost that feeds on audio frequencies and corrupts sound waves.',
-      deviceTypes: {'desktop', 'laptop', 'phone', 'tablet'},
       bossHp: 5,
       bosses: audioBosses,
     ),
@@ -185,7 +177,6 @@ class CategoryManager {
       levelCount: 29,
       bossName: 'The Goblin King',
       bossLore: 'A cunning goblin warlord that sabotages your peripherals.',
-      deviceTypes: {'desktop', 'laptop', 'printer'},
       bossHp: 5,
       bosses: peripheralsBosses,
     ),
@@ -214,7 +205,6 @@ class CategoryManager {
       levelCount: 29,
       bossName: 'The Glitch',
       bossLore: 'A digital parasite that corrupts code and breaks installations.',
-      deviceTypes: {'desktop', 'laptop'},
       bossHp: 5,
       bosses: softwareBosses,
     ),
@@ -243,7 +233,6 @@ class CategoryManager {
       levelCount: 29,
       bossName: 'The Dragon Whelp',
       bossLore: 'A young crimson dragon that hoards network packets.',
-      deviceTypes: {'desktop', 'laptop', 'phone', 'tablet', 'router'},
       bossHp: 6,
       bosses: internetBosses,
     ),
@@ -272,7 +261,6 @@ class CategoryManager {
       levelCount: 29,
       bossName: 'The Void Disk',
       bossLore: 'An ancient data-destroyer that consumes files whole.',
-      deviceTypes: {'desktop', 'laptop'},
       bossHp: 5,
       bosses: storageBosses,
     ),
@@ -301,7 +289,6 @@ class CategoryManager {
       levelCount: 29,
       bossName: 'The Beholder',
       bossLore: 'A floating eye tyrant that corrupts displays.',
-      deviceTypes: {'desktop', 'laptop', 'smart_tv', 'console'},
       bossHp: 7,
       bosses: displayBosses,
     ),
@@ -330,7 +317,6 @@ class CategoryManager {
       levelCount: 29,
       bossName: 'The Battery Wraith',
       bossLore: 'A ghostly energy-draining entity.',
-      deviceTypes: {'phone', 'tablet'},
       bossHp: 5,
       bosses: mobileBosses,
     ),
@@ -359,7 +345,6 @@ class CategoryManager {
       levelCount: 29,
       bossName: 'The Lag Dragon',
       bossLore: 'A corrupted game entity that spawns frame drops.',
-      deviceTypes: {'desktop', 'laptop', 'console', 'smart_tv'},
       bossHp: 6,
       bosses: gamingBosses,
     ),
@@ -388,7 +373,6 @@ class CategoryManager {
       levelCount: 29,
       bossName: 'The Static Phantom',
       bossLore: 'A spectral presence that possesses smart devices, making them unresponsive.',
-      deviceTypes: {'smart_home'},
       bossHp: 5,
       bosses: smartHomeBosses,
     ),
@@ -417,7 +401,6 @@ class CategoryManager {
       levelCount: 29,
       bossName: 'The Trojan Imp',
       bossLore: 'A deceptive imp that disguises itself as legitimate software.',
-      deviceTypes: {'desktop', 'laptop', 'phone', 'tablet'},
       bossHp: 7,
       bosses: securityBosses,
     ),
@@ -446,7 +429,6 @@ class CategoryManager {
       levelCount: 29,
       bossName: 'The DNS Gremlin',
       bossLore: 'A mischievous gremlin that corrupts DNS lookups, sending devices to wrong addresses.',
-      deviceTypes: {'desktop', 'laptop', 'phone', 'tablet', 'router'},
       bossHp: 5,
       bosses: networkingBosses,
     ),
@@ -458,11 +440,4 @@ class CategoryManager {
     }
     return null;
   }
-
-  static CategoryDef? byIndex(int index) {
-    if (index < 0 || index >= all.length) return null;
-    return all[index];
-  }
-
-  static int indexOf(String id) => all.indexWhere((c) => c.id == id);
 }

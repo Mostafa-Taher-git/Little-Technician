@@ -1,25 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:littletech/src/features/auth/data/services/auth_service.dart';
 
-// ── Events ────────────────────────────────────────────────────────────────────
-
-abstract class AuthEvent {}
-
-class LoginEvent extends AuthEvent {
-  final String username;
-  final String password;
-  LoginEvent({required this.username, required this.password});
-}
-
-class RegisterEvent extends AuthEvent {
-  final String username;
-  final String password;
-  final String avatarIcon;
-  RegisterEvent({required this.username, required this.password, required this.avatarIcon});
-}
-
-class LogoutEvent extends AuthEvent {}
-
 // ── States ────────────────────────────────────────────────────────────────────
 
 abstract class AuthState {
@@ -41,18 +22,17 @@ class AuthError extends AuthState {
   const AuthError(this.message);
 }
 
-// ── Bloc ──────────────────────────────────────────────────────────────────────
+// ── Cubit ─────────────────────────────────────────────────────────────────────
 
-class AuthBloc extends Bloc<AuthEvent, AuthState> {
-  AuthBloc() : super(AuthInitial()) {
-    on<LoginEvent>(_onLogin);
-    on<RegisterEvent>(_onRegister);
-    on<LogoutEvent>(_onLogout);
-  }
+class AuthCubit extends Cubit<AuthState> {
+  AuthCubit() : super(AuthInitial());
 
-  Future<void> _onLogin(LoginEvent event, Emitter<AuthState> emit) async {
+  Future<void> login({
+    required String username,
+    required String password,
+  }) async {
     emit(AuthLoading());
-    final ok = await AuthService.login(username: event.username, password: event.password);
+    final ok = await AuthService.login(username: username, password: password);
     if (ok) {
       emit(LoginSuccess());
     } else {
@@ -60,12 +40,16 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
   }
 
-  Future<void> _onRegister(RegisterEvent event, Emitter<AuthState> emit) async {
+  Future<void> register({
+    required String username,
+    required String password,
+    required String avatarIcon,
+  }) async {
     emit(AuthLoading());
     final ok = await AuthService.register(
-      username: event.username,
-      password: event.password,
-      avatarIcon: event.avatarIcon,
+      username: username,
+      password: password,
+      avatarIcon: avatarIcon,
     );
     if (ok) {
       emit(RegisterSuccess());
@@ -74,7 +58,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
   }
 
-  Future<void> _onLogout(LogoutEvent event, Emitter<AuthState> emit) async {
+  Future<void> logout() async {
     await AuthService.logout();
     emit(LogoutSuccess());
   }

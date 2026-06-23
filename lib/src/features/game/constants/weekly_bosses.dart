@@ -411,8 +411,6 @@ class WeeklyBossManager {
     ),
   ];
 
-  static List<BossEncounterDef> get all => _bosses;
-
   static BossEncounterDef getCurrent() {
     final now = DateTime.now();
     final daysSinceEpoch = now.millisecondsSinceEpoch ~/ Duration.millisecondsPerDay;

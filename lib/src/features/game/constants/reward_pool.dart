@@ -236,7 +236,6 @@ class RewardPool {
     ),
   ];
 
-  static final Map<Rarity, List<RewardDef>> _byRarity = {};
   static final List<double> _cumulativeWeights = [];
   static final List<RewardDef> _weightedList = [];
   static bool _initialized = false;
@@ -244,7 +243,6 @@ class RewardPool {
   static void _ensureInit() {
     if (_initialized) return;
     for (final r in rewards) {
-      _byRarity.putIfAbsent(r.rarity, () => []).add(r);
       _weightedList.add(r);
       _cumulativeWeights.add(_cumulativeWeights.isEmpty
           ? r.weight
@@ -268,11 +266,6 @@ class RewardPool {
     return List.unmodifiable(rewards);
   }
 
-  static List<RewardDef> byRarity(Rarity r) {
-    _ensureInit();
-    return List.unmodifiable(_byRarity[r] ?? []);
-  }
-
   static RewardDef? byId(String id) {
     _ensureInit();
     try {
@@ -287,14 +280,4 @@ class RewardPool {
     return List.unmodifiable(rewards.where((r) => r.type == RewardType.icon || r.type == RewardType.title));
   }
 
-  static const int storePrice = 1000;
-
-  static List<RewardDef> get storeItems {
-    _ensureInit();
-    return List.unmodifiable(rewards);
-  }
-
-  static bool isPurchasable(RewardDef item, List<String> earnedIds, List<String> purchasedIds) {
-    return !earnedIds.contains(item.id) && !purchasedIds.contains(item.id);
-  }
 }

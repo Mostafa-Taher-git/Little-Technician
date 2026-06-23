@@ -38,7 +38,7 @@ class _LittleTechAppState extends State<LittleTechApp> {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (_) => AuthBloc()),
+        BlocProvider(create: (_) => AuthCubit()),
         BlocProvider(create: (_) => CounterCubit()),
         BlocProvider(create: (_) => ThemeCubit()),
         if (_userId != null)
@@ -47,7 +47,7 @@ class _LittleTechAppState extends State<LittleTechApp> {
             create: (_) => GameCubit(GameRepository(widget.isar), _userId!)..loadGame(),
           ),
       ],
-      child: BlocListener<AuthBloc, AuthState>(
+      child: BlocListener<AuthCubit, AuthState>(
         listener: (_, state) {
           if (state is LoginSuccess || state is RegisterSuccess || state is LogoutSuccess) {
             _loadUserId();

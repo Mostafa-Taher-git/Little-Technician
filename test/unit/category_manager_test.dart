@@ -23,28 +23,6 @@ void main() {
       final cat = CategoryManager.byId('invalid_id');
       expect(cat, isNull);
     });
-
-    test('byIndex returns correct category', () {
-      final cat = CategoryManager.byIndex(0);
-      expect(cat, isNotNull);
-      expect(cat?.id, equals('core_components'));
-    });
-
-    test('byIndex returns null for invalid index', () {
-      final cat = CategoryManager.byIndex(-1);
-      expect(cat, isNull);
-      final cat2 = CategoryManager.byIndex(100);
-      expect(cat2, isNull);
-    });
-
-    test('indexOf returns correct index', () {
-      expect(CategoryManager.indexOf('core_components'), equals(0));
-      expect(CategoryManager.indexOf('ram'), equals(1));
-    });
-
-    test('indexOf returns -1 for unknown ID', () {
-      expect(CategoryManager.indexOf('unknown'), equals(-1));
-    });
   });
 
   group('GameData Tests', () {

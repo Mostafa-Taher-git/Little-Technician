@@ -50,7 +50,7 @@ class _LoginScreenState extends State<LoginScreen> {
       body: Container(
         decoration: const BoxDecoration(gradient: AppColors.darkGradient),
         child: SafeArea(
-          child: BlocListener<AuthBloc, AuthState>(
+          child: BlocListener<AuthCubit, AuthState>(
             listener: (context, state) {
               if (state is LoginSuccess) {
                 WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -198,7 +198,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       const Gap(24),
 
                       // Login button
-                      BlocBuilder<AuthBloc, AuthState>(
+                      BlocBuilder<AuthCubit, AuthState>(
                         builder: (_, state) {
                           return SizedBox(
                             width: double.infinity,
@@ -213,10 +213,10 @@ class _LoginScreenState extends State<LoginScreen> {
                                   ? null
                                   : () {
                                       if (_formKey.currentState!.validate()) {
-                                        context.read<AuthBloc>().add(LoginEvent(
+                                        context.read<AuthCubit>().login(
                                             username: _usernameCtrl.text.trim(),
                                             password: _passwordCtrl.text,
-                                          ));
+                                          );
                                       }
                                     },
                               child: state is AuthLoading
