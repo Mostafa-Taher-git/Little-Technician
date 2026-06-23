@@ -107,6 +107,15 @@ class AuthService {
       }
       await prefs.remove('lt_saved_solutions');
     }
+
+    final oldCount = prefs.getInt('lt_problem_counter');
+    if (oldCount != null) {
+      final newKey = 'lt_problem_counter_$userId';
+      if (prefs.getInt(newKey) == null) {
+        await prefs.setInt(newKey, oldCount);
+      }
+      await prefs.remove('lt_problem_counter');
+    }
   }
 
   // ── Public API ─────────────────────────────────────────────────────────────
@@ -203,6 +212,7 @@ class AuthService {
     final prefs = await _prefs;
     await prefs.remove('lt_solved_problems_$userId');
     await prefs.remove('lt_saved_solutions_$userId');
+    await prefs.remove('lt_problem_counter_$userId');
     await prefs.remove(_sessionKey);
     await prefs.remove('${_sessionKey}_id');
   }

@@ -39,7 +39,11 @@ class _LittleTechAppState extends State<LittleTechApp> {
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (_) => AuthCubit()),
-        BlocProvider(create: (_) => CounterCubit()),
+        if (_userId != null)
+          BlocProvider(
+            key: ValueKey('counter_$_userId'),
+            create: (_) => CounterCubit(),
+          ),
         BlocProvider(create: (_) => ThemeCubit()),
         if (_userId != null)
           BlocProvider(
@@ -50,7 +54,8 @@ class _LittleTechAppState extends State<LittleTechApp> {
       child: BlocListener<AuthCubit, AuthState>(
         listener: (_, state) {
           if (state is LoginSuccess || state is RegisterSuccess || state is LogoutSuccess) {
-            _loadUserId();
+            final userId = AuthService.getCachedUserId();
+            if (mounted) setState(() => _userId = userId);
           }
         },
         child: BlocBuilder<ThemeCubit, ThemeData>(
