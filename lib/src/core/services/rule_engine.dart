@@ -617,6 +617,431 @@ class RuleEngine {
       'Verify the cable category matches the required speed (Cat5e for Gigabit).',
     ],
 
+    // ── Core Components (new) ──────────────────────────────────────────────
+    'overclocking unstable': [
+      'Reset BIOS to default settings to remove all overclocks.',
+      'Increase CPU voltage slightly (Vcore) in small 0.025V increments.',
+      'Run a stress test (Prime95 or AIDA64) for at least 30 minutes.',
+      'Monitor temperatures — keep below 85°C under load.',
+      'If still unstable, reduce clock speed to the highest stable frequency.',
+    ],
+    'power supply failure': [
+      'Check if the PSU fan spins when the PC is powered on.',
+      'Test with a known-good PSU if available (swap test).',
+      'Use a PSU tester or multimeter to check voltage rails (+12V, +5V, +3.3V).',
+      'Inspect for bulging capacitors or burn marks on the PSU.',
+      'Replace the PSU if voltages are out of spec or it fails to power on.',
+    ],
+    'usb port not working': [
+      'Try a different USB port on the same computer.',
+      'Check Device Manager for yellow warning icons on USB controllers.',
+      'Uninstall and reinstall the USB controller driver in Device Manager.',
+      'Check BIOS to ensure USB ports are enabled.',
+      'Test the device on another computer to rule out device failure.',
+    ],
+    'thermal throttling': [
+      'Open HWMonitor or Core Temp to confirm throttling temperatures.',
+      'Clean dust from all fans and heatsinks with compressed air.',
+      'Reapply thermal paste between CPU/GPU and heatsink.',
+      'Improve case airflow — add case fans or improve cable management.',
+      'Consider upgrading the CPU cooler if stock cooler is insufficient.',
+    ],
+    'pc randomly restarts': [
+      'Check Windows Event Viewer for critical errors around the restart time.',
+      'Run Windows Memory Diagnostic to test for RAM issues.',
+      'Monitor CPU and GPU temperatures for thermal shutdowns.',
+      'Test the PSU with a PSU tester — failing PSU causes random restarts.',
+      'Update BIOS and all device drivers to latest versions.',
+    ],
+    'nvme ssd not recognized': [
+      'Enter BIOS and check if the NVMe drive appears in the storage list.',
+      'Try a different M.2 slot if your motherboard has multiple.',
+      'Update BIOS to the latest version for NVMe compatibility.',
+      'Ensure the M.2 slot is set to NVMe mode (not SATA) in BIOS.',
+      'Test the drive in another M.2 slot or an external NVMe enclosure.',
+    ],
+
+    // ── RAM (new) ──────────────────────────────────────────────────────────
+    'dual channel not working': [
+      'Check that both RAM sticks are in the correct slots (usually A2 and B2).',
+      'Enter BIOS and verify dual-channel mode is enabled.',
+      'Test with both sticks individually to rule out a faulty module.',
+      'Update BIOS — some boards need updates for proper dual-channel support.',
+      'Ensure both sticks have matching speed, timings, and voltage.',
+    ],
+    'memory leak detection': [
+      'Open Task Manager → Performance → Memory and check "In use" trend.',
+      'Use Resource Monitor to identify processes with growing memory usage.',
+      'Update the application causing the leak to its latest version.',
+      'Restart the leaking application to free the consumed memory.',
+      'Run Windows Memory Diagnostic to rule out hardware-level leaks.',
+    ],
+    'ecc memory error': [
+      'Check the motherboard BIOS for ECC support and ensure it is enabled.',
+      'Run a memory test (MemTest86) to identify the faulty DIMM.',
+      'Reseat the ECC RAM sticks and clean contacts.',
+      'Check server logs for corrected error counts — increasing errors mean failure.',
+      'Replace the DIMM if uncorrectable errors occur or error count rises.',
+    ],
+    'xmp profile fails': [
+      'Reset BIOS to defaults and try enabling XMP again.',
+      'Manually set RAM frequency, timings, and voltage instead of using XMP.',
+      'Test with one stick at a time to identify which module causes instability.',
+      'Update BIOS — newer versions often improve XMP compatibility.',
+      'If XMP still fails, run RAM at stock JEDEC speeds (no overclock).',
+    ],
+
+    // ── Operating System (new) ─────────────────────────────────────────────
+    'registry corruption': [
+      'Boot into Safe Mode and run "sfc /scannow" from an elevated Command Prompt.',
+      'Run "DISM /Online /Cleanup-Image /RestoreHealth" to repair the system image.',
+      'Use System Restore to revert to a restore point before the corruption.',
+      'If boot fails, use a Windows recovery USB and run sfc from there.',
+      'As a last resort, reset Windows while keeping personal files.',
+    ],
+    'application crash loop': [
+      'Open Task Manager and end the crashing application process.',
+      'Check Windows Event Viewer → Application logs for the crash error code.',
+      'Update the application to the latest version from the developer.',
+      'Reinstall the application after completely uninstalling it.',
+      'Check for missing Visual C++ Redistributable or .NET Framework.',
+    ],
+    'user profile corrupted': [
+      'Boot into Safe Mode and log in with a different administrator account.',
+      'Open Registry Editor and navigate to HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\ProfileList.',
+      'Delete the .bak profile entry for the corrupted account.',
+      'Restart and log in — Windows will recreate the profile from the default.',
+      'Copy personal files from C:\\Users\\OldProfile to the new profile.',
+    ],
+    'kernel security check': [
+      'Boot into Safe Mode and run "sfc /scannow".',
+      'Run "DISM /Online /Cleanup-Image /RestoreHealth".',
+      'Update all device drivers, especially storage and network drivers.',
+      'Run Windows Memory Diagnostic to check for RAM errors.',
+      'If the error persists, use System Restore to revert to a working state.',
+    ],
+
+    // ── Audio (new) ────────────────────────────────────────────────────────
+    'headphones only one side': [
+      'Test the headphones on another device to confirm the issue.',
+      'Check the audio balance in Settings → Sound → Output → Device properties → Balance.',
+      'Clean the headphone jack with compressed air — debris can block a channel.',
+      'Inspect the headphone cable for damage or kinks near the plug.',
+      'Try a different pair of headphones to rule out the audio jack.',
+    ],
+    'bluetooth audio choppy': [
+      'Move closer to the PC — reduce distance to under 3 meters.',
+      'Remove other Bluetooth devices to reduce interference.',
+      'Update Bluetooth adapter driver from Device Manager.',
+      'Disable Wi-Fi or switch to 5 GHz to reduce 2.4 GHz congestion.',
+      'Try switching audio codec to SBC in Bluetooth developer settings.',
+    ],
+    'audio crackling noise': [
+      'Disable audio enhancements in Sound → Properties → Enhancements.',
+      'Change the sample rate to 16-bit 44100Hz in Sound → Properties → Advanced.',
+      'Update the audio driver from the motherboard manufacturer website.',
+      'Check for electromagnetic interference — move speakers away from the PC.',
+      'Try a different USB port if using a USB audio device.',
+    ],
+    'sound services stopped': [
+      'Open Services (services.msc) and find "Windows Audio".',
+      'Right-click → Properties and set Startup type to "Automatic".',
+      'Click "Start" if the service is stopped, then Apply.',
+      'Repeat for "Windows Audio Endpoint Builder" service.',
+      'Restart the PC and verify sound works.',
+    ],
+
+    // ── Peripherals (new) ──────────────────────────────────────────────────
+    'webcam not working': [
+      'Check if the webcam is physically blocked or has a privacy shutter.',
+      'Open Device Manager and look for the webcam under "Cameras" or "Imaging devices".',
+      'Uninstall and reinstall the webcam driver.',
+      'Check app permissions — go to Settings → Privacy → Camera and allow access.',
+      'Test the webcam in another app (e.g., Camera app or Zoom) to isolate the issue.',
+    ],
+    'gaming controller drift': [
+      'Calibrate the controller in Windows: Settings → Devices → Controllers → Calibrate.',
+      'Clean around the analog stick with compressed air.',
+      'Update controller firmware through the manufacturer app.',
+      'Increase the dead zone in the game or controller settings.',
+      'If persistent, the analog stick module may need replacement.',
+    ],
+    'touchpad freezing': [
+      'Update the touchpad driver from the laptop manufacturer website.',
+      'Check if the issue occurs with an external mouse (rules out software).',
+      'Disable and re-enable the touchpad in Device Manager.',
+      'Adjust touchpad sensitivity in Settings → Devices → Touchpad.',
+      'Boot into Safe Mode to check if a third-party app is causing the freeze.',
+    ],
+    'usb hub overload': [
+      'Unplug all devices from the hub and reconnect one at a time.',
+      'Check if the hub has its own power adapter — use a powered hub for devices.',
+      'Move high-power devices (external drives) to a motherboard USB port.',
+      'Update the USB hub driver in Device Manager.',
+      'Replace the hub if it continues to fail under normal load.',
+    ],
+
+    // ── Software (new) ─────────────────────────────────────────────────────
+    'app won\'t open': [
+      'Restart the computer and try opening the app again.',
+      'Check Task Manager for a hanging process — end it and retry.',
+      'Run the app as Administrator (right-click → Run as administrator).',
+      'Reinstall the app after completely uninstalling it.',
+      'Check Windows Event Viewer for the specific crash error.',
+    ],
+    'antivirus conflict': [
+      'Check if two antivirus programs are installed — uninstall one.',
+      'Add the conflicting program to the antivirus exclusion/whitelist.',
+      'Update both the antivirus and the conflicting program.',
+      'Temporarily disable the antivirus to test if it is the cause.',
+      'Switch to Windows Defender if third-party AV causes persistent conflicts.',
+    ],
+    'windows store error': [
+      'Run the Windows Store Apps troubleshooter (Settings → Troubleshoot).',
+      'Reset the Microsoft Store cache: run "wsreset.exe" from the Run dialog.',
+      'Sign out and sign back into your Microsoft account.',
+      'Check that the Windows Update and BITS services are running.',
+      'Re-register the Store app: run PowerShell command from Microsoft support.',
+    ],
+    'software permission denied': [
+      'Right-click the program → Properties → Security tab → check permissions.',
+      'Run the program as Administrator.',
+      'Take ownership of the file/folder: right-click → Properties → Security → Advanced.',
+      'Check if antivirus or UAC is blocking the program.',
+      'Reinstall the program to a location where you have full permissions.',
+    ],
+
+    // ── Internet (new) ─────────────────────────────────────────────────────
+    'ethernet cable unplugged': [
+      'Check both ends of the Ethernet cable are firmly plugged in.',
+      'Try a different Ethernet cable to rule out cable damage.',
+      'Test a different port on the router or switch.',
+      'Check Device Manager for the Ethernet adapter — reinstall driver if disabled.',
+      'Run the Windows Network Troubleshooter.',
+    ],
+    'ip address conflict': [
+      'Restart the router to release and renew all DHCP leases.',
+      'On the affected PC, run "ipconfig /release" then "ipconfig /renew".',
+      'Set the adapter to obtain an IP address automatically (DHCP).',
+      'If using static IPs, ensure no two devices share the same address.',
+      'Check the router DHCP scope to ensure it is not exhausted.',
+    ],
+    'packet loss detected': [
+      'Run a continuous ping test: ping 8.8.8.8 -t and watch for drops.',
+      'Restart the router and modem.',
+      'Check for faulty Ethernet cables or loose connections.',
+      'Test with a wired connection to rule out Wi-Fi interference.',
+      'Contact your ISP if packet loss persists beyond your local network.',
+    ],
+    'proxy not working': [
+      'Disable the proxy temporarily: Settings → Network → Proxy → turn off.',
+      'Check the proxy address and port for typos.',
+      'Test without proxy to confirm the proxy is the issue.',
+      'Clear browser proxy settings and reconfigure if needed.',
+      'Contact your network admin if this is a corporate proxy.',
+    ],
+
+    // ── Storage (new) ──────────────────────────────────────────────────────
+    'ssd write protection': [
+      'Check if the SSD has a physical write-protect switch (rare).',
+      'Open Disk Management and check if the disk is read-only.',
+      'Run "diskpart" → "list disk" → "select disk N" → "attributes disk clear readonly".',
+      'Update the SSD firmware from the manufacturer website.',
+      'If persistent, the SSD controller may be failing — back up and replace.',
+    ],
+    'partition not mounting': [
+      'Open Disk Management and check if the partition has a drive letter.',
+      'Right-click the partition → "Change Drive Letter and Paths" → assign one.',
+      'If the partition is RAW, run "chkdsk /f" to repair the file system.',
+      'Check if the partition is encrypted (BitLocker) and unlock it.',
+      'Use disk repair software if the partition table is corrupted.',
+    ],
+    'raid array failed': [
+      'Open the RAID controller BIOS or management software to check array status.',
+      'Identify which disk is degraded or missing from the array.',
+      'Reseat the failed disk — check SATA/SAS cables and power.',
+      'Replace the failed disk and let the array rebuild.',
+      'Restore from backup if the array is unrecoverable.',
+    ],
+    'disk read error': [
+      'Run "chkdsk /f /r" from an elevated Command Prompt.',
+      'Check SATA data cable — try a different port on the motherboard.',
+      'Test the drive in another computer or an external enclosure.',
+      'Check SMART status with CrystalDiskInfo for impending failure signs.',
+      'Back up data immediately — read errors often precede total drive failure.',
+    ],
+
+    // ── Display (new) ──────────────────────────────────────────────────────
+    'color calibration off': [
+      'Open Settings → Display → Night light and ensure it is off.',
+      'Run the built-in color calibration tool: search "dccw" in Start menu.',
+      'Check if the monitor has a "Reset to factory" option in its OSD menu.',
+      'Update the graphics driver and check color settings in the GPU control panel.',
+      'Use a hardware color calibrator for professional accuracy.',
+    ],
+    'refresh rate stuck': [
+      'Right-click desktop → Display settings → Advanced display → choose refresh rate.',
+      'Update the graphics driver from the manufacturer website.',
+      'Check the monitor OSD to ensure it supports the desired refresh rate.',
+      'Use a different cable — some cables (HDMI 1.4) limit refresh rate.',
+      'In GPU control panel (NVIDIA/AMD), set refresh rate manually.',
+    ],
+    'multiple monitor issue': [
+      'Right-click desktop → Display settings → Detect to find the second monitor.',
+      'Try a different cable or port on the GPU.',
+      'Update the graphics driver.',
+      'Check if the monitor is set to the correct input source.',
+      'Extend or duplicate the display in Display settings → Multiple displays.',
+    ],
+    'monitor input lag': [
+      'Enable "Game Mode" or "Low Latency Mode" in the monitor OSD.',
+      'Disable V-Sync in the GPU control panel or game settings.',
+      'Use a higher refresh rate monitor if available.',
+      'Connect via DisplayPort instead of HDMI for lower latency.',
+      'Check for "Signal Processing" or "Post-Processing" settings and disable them.',
+    ],
+
+    // ── Mobile (new) ───────────────────────────────────────────────────────
+    'mobile data not working': [
+      'Toggle Airplane mode on and off to reset the cellular connection.',
+      'Check that mobile data is enabled in Settings → Network & Internet.',
+      'Restart the phone to re-register with the cellular network.',
+      'Check APN settings — reset to carrier defaults if changed.',
+      'Contact your carrier if data is not working on all apps.',
+    ],
+    'fingerprint scanner error': [
+      'Clean the fingerprint sensor with a dry microfiber cloth.',
+      'Remove and re-register your fingerprint in Settings → Security.',
+      'Ensure your finger is clean and dry when scanning.',
+      'Update the phone software — fingerprint bugs are often fixed in updates.',
+      'If persistent, the sensor may need professional repair.',
+    ],
+    'bluetooth pairing failed': [
+      'Turn Bluetooth off and on again on both devices.',
+      'Delete the pairing entry and pair from scratch.',
+      'Ensure both devices are in pairing mode and within 3 meters.',
+      'Restart both devices before retrying.',
+      'Check for firmware updates on the Bluetooth accessory.',
+    ],
+    'battery health degraded': [
+      'Check battery health in Settings → Battery → Battery health.',
+      'Reduce charging speed — avoid fast charging if battery degrades quickly.',
+      'Keep battery between 20% and 80% for optimal longevity.',
+      'Avoid using the phone while charging to reduce heat.',
+      'If health is below 80%, consider a battery replacement at a service center.',
+    ],
+
+    // ── Gaming (new) ───────────────────────────────────────────────────────
+    'game freezing mid-play': [
+      'Lower in-game graphics settings to reduce GPU/CPU load.',
+      'Update graphics drivers to the latest version.',
+      'Monitor temperatures — freezing often indicates thermal throttling.',
+      'Close background apps to free RAM and CPU resources.',
+      'Verify game files through the launcher (Steam → Properties → Local files).',
+    ],
+    'shader compilation error': [
+      'Delete the game\'s shader cache folder and relaunch the game.',
+      'Update graphics drivers — shader compilation bugs are often driver-related.',
+      'Restart the PC and launch the game fresh.',
+      'Lower graphics settings to reduce shader complexity.',
+      'Reinstall the game if the error persists after cache deletion.',
+    ],
+    'anti-cheat false positive': [
+      'Update the anti-cheat software (EasyAntiCheat, BattlEye) from the game folder.',
+      'Add the game and anti-cheat folder to antivirus exclusions.',
+      'Run the game as Administrator.',
+      'Uninstall and reinstall the anti-cheat service via the game\'s repair option.',
+      'Contact the game\'s support with the specific error code.',
+    ],
+    'game save corrupted': [
+      'Check for cloud save sync conflicts in the game launcher.',
+      'Look for manual backup saves in the game\'s save folder.',
+      'Disable cloud sync, delete the corrupted save, and let it resync.',
+      'Use file recovery software if the save was accidentally overwritten.',
+      'Start a new game if the save cannot be recovered.',
+    ],
+
+    // ── Smart Home (new) ───────────────────────────────────────────────────
+    'smart lock jammed': [
+      'Check the battery level — low batteries cause mechanical jams.',
+      'Manually lock/unlock with the physical key to reset the mechanism.',
+      'Remove the battery pack for 30 seconds to hard-reset the lock.',
+      'Ensure the deadbolt moves freely without the lock installed.',
+      'Re-pair the lock in the manufacturer app after resetting.',
+    ],
+    'thermostat not syncing': [
+      'Check that the thermostat is connected to Wi-Fi (check signal strength).',
+      'Restart the thermostat by removing it from the wall plate for 30 seconds.',
+      'Restart your router to refresh the network connection.',
+      'Update the thermostat firmware through the companion app.',
+      'Re-link the thermostat account in the app settings.',
+    ],
+    'zigbee network down': [
+      'Check that the Zigbee hub/coordinator is powered on and connected.',
+      'Restart the Zigbee hub by unplugging it for 30 seconds.',
+      'Ensure Zigbee devices are within range of the hub (30-50 feet).',
+      'Re-pair devices that show as offline in the Zigbee app.',
+      'Check for interference from Wi-Fi, microwaves, or other 2.4 GHz devices.',
+    ],
+    'mqtt broker error': [
+      'Check that the MQTT broker service is running on the server.',
+      'Verify the broker IP address and port in the client configuration.',
+      'Check firewall rules — ensure port 1883 (or 8883 for TLS) is open.',
+      'Restart the MQTT broker service.',
+      'Check broker logs for connection errors or authentication failures.',
+    ],
+
+    // ── Security (new) ─────────────────────────────────────────────────────
+    'ransomware encryption': [
+      'Disconnect the infected device from the internet and all networks immediately.',
+      'Do NOT pay the ransom — recovery is not guaranteed.',
+      'Boot into Safe Mode and run a full antivirus scan.',
+      'Check if a decryptor tool exists for this ransomware variant (nomoreransom.org).',
+      'Restore files from a clean backup if available.',
+    ],
+    'trojan detected': [
+      'Disconnect from the internet to prevent the trojan from communicating.',
+      'Boot into Safe Mode to prevent the trojan from running.',
+      'Run a full scan with your antivirus in Safe Mode.',
+      'Download and run Malwarebytes for a second-opinion scan.',
+      'Remove all detected threats and restart normally.',
+    ],
+    'rootkit hidden process': [
+      'Boot into Safe Mode with Networking.',
+      'Download and run a rootkit-specific scanner (Kaspersky TDSSKiller or Malwarebytes).',
+      'Run "sfc /scannow" and "DISM /Online /Cleanup-Image /RestoreHealth".',
+      'Check Task Manager for processes with no name or unusual descriptions.',
+      'Consider a full OS reinstall if the rootkit cannot be removed.',
+    ],
+    'security certificate expired': [
+      'Check your system clock — incorrect date/time causes false certificate errors.',
+      'Try a different browser to rule out browser-specific issues.',
+      'Clear the browser\'s SSL cache (Settings → Privacy → Clear browsing data).',
+      'If it is your own certificate, renew it through your certificate authority.',
+      'For websites you do not control, the site owner must renew the certificate.',
+    ],
+    'two factor auth failed': [
+      'Check that your device\'s time is synchronized (Settings → Date & Time → Automatic).',
+      'Use a backup code if you have one saved.',
+      'Try the authenticator app\'s manual code entry if QR scan fails.',
+      'Contact the service\'s support to reset 2FA if you lost access.',
+      'Set up 2FA again on a new device once access is restored.',
+    ],
+    'encryption key lost': [
+      'Check if you have a backup of the encryption key or recovery key.',
+      'Look for the key in your password manager or secure storage.',
+      'Contact the service provider — some offer account recovery options.',
+      'If BitLocker, check for the recovery key in your Microsoft account.',
+      'If no recovery option exists, the encrypted data may be permanently inaccessible.',
+    ],
+    'app notification missing': [
+      'Check that notifications are enabled for the app in Settings → Notifications.',
+      'Ensure "Do Not Disturb" mode is not blocking the notifications.',
+      'Check battery optimization settings — aggressive optimization may suppress alerts.',
+      'Clear the app cache and data, then reconfigure notification preferences.',
+      'Update the app and OS to the latest version.',
+    ],
+
     // ── Security ───────────────────────────────────────────────────────────
     'virus or malware infection': [
       'Disconnect from the internet to prevent the malware from spreading or communicating.',
@@ -762,6 +1187,112 @@ class RuleEngine {
     ],
   };
 
+  /// Variant phrasings → canonical solution key.
+  static final Map<String, String> _aliases = {
+    // ── Core Components ──
+    'motherboard cmos battery dead': 'computer not turning on',
+    'pcie slot not working': 'cpu not detected in bios',
+    'gpu not detected': 'cpu not detected in bios',
+    'bios recovery needed': 'beep codes on startup',
+    'hardware compatibility issue': 'cpu not detected in bios',
+    'case airflow poor': 'cpu overheating',
+    'memory overclock failed': 'ram not detected',
+    'no power button response': 'computer not turning on',
+    'motherboard speaker silent': 'beep codes on startup',
+    'cpu upgrade needed': 'cpu not detected in bios',
+    'cpu cooler rgb not lighting': 'cpu fan not spinning',
+    'system freezes on boot': 'boot loop',
+
+    // ── RAM ──
+    'memory overclock unstable': 'ram not detected',
+    'ram latency issues': 'ram compatibility issues',
+    'memory module defective': 'ram not detected',
+    'ram slot damaged': 'ram not detected',
+    'memory test failed': 'ram not detected',
+    'ram speed mismatch': 'ram compatibility issues',
+
+    // ── Operating System ──
+    'system restore failed': 'boot loop',
+    'safe mode stuck': 'boot loop',
+    'missing dll error': 'dll file missing error',
+    'startup repair stuck': 'boot loop',
+    'activation failed': 'windows not updating',
+    'driver verifier crash': 'blue screen of death (bsod)',
+
+    // ── Audio ──
+    'realtek audio missing': 'audio device not found',
+    'spatial sound not working': 'no sound output',
+    'volume slider disabled': 'no sound output',
+    'audio driver rollback': 'audio device not found',
+    'dolby atmos not working': 'no sound output',
+    'sound randomly cuts out': 'no sound output',
+
+    // ── Peripherals ──
+    'headset mic muted': 'microphone not working',
+    'scanner not detected': 'printer not responding',
+    'external drive slow': 'slow disk performance',
+    'bluetooth mouse lag': 'mouse not responding',
+    'wireless keyboard delay': 'wireless keyboard lag',
+
+    // ── Software ──
+    'license expired': 'program not compatible',
+    'subscription not recognized': 'program not compatible',
+    'cloud sync failed': 'program running slow',
+    'auto updater stuck': 'program running slow',
+    'portable app crash': 'program crashes on launch',
+    'registry cleaner needed': 'dll file missing error',
+
+    // ── Internet ──
+    'router admin locked': 'no internet connection',
+    'bandwidth throttling': 'slow internet speed',
+    'ftp connection failed': 'no internet connection',
+    'ssh timeout error': 'no internet connection',
+    'ping high latency': 'slow internet speed',
+    'port forwarding stuck': 'no internet connection',
+
+    // ── Storage ──
+    'disk defragmentation stuck': 'slow disk performance',
+    'storage pool degraded': 'hard drive not detected',
+    'file system error': 'corrupted files / sectors',
+    'disk cleanup hanging': 'disk full — no space',
+    'backup incomplete': 'hard drive not detected',
+    'drive letter missing': 'hard drive not detected',
+
+    // ── Display ──
+    'hdr not working': 'wrong resolution',
+    'oled burn in': 'dead pixels',
+    'g-sync not working': 'flickering screen',
+
+    // ── Mobile ──
+    'nfc not working': 'bluetooth pairing failed',
+    'face unlock failed': 'fingerprint scanner error',
+    'over the air update failed': 'slow phone performance',
+    'sim card not detected': 'phone not charging',
+    'wifi calling failed': 'no internet connection',
+
+    // ── Gaming ──
+    'dlss not working': 'graphics driver crash',
+    'ray tracing crash': 'graphics driver crash',
+    'vram allocation error': 'low fps in games',
+    'multiplayer connection failed': 'no internet connection',
+    'achievement not unlocking': 'game crashing on startup',
+    'game overlay conflict': 'game crashing on startup',
+
+    // ── Smart Home ──
+    'smart plug unresponsive': 'smart device offline',
+    'hue bridge not found': 'smart device offline',
+    'alexa routine failed': 'automation not triggering',
+    'google home offline': 'smart device offline',
+    'smart speaker muted': 'smart device offline',
+    'ir blaster not working': 'smart device offline',
+
+    // ── Security ──
+    'spyware infection': 'virus or malware infection',
+    'phishing attack blocked': 'phishing email received',
+    'security scan hanging': 'virus or malware infection',
+    'malware removal tool crash': 'virus or malware infection',
+  };
+
   /// Find a solution for the given problem text.
   static ProblemSolution? solve(String problem) {
     if (problem.isEmpty) return null;
@@ -772,14 +1303,30 @@ class RuleEngine {
       return ProblemSolution(problem: problem, category: 'General', steps: _solutions[p]!);
     }
 
-    // 2. Partial match
+    // 2. Alias lookup
+    final aliasTarget = _aliases[p];
+    if (aliasTarget != null && _solutions.containsKey(aliasTarget)) {
+      return ProblemSolution(problem: problem, category: 'General', steps: _solutions[aliasTarget]!);
+    }
+
+    // 3. Substring match in solutions
     for (final entry in _solutions.entries) {
       if (p.contains(entry.key) || entry.key.contains(p)) {
         return ProblemSolution(problem: problem, category: 'General', steps: entry.value);
       }
     }
 
-    // 3. Keyword fallback
+    // 4. Substring match via aliases
+    for (final alias in _aliases.entries) {
+      if (p.contains(alias.key) || alias.key.contains(p)) {
+        final target = alias.value;
+        if (_solutions.containsKey(target)) {
+          return ProblemSolution(problem: problem, category: 'General', steps: _solutions[target]!);
+        }
+      }
+    }
+
+    // 5. Keyword fallback
     if (p.contains('display') || p.contains('screen')) {
       return ProblemSolution(problem: problem, category: 'Display', steps: _solutions['no display output']!);
     }
@@ -792,10 +1339,38 @@ class RuleEngine {
     if (p.contains('boot')) {
       return ProblemSolution(problem: problem, category: 'Boot & OS', steps: _solutions["pc won't boot"]!);
     }
-
-    // Boss battles - direct match
-    if (_solutions.containsKey(p)) {
-      return ProblemSolution(problem: problem, category: 'Boss', steps: _solutions[p]!);
+    if (p.contains('mouse')) {
+      return ProblemSolution(problem: problem, category: 'Peripherals', steps: _solutions['mouse not responding']!);
+    }
+    if (p.contains('keyboard')) {
+      return ProblemSolution(problem: problem, category: 'Peripherals', steps: _solutions['keyboard not responding']!);
+    }
+    if (p.contains('printer') || p.contains('print')) {
+      return ProblemSolution(problem: problem, category: 'Peripherals', steps: _solutions['printer not responding']!);
+    }
+    if (p.contains('sound') || p.contains('audio')) {
+      return ProblemSolution(problem: problem, category: 'Audio', steps: _solutions['no sound output']!);
+    }
+    if (p.contains('disk') || p.contains('drive') || p.contains('storage')) {
+      return ProblemSolution(problem: problem, category: 'Storage', steps: _solutions['slow disk performance']!);
+    }
+    if (p.contains('network') || p.contains('router') || p.contains('ethernet')) {
+      return ProblemSolution(problem: problem, category: 'Internet', steps: _solutions['no internet connection']!);
+    }
+    if (p.contains('battery') || p.contains('phone') || p.contains('mobile')) {
+      return ProblemSolution(problem: problem, category: 'Mobile', steps: _solutions['battery draining too fast']!);
+    }
+    if (p.contains('game') || p.contains('fps') || p.contains('gpu') || p.contains('graphics')) {
+      return ProblemSolution(problem: problem, category: 'Gaming', steps: _solutions['game crashing on startup']!);
+    }
+    if (p.contains('smart') || p.contains('hub') || p.contains('automation')) {
+      return ProblemSolution(problem: problem, category: 'Smart Home', steps: _solutions['smart device offline']!);
+    }
+    if (p.contains('virus') || p.contains('malware') || p.contains('security') || p.contains('trojan') || p.contains('ransomware')) {
+      return ProblemSolution(problem: problem, category: 'Security', steps: _solutions['virus or malware infection']!);
+    }
+    if (p.contains('password') || p.contains('login') || p.contains('auth')) {
+      return ProblemSolution(problem: problem, category: 'Security', steps: _solutions['password not accepted after update']!);
     }
 
     // Boss battles - partial match
