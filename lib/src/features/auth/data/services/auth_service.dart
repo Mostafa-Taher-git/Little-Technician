@@ -226,12 +226,4 @@ class AuthService {
     _cachedPrefs = null;
   }
 
-  static Future<void> addPoints(String username, int delta) async {
-    final users = await _loadUsers();
-    final idx = users.indexWhere((u) => u.username == username);
-    if (idx >= 0) {
-      users[idx].points += delta;
-      await _saveUsers(users);
-    }
-  }
 }

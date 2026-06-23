@@ -307,7 +307,6 @@ class WeeklyBossManager {
         {'name': 'GPU Overload', 'description': 'Maxes out GPU utilization with phantom workloads, leaving no capacity for actual rendering.', 'effect': 'damage'},
       ],
       diagnosis: {
-        'shader': 'GPU render time per frame: 89ms (target: 6.9ms). GPU clock stuck at 300MHz despite thermal headroom. Nsight shows 94% of SMs occupied by an unknown compute workload. VRAM bandwidth saturated at 100% utilization.',
         'symptoms': 'GPU render time per frame: 89ms (target: 6.9ms). GPU clock stuck at 300MHz despite thermal headroom. Nsight shows 94% of SMs occupied by an unknown compute workload. VRAM bandwidth saturated at 100% utilization.',
         'options': ['GPU bottleneck or thermal throttling', 'Network latency issue', 'Hard drive bottleneck'],
         'correct': 0,
