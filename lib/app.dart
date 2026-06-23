@@ -51,13 +51,30 @@ class _LittleTechAppState extends State<LittleTechApp> {
             create: (_) => GameCubit(GameRepository(widget.isar), _userId!)..loadGame(),
           ),
       ],
-      child: BlocListener<AuthCubit, AuthState>(
-        listener: (_, state) {
-          if (state is LoginSuccess || state is RegisterSuccess || state is LogoutSuccess) {
-            final userId = AuthService.getCachedUserId();
-            if (mounted) setState(() => _userId = userId);
-          }
-        },
+      child: MultiBlocListener(
+        listeners: [
+          BlocListener<AuthCubit, AuthState>(
+            listener: (_, state) {
+              if (state is LoginSuccess || state is RegisterSuccess || state is LogoutSuccess) {
+                final userId = AuthService.getCachedUserId();
+                if (mounted) setState(() => _userId = userId);
+              }
+            },
+          ),
+          BlocListener<GameCubit, GameState>(
+            listenWhen: (prev, curr) =>
+                prev.progress.themeId != curr.progress.themeId ||
+                (prev.progress.userId != curr.progress.userId),
+            listener: (context, state) {
+              final themeId = state.progress.themeId;
+              if (themeId != null) {
+                context.read<ThemeCubit>().applyTheme(themeId);
+              } else {
+                context.read<ThemeCubit>().resetToDefault();
+              }
+            },
+          ),
+        ],
         child: BlocBuilder<ThemeCubit, ThemeData>(
           builder: (_, theme) => MaterialApp(
             title: 'LittleTech',

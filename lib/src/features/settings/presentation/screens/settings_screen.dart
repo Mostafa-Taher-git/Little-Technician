@@ -61,7 +61,7 @@ class SettingsScreen extends StatelessWidget {
                                 fontSize: 18,
                                 fontColor: scheme.onSurface,
                               ),
-                              Text('Points: ${0}', style: TextStyle(color: scheme.onSurface.withValues(alpha: 0.6), fontSize: 13)),
+                              Text('Points: ${state.progress.points}', style: TextStyle(color: scheme.onSurface.withValues(alpha: 0.6), fontSize: 13)),
                             ],
                           ),
                         ),
