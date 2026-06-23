@@ -20,7 +20,9 @@ class WorldSelectScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: scheme.surface,
       appBar: AppBar(
-        title: const Text('Dungeon Map'),
+        title: BlocBuilder<GameCubit, GameState>(
+          builder: (_, state) => Text(state.currentWorld?.name ?? 'Worlds'),
+        ),
         backgroundColor: Colors.transparent,
         actions: [
           BlocBuilder<GameCubit, GameState>(

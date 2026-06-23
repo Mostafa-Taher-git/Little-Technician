@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:isar/isar.dart';
 import 'package:littletech/src/core/constants/category_manager.dart';
 import 'package:littletech/src/features/game/constants/achievements.dart';
@@ -203,8 +204,13 @@ class GameRepository {
     });
   }
 
-  /// Create a test user with all achievements unlocked
+  /// Create a test user with all achievements unlocked (debug only)
   Future<PlayerProgress> createTestProgress(int userId) async {
+    if (!kDebugMode) return (await loadProgress(userId))!;
+    return _createTestProgressImpl(userId);
+  }
+
+  Future<PlayerProgress> _createTestProgressImpl(int userId) async {
     // Delete any existing progress for this user
     final existing = await loadProgress(userId);
     if (existing != null) {

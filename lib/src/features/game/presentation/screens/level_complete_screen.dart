@@ -67,7 +67,10 @@ class _LevelCompleteScreenState extends State<LevelCompleteScreen>
     final quizPts = _prepData?['quiz'] != null ? 20 : 0;
     final orderPts = _prepData?['ordering']?['passed'] == true ? 15 : 0;
     final trapPts = _prepData?['traps']?['passed'] == true ? 15 : 0;
-    _totalPoints = quizPts + orderPts + trapPts + 10 * widget.level.steps.length + widget.level.points;
+    final progress = context.read<GameCubit>().state.progress;
+    final noSupTechBonus = progress.supTechUsesThisLevel >= 1 ? 25 : 0;
+    const firstAttemptBonus = 25;
+    _totalPoints = quizPts + orderPts + trapPts + noSupTechBonus + firstAttemptBonus + 10 * widget.level.steps.length + widget.level.points;
 
     _controller.addListener(() {
       final t = _controller.value;
@@ -314,6 +317,14 @@ class _LevelCompleteScreenState extends State<LevelCompleteScreen>
     if (quiz != null) chips.add(_prepChip('Quiz ${quiz['correct']}/${quiz['total']}', const Color(0xFF3B82F6)));
     if (ordering != null) chips.add(_prepChip('Order ${ordering['passed'] == true ? '✓' : '${ordering['attempts']}x'}', ordering['passed'] == true ? const Color(0xFF22C55E) : const Color(0xFFEF4444)));
     if (traps != null) chips.add(_prepChip('Traps ${traps['correct']}/${traps['total']} ${traps['passed'] == true ? '✓' : '✗'}', traps['passed'] == true ? const Color(0xFF22C55E) : const Color(0xFFEF4444)));
+
+    // Bonus chips
+    final progress = context.read<GameCubit>().state.progress;
+    if (progress.supTechUsesThisLevel >= 1) {
+      chips.add(_prepChip('+25 No SupTech', const Color(0xFF22C55E)));
+    }
+    chips.add(_prepChip('+25 First Attempt', const Color(0xFF22C55E)));
+
     if (chips.isEmpty) return [];
 
     return [

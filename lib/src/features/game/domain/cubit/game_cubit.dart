@@ -82,7 +82,6 @@ class GameState {
 class GameCubit extends Cubit<GameState> {
   final GameRepository _repository;
   final int _userId;
-  DateTime? _levelStartTime;
 
   GameCubit(this._repository, this._userId)
       : super(GameState(progress: PlayerProgress()..userId = _userId));
@@ -108,7 +107,7 @@ class GameCubit extends Cubit<GameState> {
       final pending = progress.pendingAchievementIds
           .map((id) => AchievementManager.all.firstWhere((a) => a.id == id))
           .toList();
-      _safePersist(() => _repository.clearPendingAchievements(progress));
+      _safePersist([() => _repository.clearPendingAchievements(progress)]);
       emit(GameState(progress: progress, currentWorld: world, newlyUnlockedAchievements: pending));
     } catch (e, st) {
       debugPrint('loadGame failed: $e\n$st');
@@ -117,7 +116,7 @@ class GameCubit extends Cubit<GameState> {
 
   void selectWorld(WorldDef world) {
     final progress = state.progress;
-    _safePersist(() => _repository.setCurrentCategory(progress, world.id, null));
+    _safePersist([() => _repository.setCurrentCategory(progress, world.id, null)]);
     emit(state.copyWith(progress: progress, currentWorld: world, bossHpMultiplier: 1));
   }
 
@@ -132,14 +131,14 @@ class GameCubit extends Cubit<GameState> {
   void completeDailyQuest() {
     final progress = state.progress;
     progress.setDailyQuestCompleted();
-    _safePersist(() => _repository.saveProgress(progress));
+    _safePersist([() => _repository.saveProgress(progress)]);
     emit(state.copyWith(progress: progress));
   }
 
   void completeWeeklyBoss() {
     final progress = state.progress;
     progress.setWeeklyBossCompleted();
-    _safePersist(() => _repository.saveProgress(progress));
+    _safePersist([() => _repository.saveProgress(progress)]);
     emit(state.copyWith(progress: progress));
   }
 
@@ -147,8 +146,7 @@ class GameCubit extends Cubit<GameState> {
     final progress = state.progress;
     final world = worldOverride ?? state.currentWorld;
     progress.currentLevelId = level.id;
-    _levelStartTime = DateTime.now();
-    _safePersist(() => _repository.setCurrentCategory(progress, world?.id, level.id));
+    _safePersist([() => _repository.setCurrentCategory(progress, world?.id, level.id)]);
     emit(state.copyWith(
       progress: progress,
       currentWorld: world ?? state.currentWorld,
@@ -167,13 +165,13 @@ class GameCubit extends Cubit<GameState> {
         : <String, dynamic>{};
     data['feedback'] = {'helpful': wasHelpful, 'timestamp': DateTime.now().toIso8601String()};
     p.setPrepResult(levelId, json.encode(data));
-    _safePersist(() => _repository.saveProgress(p));
+    _safePersist([() => _repository.saveProgress(p)]);
     emit(state.copyWith(progress: p));
   }
 
   void addChallengeBonus(int bonusPoints) {
     final p = state.progress;
-    _safePersist(() => _repository.addPoints(p, bonusPoints));
+    _safePersist([() => _repository.addPoints(p, bonusPoints)]);
     emit(state.copyWith(progress: p));
   }
 
@@ -192,7 +190,7 @@ class GameCubit extends Cubit<GameState> {
     final nextIndex = state.currentStepIndex + 1;
     final progress = state.progress;
 
-    _safePersist(() => _repository.addPoints(progress, 10));
+    _safePersist([() => _repository.addPoints(progress, 10)]);
     if (nextIndex >= steps.length) {
       _completeLevel(progress, nextIndex);
     } else {
@@ -204,9 +202,10 @@ class GameCubit extends Cubit<GameState> {
     }
   }
 
-  void _safePersist(Future<void> Function() op) {
-    op().catchError((e, st) {
+  void _safePersist(List<Future<void> Function()> ops) {
+    Future.wait(ops.map((op) => op())).catchError((e, st) {
       debugPrint('Persist error: $e');
+      return <void>[];
     });
   }
 
@@ -218,46 +217,40 @@ class GameCubit extends Cubit<GameState> {
     if (progress.supTechUsesThisLevel >= 1) {
       bonusPoints += 25;
     }
-
-    final elapsed = _levelStartTime != null
-        ? DateTime.now().difference(_levelStartTime!).inSeconds
-        : 999;
-    if (elapsed <= 30) {
-      bonusPoints += 50;
-    } else if (elapsed <= 60) {
-      bonusPoints += 30;
-    } else if (elapsed <= 120) {
-      bonusPoints += 15;
-    }
+    // First attempt bonus — completed without retrying (linear game = always true)
+    bonusPoints += 25;
 
     final totalPoints = basePoints + bonusPoints;
-    _safePersist(() => _repository.addPoints(progress, totalPoints));
-    _safePersist(() => _repository.completeLevel(progress, level.id));
-    _safePersist(() => _repository.resetLevelUses(progress));
     final world = state.currentWorld;
-    if (world != null && GameData.isWorldComplete(world, progress.completedLevelIds)) {
-      _safePersist(() => _repository.completeWorld(progress, 0));
-      _safePersist(() => _repository.completeCategory(progress, world.id));
-    }
+    final isWorldComplete = world != null && GameData.isWorldComplete(world, progress.completedLevelIds);
 
     // Draw reward safely — ensure state always emits even if reward fails
     RewardDef? reward;
     try {
       reward = RewardPool.draw();
-      _safePersist(() => _repository.addReward(progress, reward!.id));
-      if (reward.type == RewardType.skin) {
-        _safePersist(() => _repository.unlockSkin(progress, reward!.value));
-      }
     } catch (e, st) {
       debugPrint('Reward draw failed: $e\n$st');
     }
 
-    _safePersist(() => _repository.recordPlayDate(progress));
-    
+    final persistOps = <Future<void> Function()>[
+      () => _repository.addPoints(progress, totalPoints),
+      () => _repository.completeLevel(progress, level.id),
+      () => _repository.resetLevelUses(progress),
+      if (isWorldComplete) ...[
+        () => _repository.completeWorld(progress, 0),
+        () => _repository.completeCategory(progress, world.id),
+      ],
+      if (reward != null) () => _repository.addReward(progress, reward!.id),
+      if (reward?.type == RewardType.skin) () => _repository.unlockSkin(progress, reward!.value),
+      () => _repository.recordPlayDate(progress),
+    ];
+
     // Complete daily quest if this level was from a daily challenge
     if (state.pointsMultiplier > 1) {
-      _safePersist(() => _repository.saveProgress(progress..setDailyQuestCompleted()));
+      persistOps.add(() => _repository.saveProgress(progress..setDailyQuestCompleted()));
     }
+
+    _safePersist(persistOps);
     
     _checkAndUnlockProgressionSkins();
     final newAchievements = _checkAchievements();
@@ -277,7 +270,7 @@ class GameCubit extends Cubit<GameState> {
     final hpLeft = state.currentBossHp - damage;
     final progress = state.progress;
 
-    _safePersist(() => _repository.addPoints(progress, 10));
+    _safePersist([() => _repository.addPoints(progress, 10)]);
     if (hpLeft <= 0) {
       _defeatBoss(progress);
     } else {
@@ -288,24 +281,26 @@ class GameCubit extends Cubit<GameState> {
   void _defeatBoss(PlayerProgress progress) {
     final boss = state.currentBoss;
     final bossPoints = boss?.points ?? state.currentWorld?.boss.points ?? 500;
-    _safePersist(() => _repository.addPoints(progress, bossPoints * state.pointsMultiplier));
-    _safePersist(() => _repository.defeatBoss(progress, bossId: boss?.id));
-    _safePersist(() => _repository.recordPlayDate(progress));
 
-    if (boss?.id.startsWith('weekly_') == true) {
-      _safePersist(() => _repository.saveProgress(progress..setWeeklyBossCompleted()));
-    }
-
+    // Draw reward safely — ensure state always emits even if reward fails
     RewardDef? reward;
     try {
       reward = RewardPool.draw();
-      _safePersist(() => _repository.addReward(progress, reward!.id));
-      if (reward.type == RewardType.skin) {
-        _safePersist(() => _repository.unlockSkin(progress, reward!.value));
-      }
     } catch (e, st) {
       debugPrint('Boss reward draw failed: $e\n$st');
     }
+
+    final persistOps = <Future<void> Function()>[
+      () => _repository.addPoints(progress, bossPoints * state.pointsMultiplier),
+      () => _repository.defeatBoss(progress, bossId: boss?.id),
+      () => _repository.recordPlayDate(progress),
+      if (boss?.id.startsWith('weekly_') == true)
+        () => _repository.saveProgress(progress..setWeeklyBossCompleted()),
+      if (reward != null) () => _repository.addReward(progress, reward!.id),
+      if (reward?.type == RewardType.skin) () => _repository.unlockSkin(progress, reward!.value),
+    ];
+
+    _safePersist(persistOps);
 
     _checkAndUnlockProgressionSkins();
     final newAchievements = _checkAchievements();
@@ -331,7 +326,7 @@ class GameCubit extends Cubit<GameState> {
       case 'hint':
         final hints = GameData.levelHints[state.currentLevel?.id];
         if (hints != null && hints.isNotEmpty) {
-          _safePersist(() => _repository.useSupTech(progress));
+          _safePersist([() => _repository.useSupTech(progress)]);
           emit(state.copyWith(
             progress: progress,
             hintText: hints[state.currentStepIndex % hints.length],
@@ -339,10 +334,10 @@ class GameCubit extends Cubit<GameState> {
         }
       case 'skip':
         if (state.currentLevel == null) return;
-        _safePersist(() => _repository.useSupTech(progress));
+        _safePersist([() => _repository.useSupTech(progress)]);
         solveStep();
       case 'diagnose':
-        _safePersist(() => _repository.useSupTech(progress));
+        _safePersist([() => _repository.useSupTech(progress)]);
         emit(state.copyWith(
           progress: progress,
           hintText: 'Try checking the most common causes first. '
@@ -351,7 +346,7 @@ class GameCubit extends Cubit<GameState> {
       case 'explain':
         if (state.currentLevel != null &&
             state.currentStepIndex < state.currentLevel!.steps.length) {
-          _safePersist(() => _repository.useSupTech(progress));
+          _safePersist([() => _repository.useSupTech(progress)]);
           emit(state.copyWith(
             progress: progress,
             hintText: state.currentLevel!.steps[state.currentStepIndex],
@@ -366,7 +361,7 @@ class GameCubit extends Cubit<GameState> {
 
   void addPoints(int amount) {
     final p = state.progress;
-    _safePersist(() => _repository.addPoints(p, amount));
+    _safePersist([() => _repository.addPoints(p, amount)]);
     emit(state.copyWith(progress: p));
   }
 
@@ -378,7 +373,7 @@ class GameCubit extends Cubit<GameState> {
         : <String, dynamic>{};
     data['quiz'] = {'correct': correct, 'total': total, 'hearts': hearts};
     p.setPrepResult(levelId, json.encode(data));
-    _safePersist(() => _repository.saveProgress(p));
+    _safePersist([() => _repository.saveProgress(p)]);
     emit(state.copyWith(progress: p));
   }
 
@@ -390,7 +385,7 @@ class GameCubit extends Cubit<GameState> {
         : <String, dynamic>{};
     data['ordering'] = {'attempts': attempts, 'passed': passed};
     p.setPrepResult(levelId, json.encode(data));
-    _safePersist(() => _repository.saveProgress(p));
+    _safePersist([() => _repository.saveProgress(p)]);
     emit(state.copyWith(progress: p));
   }
 
@@ -402,7 +397,7 @@ class GameCubit extends Cubit<GameState> {
         : <String, dynamic>{};
     data['traps'] = {'correct': correct, 'total': total, 'passed': passed};
     p.setPrepResult(levelId, json.encode(data));
-    _safePersist(() => _repository.saveProgress(p));
+    _safePersist([() => _repository.saveProgress(p)]);
     emit(state.copyWith(progress: p));
   }
 
@@ -414,7 +409,7 @@ class GameCubit extends Cubit<GameState> {
         : <String, dynamic>{};
     data['scenarios'] = {'correct': correct, 'total': total, 'passed': passed};
     p.setPrepResult(levelId, json.encode(data));
-    _safePersist(() => _repository.saveProgress(p));
+    _safePersist([() => _repository.saveProgress(p)]);
     emit(state.copyWith(progress: p));
   }
 
@@ -426,14 +421,14 @@ class GameCubit extends Cubit<GameState> {
         : <String, dynamic>{};
     data['mistakes'] = {'passed': passed};
     p.setPrepResult(levelId, json.encode(data));
-    _safePersist(() => _repository.saveProgress(p));
+    _safePersist([() => _repository.saveProgress(p)]);
     emit(state.copyWith(progress: p));
   }
 
   Future<void> setThemeId(String? themeId) async {
     final progress = state.progress;
     progress.themeId = themeId;
-    _safePersist(() => _repository.saveProgress(progress));
+    _safePersist([() => _repository.saveProgress(progress)]);
     emit(state.copyWith(progress: progress));
   }
 
@@ -449,7 +444,7 @@ class GameCubit extends Cubit<GameState> {
       }
     }
     if (changed) {
-      _safePersist(() => _repository.saveProgress(progress));
+      _safePersist([() => _repository.saveProgress(progress)]);
     }
   }
 
@@ -466,9 +461,9 @@ class GameCubit extends Cubit<GameState> {
       alreadyUnlockedIds: progress.unlockedAchievementIds,
     );
     for (final a in newAchievements) {
-      _safePersist(() => _repository.unlockAchievement(progress, a.id));
+      _safePersist([() => _repository.unlockAchievement(progress, a.id)]);
       for (final reward in a.rewards) {
-        _safePersist(() => _repository.unlockRewardFromAchievement(progress, reward.rewardId));
+        _safePersist([() => _repository.unlockRewardFromAchievement(progress, reward.rewardId)]);
       }
     }
     return newAchievements;
@@ -483,7 +478,7 @@ class GameCubit extends Cubit<GameState> {
       return; // Can't equip locked skin
     }
     progress.activeSkinId = skinId;
-    _safePersist(() => _repository.setActiveSkin(progress, skinId));
+    _safePersist([() => _repository.setActiveSkin(progress, skinId)]);
     emit(state.copyWith(progress: progress));
   }
 
@@ -493,7 +488,7 @@ class GameCubit extends Cubit<GameState> {
       return; // Can't equip locked frame
     }
     progress.activeFrameId = frameId;
-    _safePersist(() => _repository.setActiveFrame(progress, frameId));
+    _safePersist([() => _repository.setActiveFrame(progress, frameId)]);
     emit(state.copyWith(progress: progress));
   }
 
@@ -504,7 +499,7 @@ class GameCubit extends Cubit<GameState> {
     if (progress.earnedRewardIds.contains(itemId)) return;
     progress.points -= 1000;
     progress.purchasedItemIds = List<String>.from(progress.purchasedItemIds)..add(itemId);
-    _safePersist(() => _repository.saveProgress(progress));
+    _safePersist([() => _repository.saveProgress(progress)]);
     emit(state.copyWith(progress: progress));
   }
 
@@ -523,6 +518,7 @@ class GameCubit extends Cubit<GameState> {
   }
 
   Future<void> unlockEverything() async {
+    if (!kDebugMode) return;
     final progress = await _repository.createTestProgress(_userId);
     emit(GameState(progress: progress, currentWorld: state.currentWorld));
   }

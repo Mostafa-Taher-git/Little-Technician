@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'dart:math';
+import 'package:crypto/crypto.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:littletech/src/features/auth/data/models/user_model.dart';
 
@@ -25,6 +27,37 @@ class AuthService {
   static Future<int?> getFreshUserId() async {
     final prefs = await _prefs;
     return prefs.getInt('${_sessionKey}_id');
+  }
+
+  // ── Password hashing ─────────────────────────────────────────────────────
+
+  static String _generateSalt() {
+    final rng = Random.secure();
+    return List.generate(16, (_) => rng.nextInt(36).toRadixString(36)).join();
+  }
+
+  static String _hashPassword(String password, String salt) {
+    final bytes = utf8.encode('$salt$password');
+    return sha256.convert(bytes).toString();
+  }
+
+  static String _saltAndHash(String password) {
+    final salt = _generateSalt();
+    final hash = _hashPassword(password, salt);
+    return '$salt:$hash';
+  }
+
+  /// Returns true if [stored] is in "salt:hash" format.
+  static bool _isHashed(String stored) => stored.contains(':');
+
+  /// Verify a plaintext password against a stored value (hashed or legacy).
+  static bool _verifyPassword(String password, String stored) {
+    if (_isHashed(stored)) {
+      final parts = stored.split(':');
+      if (parts.length != 2) return false;
+      return _hashPassword(password, parts[0]) == parts[1];
+    }
+    return password == stored;
   }
 
   // ── Helpers ────────────────────────────────────────────────────────────────
@@ -88,7 +121,7 @@ class AuthService {
       return false;
     }
     final newId = users.isEmpty ? 1 : users.map((u) => u.id).reduce((a, b) => a > b ? a : b) + 1;
-    users.add(UserModel(id: newId, username: username, password: password, avatarIcon: avatarIcon));
+    users.add(UserModel(id: newId, username: username, password: _saltAndHash(password), avatarIcon: avatarIcon));
     await _saveUsers(users);
     final prefs = await _prefs;
     await prefs.setString(_sessionKey, username);
@@ -101,12 +134,17 @@ class AuthService {
     final users = await _loadUsers();
     UserModel? match;
     for (final u in users) {
-      if (u.username.toLowerCase() == username.toLowerCase() && u.password == password) {
+      if (u.username.toLowerCase() == username.toLowerCase() && _verifyPassword(password, u.password)) {
         match = u;
         break;
       }
     }
     if (match == null) return false;
+    // Transparently re-hash if stored as legacy plaintext
+    if (!_isHashed(match.password)) {
+      match.password = _saltAndHash(password);
+      await _saveUsers(users);
+    }
     final prefs = await _prefs;
     await prefs.setString(_sessionKey, match.username);
     await prefs.setInt('${_sessionKey}_id', match.id);
@@ -152,7 +190,7 @@ class AuthService {
     final users = await _loadUsers();
     final idx = users.indexWhere((u) => u.username.toLowerCase() == username.toLowerCase());
     if (idx < 0) return false;
-    users[idx].password = newPassword;
+    users[idx].password = _saltAndHash(newPassword);
     await _saveUsers(users);
     return true;
   }

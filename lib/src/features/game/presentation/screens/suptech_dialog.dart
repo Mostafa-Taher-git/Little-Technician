@@ -39,7 +39,7 @@ class SupTechDialog extends StatelessWidget {
               Row(
                 children: [
                   Text(
-                    'Magical Companion',
+                    'SupTech',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,

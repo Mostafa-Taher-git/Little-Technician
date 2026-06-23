@@ -49,7 +49,7 @@ class RewardPool {
       type: RewardType.icon,
       value: '🔧',
       rarity: Rarity.common,
-      displayName: 'Dagger Icon',
+      displayName: 'Wrench Icon',
       icon: Icons.build,
     ),
     RewardDef(
@@ -57,7 +57,7 @@ class RewardPool {
       type: RewardType.icon,
       value: '🪛',
       rarity: Rarity.common,
-      displayName: 'Wand Icon',
+      displayName: 'Screwdriver Icon',
       icon: Icons.build_circle,
     ),
     RewardDef(
@@ -65,7 +65,7 @@ class RewardPool {
       type: RewardType.icon,
       value: '⚙️',
       rarity: Rarity.common,
-      displayName: 'Shield Icon',
+      displayName: 'Gear Icon',
       icon: Icons.settings,
     ),
     RewardDef(
@@ -107,7 +107,7 @@ class RewardPool {
       type: RewardType.icon,
       value: '💻',
       rarity: Rarity.rare,
-      displayName: 'Tome Icon',
+      displayName: 'Laptop Icon',
       icon: Icons.computer,
     ),
     RewardDef(
@@ -115,15 +115,15 @@ class RewardPool {
       type: RewardType.icon,
       value: '🖥️',
       rarity: Rarity.rare,
-      displayName: 'Castle Icon',
+      displayName: 'Server Icon',
       icon: Icons.dns,
     ),
     RewardDef(
       id: 'title_engineer',
       type: RewardType.title,
-      value: 'Battle Mage',
+      value: 'Engineer',
       rarity: Rarity.rare,
-      displayName: 'Title: Battle Mage',
+      displayName: 'Title: Engineer',
       icon: Icons.badge,
     ),
     RewardDef(
@@ -131,7 +131,7 @@ class RewardPool {
       type: RewardType.nicknameFrame,
       value: 'tech_frame',
       rarity: Rarity.rare,
-      displayName: 'Rune Frame',
+      displayName: 'Tech Frame',
       icon: Icons.border_style,
     ),
     RewardDef(
@@ -157,15 +157,15 @@ class RewardPool {
       type: RewardType.icon,
       value: '🤖',
       rarity: Rarity.epic,
-      displayName: 'Golem Icon',
+      displayName: 'Robot Icon',
       icon: Icons.smart_toy,
     ),
     RewardDef(
       id: 'title_architect',
       type: RewardType.title,
-      value: 'Dungeon Master',
+      value: 'Architect',
       rarity: Rarity.epic,
-      displayName: 'Title: Dungeon Master',
+      displayName: 'Title: Architect',
       icon: Icons.badge,
     ),
     RewardDef(
@@ -181,7 +181,7 @@ class RewardPool {
       type: RewardType.nicknameFrame,
       value: 'cyber_frame',
       rarity: Rarity.epic,
-      displayName: 'Enchanted Frame',
+      displayName: 'Cyber Frame',
       icon: Icons.border_all,
     ),
     RewardDef(
