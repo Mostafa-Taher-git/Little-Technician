@@ -12,6 +12,7 @@ class RewardDef {
   final Rarity rarity;
   final String displayName;
   final IconData icon;
+  final Color? frameColor;
 
   const RewardDef({
     required this.id,
@@ -20,9 +21,11 @@ class RewardDef {
     required this.rarity,
     required this.displayName,
     required this.icon,
+    this.frameColor,
   });
 
   Color get color {
+    if (frameColor != null) return frameColor!;
     return switch (rarity) {
       Rarity.common => Colors.grey,
       Rarity.rare => Colors.blue,
@@ -91,6 +94,7 @@ class RewardPool {
       rarity: Rarity.common,
       displayName: 'Simple Frame',
       icon: Icons.crop_square,
+      frameColor: Color(0xFF9CA3AF),
     ),
     RewardDef(
       id: 'theme_dark',
@@ -133,6 +137,7 @@ class RewardPool {
       rarity: Rarity.rare,
       displayName: 'Tech Frame',
       icon: Icons.border_style,
+      frameColor: Color(0xFF3B82F6),
     ),
     RewardDef(
       id: 'skin_hacker',
@@ -183,6 +188,7 @@ class RewardPool {
       rarity: Rarity.epic,
       displayName: 'Cyber Frame',
       icon: Icons.border_all,
+      frameColor: Color(0xFF06B6D4),
     ),
     RewardDef(
       id: 'theme_ocean',
@@ -191,6 +197,147 @@ class RewardPool {
       rarity: Rarity.epic,
       displayName: 'Ocean Depths Theme',
       icon: Icons.water_drop,
+    ),
+    RewardDef(
+      id: 'skin_cyber',
+      type: RewardType.skin,
+      value: 'cyber',
+      rarity: Rarity.epic,
+      displayName: 'Skin: Cyber Scout',
+      icon: Icons.phonelink,
+    ),
+    RewardDef(
+      id: 'skin_shadow',
+      type: RewardType.skin,
+      value: 'shadow',
+      rarity: Rarity.epic,
+      displayName: 'Skin: Shadow Coder',
+      icon: Icons.visibility_off,
+    ),
+    RewardDef(
+      id: 'skin_neon',
+      type: RewardType.skin,
+      value: 'neon',
+      rarity: Rarity.epic,
+      displayName: 'Skin: Neon Rider',
+      icon: Icons.bolt,
+    ),
+    RewardDef(
+      id: 'skin_phoenix',
+      type: RewardType.skin,
+      value: 'phoenix',
+      rarity: Rarity.epic,
+      displayName: 'Skin: Phoenix Coder',
+      icon: Icons.local_fire_department,
+    ),
+    RewardDef(
+      id: 'skin_titan',
+      type: RewardType.skin,
+      value: 'titan',
+      rarity: Rarity.epic,
+      displayName: 'Skin: Titan Tech',
+      icon: Icons.hardware,
+    ),
+    RewardDef(
+      id: 'skin_void_',
+      type: RewardType.skin,
+      value: 'void_',
+      rarity: Rarity.legendary,
+      displayName: 'Skin: Void Walker',
+      icon: Icons.all_inclusive,
+    ),
+    RewardDef(
+      id: 'skin_glitch',
+      type: RewardType.skin,
+      value: 'glitch',
+      rarity: Rarity.epic,
+      displayName: 'Skin: Glitch Master',
+      icon: Icons.bug_report,
+    ),
+    RewardDef(
+      id: 'skin_frost',
+      type: RewardType.skin,
+      value: 'frost',
+      rarity: Rarity.epic,
+      displayName: 'Skin: Frost Byte',
+      icon: Icons.ac_unit,
+    ),
+    RewardDef(
+      id: 'skin_chrono',
+      type: RewardType.skin,
+      value: 'chrono',
+      rarity: Rarity.legendary,
+      displayName: 'Skin: Chrono Tech',
+      icon: Icons.schedule,
+    ),
+    RewardDef(
+      id: 'skin_spectre',
+      type: RewardType.skin,
+      value: 'spectre',
+      rarity: Rarity.legendary,
+      displayName: 'Skin: Spectre Admin',
+      icon: Icons.admin_panel_settings,
+    ),
+    RewardDef(
+      id: 'skin_viper',
+      type: RewardType.skin,
+      value: 'viper',
+      rarity: Rarity.epic,
+      displayName: 'Skin: Viper Security',
+      icon: Icons.security,
+    ),
+    RewardDef(
+      id: 'skin_spark',
+      type: RewardType.skin,
+      value: 'spark',
+      rarity: Rarity.epic,
+      displayName: 'Skin: Spark Circuit',
+      icon: Icons.electric_bolt,
+    ),
+    RewardDef(
+      id: 'frame_neon',
+      type: RewardType.nicknameFrame,
+      value: 'neon_frame',
+      rarity: Rarity.rare,
+      displayName: 'Neon Frame',
+      icon: Icons.lightbulb_outline,
+      frameColor: Color(0xFF22D3EE),
+    ),
+    RewardDef(
+      id: 'frame_circuit',
+      type: RewardType.nicknameFrame,
+      value: 'circuit_frame',
+      rarity: Rarity.epic,
+      displayName: 'Circuit Frame',
+      icon: Icons.cable,
+      frameColor: Color(0xFF10B981),
+    ),
+    RewardDef(
+      id: 'frame_glitch',
+      type: RewardType.nicknameFrame,
+      value: 'glitch_frame',
+      rarity: Rarity.rare,
+      displayName: 'Glitch Frame',
+      icon: Icons.error_outline,
+      frameColor: Color(0xFFF472B6),
+    ),
+    RewardDef(
+      id: 'frame_binary',
+      type: RewardType.nicknameFrame,
+      value: 'binary_frame',
+      rarity: Rarity.rare,
+      displayName: 'Binary Frame',
+      icon: Icons.code,
+      frameColor: Color(0xFF4ADE80),
+    ),
+    RewardDef(
+      id: 'frame_platinum',
+      type: RewardType.nicknameFrame,
+      value: 'platinum_frame',
+      rarity: Rarity.legendary,
+      displayName: 'Platinum Frame',
+      icon: Icons.diamond,
+      frameColor: Color(0xFFE2E8F0),
     ),
 
     // Legendary rewards (3%)
@@ -225,6 +372,7 @@ class RewardPool {
       rarity: Rarity.legendary,
       displayName: 'Legendary Frame',
       icon: Icons.star_border,
+      frameColor: Color(0xFFF59E0B),
     ),
     RewardDef(
       id: 'theme_neon',

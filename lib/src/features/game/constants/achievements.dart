@@ -62,6 +62,16 @@ class AchievementManager {
       rewards: [AchievementReward(rewardId: 'title_fixer', type: RewardType.title)],
     ),
     Achievement(
+      id: 'fifteen_levels',
+      name: 'Tech Savvy',
+      description: 'Complete 15 levels',
+      type: AchievementType.levels,
+      requirement: 15,
+
+      icon: Icons.star,
+      rewards: [AchievementReward(rewardId: 'skin_cyber', type: RewardType.skin)],
+    ),
+    Achievement(
       id: 'twenty_levels',
       name: 'Master Technician',
       description: 'Complete 20 levels',
@@ -70,6 +80,26 @@ class AchievementManager {
 
       icon: Icons.workspace_premium,
       rewards: [AchievementReward(rewardId: 'frame_tech', type: RewardType.nicknameFrame)],
+    ),
+    Achievement(
+      id: 'forty_levels',
+      name: 'Veteran Tech',
+      description: 'Complete 40 levels',
+      type: AchievementType.levels,
+      requirement: 40,
+
+      icon: Icons.workspace_premium,
+      rewards: [AchievementReward(rewardId: 'skin_chrono', type: RewardType.skin)],
+    ),
+    Achievement(
+      id: 'fifty_levels',
+      name: 'Master Tech',
+      description: 'Complete 50 levels',
+      type: AchievementType.levels,
+      requirement: 50,
+
+      icon: Icons.emoji_events,
+      rewards: [AchievementReward(rewardId: 'skin_spark', type: RewardType.skin)],
     ),
 
     // ── Bosses ──────────────────────────────────────────────────────────────
@@ -92,6 +122,26 @@ class AchievementManager {
       icon: Icons.shield_outlined,
     ),
     Achievement(
+      id: 'five_bosses',
+      name: 'Elite Hunter',
+      description: 'Defeat 5 bosses',
+      type: AchievementType.bosses,
+      requirement: 5,
+
+      icon: Icons.shield,
+      rewards: [AchievementReward(rewardId: 'skin_shadow', type: RewardType.skin)],
+    ),
+    Achievement(
+      id: 'ten_bosses',
+      name: 'Boss Slayer',
+      description: 'Defeat 10 bosses',
+      type: AchievementType.bosses,
+      requirement: 10,
+
+      icon: Icons.shield_moon,
+      rewards: [AchievementReward(rewardId: 'skin_void_', type: RewardType.skin)],
+    ),
+    Achievement(
       id: 'all_bosses',
       name: 'Overlord',
       description: 'Defeat a boss in every category',
@@ -100,6 +150,16 @@ class AchievementManager {
 
       icon: Icons.shield_moon,
       rewards: [AchievementReward(rewardId: 'skin_hacker', type: RewardType.skin)],
+    ),
+    Achievement(
+      id: 'fifty_bosses',
+      name: 'Spectre Admin',
+      description: 'Defeat 50 bosses',
+      type: AchievementType.bosses,
+      requirement: 50,
+
+      icon: Icons.admin_panel_settings,
+      rewards: [AchievementReward(rewardId: 'skin_spectre', type: RewardType.skin)],
     ),
 
     // ── Points ──────────────────────────────────────────────────────────────
@@ -111,6 +171,7 @@ class AchievementManager {
       requirement: 100,
 
       icon: Icons.monetization_on,
+      rewards: [AchievementReward(rewardId: 'frame_glitch', type: RewardType.nicknameFrame)],
     ),
     Achievement(
       id: 'thousand_points',
@@ -121,6 +182,16 @@ class AchievementManager {
 
       icon: Icons.monetization_on,
       rewards: [AchievementReward(rewardId: 'theme_dark', type: RewardType.theme)],
+    ),
+    Achievement(
+      id: 'two_thousand_points',
+      name: 'Point Baron',
+      description: 'Earn 2000 points',
+      type: AchievementType.points,
+      requirement: 2000,
+
+      icon: Icons.monetization_on,
+      rewards: [AchievementReward(rewardId: 'skin_phoenix', type: RewardType.skin)],
     ),
     Achievement(
       id: 'five_thousand_points',
@@ -151,6 +222,7 @@ class AchievementManager {
       requirement: 5,
 
       icon: Icons.card_giftcard,
+      rewards: [AchievementReward(rewardId: 'frame_neon', type: RewardType.nicknameFrame)],
     ),
     Achievement(
       id: 'ten_rewards',
@@ -162,6 +234,16 @@ class AchievementManager {
       icon: Icons.inventory,
       rewards: [AchievementReward(rewardId: 'frame_legendary', type: RewardType.nicknameFrame)],
     ),
+    Achievement(
+      id: 'fifteen_rewards',
+      name: 'Loot Goblin',
+      description: 'Earn 15 rewards',
+      type: AchievementType.rewards,
+      requirement: 15,
+
+      icon: Icons.inventory_2,
+      rewards: [AchievementReward(rewardId: 'skin_glitch', type: RewardType.skin)],
+    ),
 
     // ── Streak ──────────────────────────────────────────────────────────────
     Achievement(
@@ -172,6 +254,7 @@ class AchievementManager {
       requirement: 3,
 
       icon: Icons.local_fire_department,
+      rewards: [AchievementReward(rewardId: 'frame_circuit', type: RewardType.nicknameFrame)],
     ),
     Achievement(
       id: 'seven_day_streak',
@@ -182,6 +265,16 @@ class AchievementManager {
 
       icon: Icons.whatshot,
       rewards: [AchievementReward(rewardId: 'theme_amber', type: RewardType.theme)],
+    ),
+    Achievement(
+      id: 'fourteen_day_streak',
+      name: 'Unstoppable',
+      description: 'Achieve a 14-day streak',
+      type: AchievementType.streak,
+      requirement: 14,
+
+      icon: Icons.local_fire_department,
+      rewards: [AchievementReward(rewardId: 'skin_frost', type: RewardType.skin)],
     ),
     Achievement(
       id: 'thirty_day_streak',
@@ -213,6 +306,16 @@ class AchievementManager {
 
       icon: Icons.travel_explore,
       rewards: [AchievementReward(rewardId: 'frame_cyber', type: RewardType.nicknameFrame)],
+    ),
+    Achievement(
+      id: 'five_worlds',
+      name: 'Viper Security',
+      description: 'Complete 5 category campaigns',
+      type: AchievementType.categories,
+      requirement: 5,
+
+      icon: Icons.security,
+      rewards: [AchievementReward(rewardId: 'skin_viper', type: RewardType.skin)],
     ),
     Achievement(
       id: 'all_worlds',

@@ -484,7 +484,9 @@ class GameCubit extends Cubit<GameState> {
 
   Future<void> setActiveFrame(String? frameId) async {
     final progress = state.progress;
-    if (frameId != null && !progress.earnedRewardIds.contains(frameId)) {
+    if (frameId != null &&
+        !progress.earnedRewardIds.contains(frameId) &&
+        !progress.purchasedItemIds.contains(frameId)) {
       return; // Can't equip locked frame
     }
     progress.activeFrameId = frameId;

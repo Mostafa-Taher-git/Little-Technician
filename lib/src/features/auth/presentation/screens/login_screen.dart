@@ -8,7 +8,6 @@ import 'package:littletech/src/core/widgets/app_widgets.dart';
 import 'package:littletech/src/features/auth/data/models/user_model.dart';
 import 'package:littletech/src/features/auth/data/services/auth_service.dart';
 import 'package:littletech/src/features/auth/presentation/bloc/auth_bloc.dart';
-import 'package:littletech/src/features/home/presentation/screens/home_screen.dart';
 import 'register_screen.dart';
 import 'forget_password_screen.dart';
 
@@ -52,11 +51,7 @@ class _LoginScreenState extends State<LoginScreen> {
         child: SafeArea(
           child: BlocListener<AuthCubit, AuthState>(
             listener: (context, state) {
-              if (state is LoginSuccess) {
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  if (context.mounted) Nav.replaceAll(context, const HomeScreen());
-                });
-              } else if (state is AuthError) {
+              if (state is AuthError) {
                 showErrorToast(context, state.message);
               }
             },
