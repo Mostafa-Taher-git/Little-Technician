@@ -18,18 +18,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   final _pages = const [
     _OnboardingPage(
-      icon: Icons.search,
-      title: 'Find Problems',
+      icon: Icons.door_front_door,
+      title: 'Your Quest Begins',
     ),
     _OnboardingPage(
-      icon: Icons.tips_and_updates,
-      title: 'Step-by-Step Fixes',
-      subtitle: 'Follow clear, numbered steps to resolve any computer issue.',
+      icon: Icons.shield,
+      title: 'Slay the Beast',
     ),
     _OnboardingPage(
-      icon: Icons.bookmark,
-      title: 'Save & Track',
-      subtitle: 'Bookmark solutions for quick access and track your progress.',
+      icon: Icons.emoji_events,
+      title: 'Claim Your Tech Glory',
     ),
   ];
 
@@ -87,12 +85,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             ),
                           ),
                           const Gap(16),
-                          if (p.subtitle != null)
-                            Text(
-                              p.subtitle!,
-                              textAlign: TextAlign.center,
-                              style: const TextStyle(fontSize: 16, color: Colors.white60, height: 1.5),
-                            ),
                         ],
                       ),
                     );
@@ -158,7 +150,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 class _OnboardingPage {
   final IconData icon;
   final String title;
-  final String? subtitle;
 
-  const _OnboardingPage({required this.icon, required this.title, this.subtitle});
+  const _OnboardingPage({required this.icon, required this.title});
 }
