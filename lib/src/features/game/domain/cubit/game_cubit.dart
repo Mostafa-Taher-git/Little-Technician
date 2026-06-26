@@ -494,6 +494,26 @@ class GameCubit extends Cubit<GameState> {
     emit(state.copyWith(progress: progress));
   }
 
+  Future<void> setActiveIcon(String? iconId) async {
+    final progress = state.progress;
+    if (iconId != null && !progress.earnedRewardIds.contains(iconId)) {
+      return; // Can't equip locked icon
+    }
+    progress.activeIconId = iconId;
+    _safePersist([() => _repository.setActiveIcon(progress, iconId)]);
+    emit(state.copyWith(progress: progress));
+  }
+
+  Future<void> setActiveTitle(String? titleId) async {
+    final progress = state.progress;
+    if (titleId != null && !progress.earnedRewardIds.contains(titleId)) {
+      return; // Can't equip locked title
+    }
+    progress.activeTitleId = titleId;
+    _safePersist([() => _repository.setActiveTitle(progress, titleId)]);
+    emit(state.copyWith(progress: progress));
+  }
+
   void purchaseItem(String itemId) {
     final progress = state.progress;
     if (progress.points < 1000) return;

@@ -84,12 +84,19 @@ class SkinDefinition {
 }
 
 class SkinTierManager {
+  static SkinDefinition fromId(String? id) {
+    return skins.firstWhere(
+      (s) => s.id == id,
+      orElse: () => skins.first,
+    );
+  }
+
   static const List<SkinDefinition> skins = [
     SkinDefinition(
       id: 'default',
       name: 'Default SupTech',
       tier: SkinTier.default_,
-      description: 'A friendly gray companion ready for adventure',
+      description: 'A dark hooded chibi with a gray robe and silver glow',
       levelsRequired: 0,
       previewIcon: Icons.auto_awesome,
       bodyColor: Color(0xFF6B7280),
@@ -99,7 +106,7 @@ class SkinTierManager {
       id: 'rookie',
       name: 'Tech Rookie',
       tier: SkinTier.rookie,
-      description: 'A blue-capped novice with an antenna for detecting signals',
+      description: 'A blue-robed novice with an antenna for detecting signals',
       levelsRequired: 5,
       previewIcon: Icons.auto_awesome_mosaic,
       bodyColor: Color(0xFF2563EB),
@@ -110,7 +117,7 @@ class SkinTierManager {
       id: 'ninja',
       name: 'Network Ninja',
       tier: SkinTier.ninja,
-      description: 'A purple headband-wrapped stealth specialist',
+      description: 'A purple hooded stealth specialist with a headband',
       levelsRequired: 15,
       previewIcon: Icons.auto_awesome_motion,
       bodyColor: Color(0xFF7C3AED),
@@ -132,7 +139,7 @@ class SkinTierManager {
       id: 'golden',
       name: 'Golden SupTech',
       tier: SkinTier.golden,
-      description: 'A red-suited hero crowned with golden authority',
+      description: 'A dark-robed figure crowned with golden authority',
       levelsRequired: 50,
       previewIcon: Icons.auto_awesome,
       bodyColor: Color(0xFFDC2626),
@@ -155,7 +162,7 @@ class SkinTierManager {
       id: 'engineer',
       name: 'Engineer',
       tier: SkinTier.engineer,
-      description: 'An indigo-clad builder with a gear of creation',
+      description: 'An indigo-robed builder with a gear of creation',
       levelsRequired: 0,
       previewIcon: Icons.engineering,
       isRewardSkin: true,
@@ -179,7 +186,7 @@ class SkinTierManager {
       id: 'cyber',
       name: 'Cyber Scout',
       tier: SkinTier.cyber,
-      description: 'A cyan-hued scout with enhanced digital senses',
+      description: 'A cyan-robed scout with enhanced digital senses',
       levelsRequired: 0,
       previewIcon: Icons.phonelink,
       isRewardSkin: true,
@@ -215,7 +222,7 @@ class SkinTierManager {
       id: 'phoenix',
       name: 'Phoenix Coder',
       tier: SkinTier.phoenix,
-      description: 'An orange flame reborn from every system crash',
+      description: 'An orange-robed flame reborn from every system crash',
       levelsRequired: 0,
       previewIcon: Icons.local_fire_department,
       isRewardSkin: true,

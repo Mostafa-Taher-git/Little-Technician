@@ -16,6 +16,7 @@ import 'package:littletech/src/core/navigation/nav.dart';
 import 'package:littletech/src/features/game/presentation/screens/achievements_screen.dart';
 import 'package:littletech/src/features/game/presentation/screens/challenge_screen.dart';
 import 'package:littletech/src/features/game/presentation/screens/stats_screen.dart';
+import 'package:littletech/src/features/game/presentation/screens/suptech_concept_sheet.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -114,6 +115,39 @@ SupTechAvatarWrapper(
                                 ],
                               ),
                             ],
+                          ),
+                          const Gap(12),
+                          GestureDetector(
+                            onTap: () {
+                              final skin = SkinTierManager.fromId(progress.activeSkinId);
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (_) => SupTechConceptSheet(skin: skin),
+                                ),
+                              );
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                              decoration: BoxDecoration(
+                                color: scheme.onPrimary.withValues(alpha: 0.15),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.description_outlined, size: 16, color: scheme.onPrimary),
+                                  const Gap(6),
+                                  Text(
+                                    'Concept Sheet',
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w600,
+                                      color: scheme.onPrimary,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
                         ],
                       ),
@@ -344,6 +378,133 @@ const Gap(24),
                                       ),
                                     ),
                                   ),
+                                ],
+                              ],
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                    const Gap(24),
+                    Text(
+                      'Icons',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        color: scheme.onSurface,
+                      ),
+                    ),
+                    const Gap(12),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: RewardPool.all.where((r) => r.type == RewardType.icon).map((iconReward) {
+                        final earned = progress.earnedRewardIds.contains(iconReward.id);
+                        final isActive = progress.activeIconId == iconReward.id;
+                        return GestureDetector(
+                          onTap: earned
+                              ? () => context.read<GameCubit>().setActiveIcon(isActive ? null : iconReward.id)
+                              : null,
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: isActive
+                                  ? iconReward.color.withValues(alpha: 0.2)
+                                  : earned
+                                      ? iconReward.color.withValues(alpha: 0.1)
+                                      : scheme.surface.withValues(alpha: 0.5),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: isActive
+                                    ? iconReward.color
+                                    : earned
+                                        ? iconReward.color.withValues(alpha: 0.3)
+                                        : scheme.outline.withValues(alpha: 0.1),
+                                width: isActive ? 2 : 1,
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  iconReward.value,
+                                  style: const TextStyle(fontSize: 16),
+                                ),
+                                const Gap(8),
+                                Text(
+                                  earned ? iconReward.displayName : '${iconReward.displayName} · Locked',
+                                  style: TextStyle(
+                                    color: earned ? iconReward.color : scheme.onSurface.withValues(alpha: 0.3),
+                                    fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                                if (isActive) ...[
+                                  const Gap(6),
+                                  Icon(Icons.check_circle, color: iconReward.color, size: 16),
+                                ],
+                              ],
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                    const Gap(24),
+                    Text(
+                      'Titles',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        color: scheme.onSurface,
+                      ),
+                    ),
+                    const Gap(12),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: RewardPool.all.where((r) => r.type == RewardType.title).map((titleReward) {
+                        final earned = progress.earnedRewardIds.contains(titleReward.id);
+                        final isActive = progress.activeTitleId == titleReward.id;
+                        return GestureDetector(
+                          onTap: earned
+                              ? () => context.read<GameCubit>().setActiveTitle(isActive ? null : titleReward.id)
+                              : null,
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: isActive
+                                  ? titleReward.color.withValues(alpha: 0.2)
+                                  : earned
+                                      ? titleReward.color.withValues(alpha: 0.1)
+                                      : scheme.surface.withValues(alpha: 0.5),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: isActive
+                                    ? titleReward.color
+                                    : earned
+                                        ? titleReward.color.withValues(alpha: 0.3)
+                                        : scheme.outline.withValues(alpha: 0.1),
+                                width: isActive ? 2 : 1,
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(titleReward.icon, color: earned ? titleReward.color : scheme.onSurface.withValues(alpha: 0.3), size: 18),
+                                const Gap(8),
+                                Text(
+                                  earned ? titleReward.value : '${titleReward.value} · Locked',
+                                  style: TextStyle(
+                                    color: earned ? titleReward.color : scheme.onSurface.withValues(alpha: 0.3),
+                                    fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                                if (isActive) ...[
+                                  const Gap(6),
+                                  Icon(Icons.check_circle, color: titleReward.color, size: 16),
                                 ],
                               ],
                             ),

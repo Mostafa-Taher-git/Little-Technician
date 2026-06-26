@@ -27,8 +27,14 @@ class FramedUsername extends StatelessWidget {
         final activeFrame = progress.activeFrameId != null
             ? RewardPool.byId(progress.activeFrameId!)
             : null;
+        final activeIcon = progress.activeIconId != null
+            ? RewardPool.byId(progress.activeIconId!)
+            : null;
+        final activeTitle = progress.activeTitleId != null
+            ? RewardPool.byId(progress.activeTitleId!)
+            : null;
 
-        final text = Text(
+        final usernameText = Text(
           username,
           textAlign: textAlign,
           maxLines: 1,
@@ -40,26 +46,63 @@ class FramedUsername extends StatelessWidget {
           ),
         );
 
-        if (activeFrame == null) return text;
+        final hasBadge = activeIcon != null || activeTitle != null;
+        final badgeColor = activeFrame?.color ?? Colors.white54;
+
+        if (activeFrame == null && !hasBadge) return usernameText;
 
         return Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                activeFrame.color.withValues(alpha: 0.3),
-                activeFrame.color.withValues(alpha: 0.1),
+                badgeColor.withValues(alpha: 0.3),
+                badgeColor.withValues(alpha: 0.1),
               ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: activeFrame.color.withValues(alpha: 0.5),
+              color: badgeColor.withValues(alpha: 0.5),
               width: 2,
             ),
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-          child: text,
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          child: Column(
+            crossAxisAlignment: textAlign == TextAlign.center
+                ? CrossAxisAlignment.center
+                : CrossAxisAlignment.start,
+            children: [
+              usernameText,
+              if (hasBadge) ...[
+                const SizedBox(height: 4),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (activeIcon != null)
+                      Text(
+                        activeIcon.value,
+                        style: TextStyle(
+                          fontSize: fontSize * 0.75,
+                          color: badgeColor,
+                        ),
+                      ),
+                    if (activeIcon != null && activeTitle != null)
+                      const SizedBox(width: 4),
+                    if (activeTitle != null)
+                      Text(
+                        activeTitle.value,
+                        style: TextStyle(
+                          fontSize: fontSize * 0.65,
+                          color: badgeColor,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                  ],
+                ),
+              ],
+            ],
+          ),
         );
       },
     );

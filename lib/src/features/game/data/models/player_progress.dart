@@ -24,6 +24,8 @@ int points = 0;
    List<String> defeatedBossIds = [];
    String? activeSkinId;  // Currently equipped skin
    String? activeFrameId; // Currently equipped nickname frame
+   String? activeIconId;  // Currently equipped icon badge
+   String? activeTitleId; // Currently equipped title
    String? themeId;
    int levelsCleared = 0;
    int bossesDefeated = 0;

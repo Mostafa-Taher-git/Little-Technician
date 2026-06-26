@@ -144,6 +144,16 @@ class GameRepository {
     await saveProgress(progress);
   }
 
+  Future<void> setActiveIcon(PlayerProgress progress, String? iconId) async {
+    progress.activeIconId = iconId;
+    await saveProgress(progress);
+  }
+
+  Future<void> setActiveTitle(PlayerProgress progress, String? titleId) async {
+    progress.activeTitleId = titleId;
+    await saveProgress(progress);
+  }
+
   Future<void> setCurrentLevel(
       PlayerProgress progress, int worldId, String? levelId) async {
     progress.currentWorldId = worldId;
