@@ -57,6 +57,7 @@ class AchievementsScreen extends StatelessWidget {
                   AchievementType.streak => StreakTracker.calculateStreak(progress.playDates),
                   AchievementType.worlds => progress.completedWorldIds.length,
                   AchievementType.categories => progress.completedCategoryIds.length,
+                  AchievementType.weeklyBosses => progress.weeklyBossesDefeated,
                 };
                 final isDone = progress.unlockedAchievementIds.contains(a.id);
                 final progressFraction = (progressVal / a.requirement).clamp(0.0, 1.0);

@@ -138,6 +138,7 @@ class GameCubit extends Cubit<GameState> {
   void completeWeeklyBoss() {
     final progress = state.progress;
     progress.setWeeklyBossCompleted();
+    progress.weeklyBossesDefeated++;
     _safePersist([() => _repository.saveProgress(progress)]);
     emit(state.copyWith(progress: progress));
   }

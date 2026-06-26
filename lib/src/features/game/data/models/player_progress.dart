@@ -32,8 +32,9 @@ int points = 0;
    List<DateTime> playDates = [];
    DateTime? lastActiveDate;
    int totalPlayTimeSeconds = 0;
-   int correctAnswers = 0;
-   int totalAnswers = 0;
+    int correctAnswers = 0;
+    int totalAnswers = 0;
+    int weeklyBossesDefeated = 0;
     List<String> prepResults = [];  // "levelId\x01json" entries
      DateTime? lastDailyQuestDate;  // Track daily quest completion
      DateTime? lastWeeklyBossDate;  // Track weekly boss completion
