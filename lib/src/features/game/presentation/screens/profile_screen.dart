@@ -8,7 +8,6 @@ import 'package:littletech/src/features/game/constants/skin_tiers.dart';
 import 'package:littletech/src/features/game/constants/streak_tracker.dart';
 import 'package:littletech/src/features/game/domain/cubit/game_cubit.dart';
 import 'package:littletech/src/features/game/domain/cubit/theme_cubit.dart';
-import 'package:littletech/src/features/game/presentation/widgets/reward_chip.dart';
 import 'package:littletech/src/features/game/presentation/widgets/suptech_avatar.dart';
 import 'package:littletech/src/features/game/presentation/widgets/sup_tech_avatar_wrapper.dart';
 import 'package:littletech/src/features/game/presentation/widgets/framed_username.dart';
@@ -512,31 +511,6 @@ const Gap(24),
                         );
                       }).toList(),
                     ),
-                    const Gap(24),
-                    Text(
-                      'Earned Rewards',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                        color: scheme.onSurface,
-                      ),
-                    ),
-                    const Gap(12),
-                    if (earnedRewards.isEmpty)
-                      Text(
-                        'Complete levels to earn rewards!',
-                        style: TextStyle(
-                          color: scheme.onSurface.withValues(alpha: 0.5),
-                        ),
-                      )
-                    else
-                      Wrap(
-                        spacing: 8,
-                        runSpacing: 8,
-                        children: earnedRewards
-                            .map((r) => RewardChip(reward: r))
-                            .toList(),
-                      ),
                     const Gap(24),
                     Text(
                       'Skins',
