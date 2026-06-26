@@ -21,7 +21,13 @@ class SavedSolutionsService {
     final prefs = await _prefs;
     final raw = prefs.getString(_userKey(uid));
     if (raw == null) return [];
-    final list = jsonDecode(raw) as List;
+    List list;
+    try {
+      list = jsonDecode(raw) as List;
+    } on FormatException {
+      await prefs.remove(_userKey(uid));
+      return [];
+    }
     final items = list.map((e) => SavedSolution.fromJson(e as Map<String, dynamic>)).toList();
     if (items.isNotEmpty) {
       final ids = items.map((s) => s.id ?? 0).toList();

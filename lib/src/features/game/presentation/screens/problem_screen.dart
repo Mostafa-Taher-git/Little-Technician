@@ -6,6 +6,7 @@ import 'package:gap/gap.dart';
 import 'package:littletech/src/core/navigation/nav.dart';
 import 'package:littletech/src/features/game/constants/game_data.dart';
 import 'package:littletech/src/features/game/domain/cubit/game_cubit.dart';
+import 'package:littletech/src/features/game/presentation/screens/level_complete_screen.dart';
 import 'package:littletech/src/features/game/presentation/screens/level_select_screen.dart';
 import 'package:littletech/src/features/game/presentation/screens/reward_spin_screen.dart';
 import 'package:littletech/src/features/game/presentation/screens/suptech_dialog.dart';
@@ -101,7 +102,12 @@ class _ProblemScreenState extends State<ProblemScreen> {
                 } else {
                   Nav.pushReplacement(
                     context,
-                    LevelSelectScreen(world: widget.world),
+                    LevelCompleteScreen(
+                      world: widget.world,
+                      level: widget.level,
+                      newAchievements: state.newlyUnlockedAchievements,
+                      reward: null,
+                    ),
                   );
                 }
               }

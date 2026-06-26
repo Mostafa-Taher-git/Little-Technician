@@ -58,7 +58,6 @@ class HomeScreen extends StatelessWidget {
                       AchievementType.points => progress.points,
                       AchievementType.rewards => earnedIds.length,
                       AchievementType.streak => StreakTracker.calculateStreak(progress.playDates),
-                      AchievementType.worlds => progress.completedWorldIds.length,
                       AchievementType.categories => progress.completedCategoryIds.length,
                       AchievementType.weeklyBosses => progress.weeklyBossesDefeated,
                     };

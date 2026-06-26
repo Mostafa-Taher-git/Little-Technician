@@ -107,7 +107,7 @@ const List<BossEncounterDef> coreComponentsBosses = [
     abilities: [
       {'name': 'Heat Wave', 'description': 'Releases a radial burst of extreme heat that degrades thermal paste and warps plastic connectors.', 'effect': 'damage'},
       {'name': 'Meltdown Touch', 'description': 'Contacts a component directly, pushing it past its maximum rated temperature for instant damage.', 'effect': 'damage'},
-      {'name': 'Fan Disable', 'description': ' jams fan bearings with heat-fused debris, stopping all active cooling and applying a sustained debuff.', 'effect': 'debuff'},
+      {'name': 'Fan Disable', 'description': 'Jams fan bearings with heat-fused debris, stopping all active cooling and applying a sustained debuff.', 'effect': 'debuff'},
     ],
     diagnosis: {
       'symptoms': 'All system fans spinning at 100% RPM yet temperatures still climbing. LM Sensors reporting CPU at T_junction max. IR thermometer shows localized hotspot of 95°C on VRM heatsink. Thermal throttle events occurring every 2 seconds in Windows Event Log.',
@@ -128,7 +128,7 @@ const List<BossEncounterDef> coreComponentsBosses = [
     introText: 'Your GPU fans stutter and stop. The PCIe slot glows an angry red as something hungry moves in the shadows beneath your graphics card.',
     phaseShiftText: 'The Horror rips free from the slot — you can see it now, a maw of corrupted lanes and broken signal lines.',
     hp: 5, points: 550, armor: 14, challengeRating: 4, difficulty: DifficultyLevel.medium,
-    bossKey: 'boss_core_boss_6',
+    bossKey: 'boss_core_6',
     abilities: [
       {'name': 'Slot Corruption', 'description': 'Poisons a PCIe slot with electrical noise, causing any card inserted to malfunction or not be detected.', 'effect': 'damage'},
       {'name': 'GPU Devour', 'description': 'Consumes the bandwidth allocated to the GPU, causing display driver crashes and black screens.', 'effect': 'debuff'},
@@ -153,7 +153,7 @@ const List<BossEncounterDef> coreComponentsBosses = [
     introText: 'The lights flicker and die. In the darkness, arcs of blue-white electricity dance across every power cable as the Demon rides the current into your system.',
     phaseShiftText: 'The Demon fuses with the PSU — you can hear the capacitors whine as it gathers power for a devastating surge.',
     hp: 6, points: 600, armor: 15, challengeRating: 5, difficulty: DifficultyLevel.medium,
-    bossKey: 'boss_core_boss_7',
+    bossKey: 'boss_core_7',
     abilities: [
       {'name': 'Voltage Spike', 'description': 'Sends a massive voltage transient through the power rails, dealing heavy damage to all connected components.', 'effect': 'damage'},
       {'name': 'Surge Wave', 'description': 'Releases a wave of electromagnetic interference that corrupts data signals and applies a debuff to all systems.', 'effect': 'debuff'},
@@ -178,7 +178,7 @@ const List<BossEncounterDef> coreComponentsBosses = [
     introText: 'A sickly sweet chemical smell fills the air as capacitors across the motherboard begin to bulge and weep. The Ghoul oozes from the failing components, bloated with stolen charge.',
     phaseShiftText: 'The Ghoul\'s body swells as it sacrifices its stored charge — every capacitor on the board begins to bulge simultaneously.',
     hp: 6, points: 650, armor: 15, challengeRating: 5, difficulty: DifficultyLevel.medium,
-    bossKey: 'boss_core_boss_8',
+    bossKey: 'boss_core_8',
     abilities: [
       {'name': 'Capacitor Burst', 'description': 'Detonates a charged capacitor in a localized explosion, dealing area damage to nearby components.', 'effect': 'damage'},
       {'name': 'Leak Drain', 'description': 'Seeps conductive electrolyte across the board, creating short circuits that slowly drain system health.', 'effect': 'debuff'},
@@ -203,7 +203,7 @@ const List<BossEncounterDef> coreComponentsBosses = [
     introText: 'Every transistor on the board begins switching at once — a roar of a billion tiny switches fills the air. The Titan rises, its body a fractal of impossible circuitry.',
     phaseShiftText: 'The Titan collapses into a single point of pure logic, then explodes outward — every gate on the board flips simultaneously.',
     hp: 7, points: 700, armor: 16, challengeRating: 6, difficulty: DifficultyLevel.hard,
-    bossKey: 'boss_core_boss_9',
+    bossKey: 'boss_core_9',
     abilities: [
       {'name': 'State Flip', 'description': 'Rapidly toggles transistor states in your hardware, creating logic errors that corrupt calculations and damage components.', 'effect': 'damage'},
       {'name': 'Gate Lock', 'description': 'Freezes transistor gates in a fixed state, rendering entire circuit blocks unresponsive.', 'effect': 'debuff'},
@@ -228,7 +228,7 @@ const List<BossEncounterDef> coreComponentsBosses = [
     introText: 'The system clock begins to drift — milliseconds stretch into seconds. A shadow moves between the ticks, visible only in the gaps between one clock cycle and the next.',
     phaseShiftText: 'The Shadow seizes the PLL — the system clock begins erratically jumping between 100MHz and 10GHz, tearing the timeline apart.',
     hp: 7, points: 800, armor: 17, challengeRating: 7, difficulty: DifficultyLevel.hard,
-    bossKey: 'boss_core_boss_10',
+    bossKey: 'boss_core_10',
     abilities: [
       {'name': 'Time Warp', 'description': 'Distorts clock signals to desynchronize components, causing communication failures and data corruption.', 'effect': 'damage'},
       {'name': 'Clock Jitter', 'description': 'Injects random timing variations into the clock signal, degrading signal integrity across all buses.', 'effect': 'debuff'},
@@ -253,7 +253,7 @@ const List<BossEncounterDef> coreComponentsBosses = [
     introText: 'The heat sink begins to vibrate as something grips it from within. Thermal paste oozes like blood as the Guardian tightens its hold on your cooling.',
     phaseShiftText: 'The Guardian crushes the heat sink fins flat — there is no more cooling, only the promise of meltdown.',
     hp: 8, points: 900, armor: 18, challengeRating: 7, difficulty: DifficultyLevel.hard,
-    bossKey: 'boss_core_boss_11',
+    bossKey: 'boss_core_11',
     abilities: [
       {'name': 'Heat Trap', 'description': 'Seals all thermal pathways, trapping heat against the CPU die and causing rapid temperature escalation.', 'effect': 'damage'},
       {'name': 'Cooling Block', 'description': 'Physically obstructs heatsink fins and heatpipes, applying a debuff that reduces all cooling effectiveness.', 'effect': 'debuff'},
@@ -278,7 +278,7 @@ const List<BossEncounterDef> coreComponentsBosses = [
     introText: 'The multimeter reads 1.1V at the CPU socket — but you set it for 1.35V. Something is drinking your voltage. Red eyes appear in the VRM heatsink as the Vampire reveals itself.',
     phaseShiftText: 'The Vampire latches directly onto the 12V rail — the entire system flickers as it gulps down power meant for everything.',
     hp: 8, points: 1000, armor: 19, challengeRating: 8, difficulty: DifficultyLevel.hard,
-    bossKey: 'boss_core_boss_12',
+    bossKey: 'boss_core_12',
     abilities: [
       {'name': 'Rail Drain', 'description': 'Siphons voltage from power delivery rails, starving components and dealing sustained damage over time.', 'effect': 'damage'},
       {'name': 'Voltage Spike', 'description': 'Releases stored energy in a burst, sending a damaging voltage transient through the power delivery system.', 'effect': 'damage'},
@@ -303,7 +303,7 @@ const List<BossEncounterDef> coreComponentsBosses = [
     introText: 'The POST speaker emits a single, ear-piercing shriek. The BIOS chip glows cherry-red as the Banshee\'s form materializes from corrupted firmware code.',
     phaseShiftText: 'The Banshee shrieks through both BIOS chips — the backup is corrupted too. There is no going back.',
     hp: 9, points: 1200, armor: 20, challengeRating: 9, difficulty: DifficultyLevel.hard,
-    bossKey: 'boss_core_boss_13',
+    bossKey: 'boss_core_13',
     abilities: [
       {'name': 'Firmware Screech', 'description': 'Unleashes a sonic blast of corrupted firmware data that damages BIOS and surrounding components.', 'effect': 'damage'},
       {'name': 'Boot Lock', 'description': 'Corrupts the boot sequence, preventing the system from initializing — a devastating debuff.', 'effect': 'debuff'},
@@ -328,7 +328,7 @@ const List<BossEncounterDef> coreComponentsBosses = [
     introText: 'The BIOS splash screen distorts as clock speeds displayed climb past reason. The Ogre bursts from the overclocking menu, arms made of bent heatpipes and eyes burning with unstable voltage.',
     phaseShiftText: 'The Ogre cranks everything to maximum — the system screams as voltages and clocks go far beyond safe limits.',
     hp: 10, points: 1500, armor: 22, challengeRating: 10, difficulty: DifficultyLevel.hard,
-    bossKey: 'boss_core_boss_14',
+    bossKey: 'boss_core_14',
     abilities: [
       {'name': 'Speed Surge', 'description': 'Forces clock speeds beyond stable limits, dealing escalating damage as the system tears itself apart.', 'effect': 'damage'},
       {'name': 'Voltage Rampage', 'description': 'Dumps maximum voltage through all rails simultaneously, causing instant component stress.', 'effect': 'damage'},

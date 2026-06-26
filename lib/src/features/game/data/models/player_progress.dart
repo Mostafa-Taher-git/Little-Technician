@@ -52,10 +52,9 @@ int points = 0;
   }
 
   void setPrepResult(String levelId, String json) {
-    final mutable = List<String>.from(prepResults);
-    mutable.removeWhere((e) => e.startsWith('$levelId$_sep'));
-    mutable.add('$levelId$_sep$json');
-    prepResults = mutable;
+    final key = '$levelId$_sep';
+    prepResults.removeWhere((e) => e.startsWith(key));
+    prepResults.add('$key$json');
   }
 
   /// Call after loading from Isar to ensure all lists are growable.

@@ -31,6 +31,7 @@ class _BossScreenState extends State<BossScreen>
   String? _lastOutcome;
   bool _navigatedToReward = false;
   bool _showDiagnosis = false;
+  bool _diagnosisLocked = false;
   String? _diagnosisResult;
   int _resolveCount = 0;
 
@@ -71,9 +72,11 @@ class _BossScreenState extends State<BossScreen>
   }
 
   void _selectedDiagnosis(int selectedIndex) {
+    if (_diagnosisLocked) return;
     final diagnosis = widget.boss.diagnosis;
     if (diagnosis.isEmpty) return;
 
+    _diagnosisLocked = true;
     final correct = diagnosis['correct'] as int;
     final cubit = context.read<GameCubit>();
 
@@ -93,6 +96,7 @@ class _BossScreenState extends State<BossScreen>
         setState(() {
           _showDiagnosis = false;
           _diagnosisResult = null;
+          _diagnosisLocked = false;
           _currentPhase = 1;
         });
       }

@@ -462,7 +462,7 @@ class RewardPool {
       icon: Icons.workspace_premium,
     ),
     RewardDef(
-      id: 'skin_void_',
+      id: 'skin_void',
       type: RewardType.skin,
       value: 'void_',
       rarity: Rarity.legendary,

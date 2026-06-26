@@ -238,7 +238,6 @@ class GameCubit extends Cubit<GameState> {
       () => _repository.completeLevel(progress, level.id),
       () => _repository.resetLevelUses(progress),
       if (isWorldComplete) ...[
-        () => _repository.completeWorld(progress, 0),
         () => _repository.completeCategory(progress, world.id),
       ],
       if (reward != null) () => _repository.addReward(progress, reward!.id),

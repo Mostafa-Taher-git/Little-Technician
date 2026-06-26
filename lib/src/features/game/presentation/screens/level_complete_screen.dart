@@ -33,7 +33,7 @@ class _LevelCompleteScreenState extends State<LevelCompleteScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late List<_Particle> _particles;
-  final _rng = Random(42);
+  final _rng = Random();
   int _displayPoints = 0;
   int _totalPoints = 0;
   Map<String, dynamic>? _prepData;

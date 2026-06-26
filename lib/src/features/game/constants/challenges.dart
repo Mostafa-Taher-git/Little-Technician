@@ -2,6 +2,12 @@ import 'dart:math';
 import 'package:littletech/src/core/constants/category_manager.dart';
 import 'game_data.dart';
 
+int _hashSeed(int s) {
+  s = ((s ^ (s >> 30)) * 0xbf58476d1ce4e5b9) & 0x7FFFFFFFFFFFFFFF;
+  s = ((s ^ (s >> 27)) * 0x94d049bb133111eb) & 0x7FFFFFFFFFFFFFFF;
+  return s ^ (s >> 31);
+}
+
 class DailyChallenge {
   final String levelId;
   final String title;
@@ -38,7 +44,7 @@ class ChallengeManager {
   static DailyChallenge getDailyChallenge({int streak = 0}) {
     final today = DateTime.now();
     final seed = today.year * 10000 + today.month * 100 + today.day;
-    final rng = Random(seed);
+    final rng = Random(_hashSeed(seed));
 
     final allLevelIds = GameData.worlds
         .expand((w) => w.levels)
@@ -60,7 +66,7 @@ class ChallengeManager {
     final now = DateTime.now();
     final daysSinceEpoch = now.millisecondsSinceEpoch ~/ Duration.millisecondsPerDay;
     final weekNumber = daysSinceEpoch ~/ 7;
-    final rng = Random(weekNumber);
+    final rng = Random(_hashSeed(weekNumber));
 
     final catIndex = rng.nextInt(CategoryManager.all.length);
     final cat = CategoryManager.all[catIndex];

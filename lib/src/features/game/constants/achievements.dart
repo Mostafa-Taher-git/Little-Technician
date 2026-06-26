@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:littletech/src/features/game/constants/reward_pool.dart';
 
-enum AchievementType { levels, bosses, points, rewards, streak, worlds, categories, weeklyBosses }
+enum AchievementType { levels, bosses, points, rewards, streak, categories, weeklyBosses }
 
 class AchievementReward {
   final String rewardId;
@@ -222,7 +222,7 @@ class AchievementManager {
       requirement: 10,
 
       icon: Icons.shield_moon,
-      rewards: [AchievementReward(rewardId: 'skin_void_', type: RewardType.skin)],
+      rewards: [AchievementReward(rewardId: 'skin_void', type: RewardType.skin)],
     ),
     Achievement(
       id: 'boss_crusher',
@@ -237,9 +237,9 @@ class AchievementManager {
     Achievement(
       id: 'five_bosses_elite',
       name: 'Elite Hunter',
-      description: 'Defeat 5 bosses',
+      description: 'Defeat 15 bosses',
       type: AchievementType.bosses,
-      requirement: 5,
+      requirement: 15,
 
       icon: Icons.shield,
       rewards: [AchievementReward(rewardId: 'skin_shadow', type: RewardType.skin)],
@@ -257,9 +257,9 @@ class AchievementManager {
     Achievement(
       id: 'boss_conqueror',
       name: 'Boss Conqueror',
-      description: 'Defeat all 196 bosses',
+      description: 'Defeat 150 bosses',
       type: AchievementType.bosses,
-      requirement: 196,
+      requirement: 150,
 
       icon: Icons.emoji_events,
       rewards: [
@@ -661,7 +661,6 @@ class AchievementManager {
         AchievementType.points => points,
         AchievementType.rewards => rewardsEarned,
         AchievementType.streak => streak,
-        AchievementType.worlds => categoriesCompleted,
         AchievementType.categories => categoriesCompleted,
         AchievementType.weeklyBosses => weeklyBossesDefeated,
       };
