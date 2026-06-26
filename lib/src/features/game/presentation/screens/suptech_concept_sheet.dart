@@ -11,7 +11,7 @@ class SupTechConceptSheet extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: scheme.surface,
       appBar: AppBar(
         title: Text('Concept Sheet: ${skin.name}'),
         backgroundColor: scheme.surface,
@@ -29,16 +29,16 @@ class SupTechConceptSheet extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _sectionHeader('Front View'),
+            _sectionHeader('Front View', scheme: scheme),
             const SizedBox(height: 12),
             Center(
               child: Container(
                 width: 220,
                 height: 260,
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade50,
+                  color: scheme.surfaceContainerHighest,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.grey.shade200),
+                  border: Border.all(color: scheme.outline.withValues(alpha: 0.15)),
                 ),
                 child: CustomPaint(
                   painter: _ConceptPainter(skin: skin),
@@ -47,7 +47,7 @@ class SupTechConceptSheet extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 32),
-            _sectionHeader('Expressions'),
+            _sectionHeader('Expressions', scheme: scheme),
             const SizedBox(height: 12),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -58,9 +58,9 @@ class SupTechConceptSheet extends StatelessWidget {
                       width: 64,
                       height: 64,
                       decoration: BoxDecoration(
-                        color: Colors.grey.shade50,
+                        color: scheme.surfaceContainerHighest,
                         borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: Colors.grey.shade200),
+                        border: Border.all(color: scheme.outline.withValues(alpha: 0.15)),
                       ),
                       child: CustomPaint(
                         painter:
@@ -82,17 +82,17 @@ class SupTechConceptSheet extends StatelessWidget {
               }),
             ),
             const SizedBox(height: 32),
-            _sectionHeader('Color Palette'),
+            _sectionHeader('Color Palette', scheme: scheme),
             const SizedBox(height: 12),
             Row(
               children: [
-                _colorSwatch('Robe', skin.bodyColor),
+                _colorSwatch('Robe', skin.bodyColor, scheme: scheme),
                 const SizedBox(width: 12),
-                _colorSwatch('Glow', skin.accentColor),
+                _colorSwatch('Glow', skin.accentColor, scheme: scheme),
               ],
             ),
             const SizedBox(height: 32),
-            _sectionHeader('Accessory'),
+            _sectionHeader('Accessory', scheme: scheme),
             const SizedBox(height: 8),
             Container(
               padding:
@@ -128,19 +128,19 @@ class SupTechConceptSheet extends StatelessWidget {
     );
   }
 
-  Widget _sectionHeader(String title) {
+  Widget _sectionHeader(String title, {required ColorScheme scheme}) {
     return Text(
       title.toUpperCase(),
       style: TextStyle(
         fontSize: 11,
         fontWeight: FontWeight.w700,
         letterSpacing: 1.5,
-        color: Colors.grey.shade500,
+        color: scheme.onSurface.withValues(alpha: 0.5),
       ),
     );
   }
 
-  Widget _colorSwatch(String label, Color color) {
+  Widget _colorSwatch(String label, Color color, {required ColorScheme scheme}) {
     return Column(
       children: [
         Container(
@@ -149,7 +149,7 @@ class SupTechConceptSheet extends StatelessWidget {
           decoration: BoxDecoration(
             color: color,
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: Colors.grey.shade300),
+            border: Border.all(color: scheme.outline.withValues(alpha: 0.3)),
           ),
         ),
         const SizedBox(height: 4),
@@ -157,14 +157,14 @@ class SupTechConceptSheet extends StatelessWidget {
           label,
           style: TextStyle(
             fontSize: 10,
-            color: Colors.grey.shade600,
+            color: scheme.onSurface.withValues(alpha: 0.6),
           ),
         ),
         Text(
           '#${color.toARGB32().toRadixString(16).substring(2).toUpperCase()}',
           style: TextStyle(
             fontSize: 9,
-            color: Colors.grey.shade400,
+            color: scheme.onSurface.withValues(alpha: 0.4),
             fontFamily: 'monospace',
           ),
         ),

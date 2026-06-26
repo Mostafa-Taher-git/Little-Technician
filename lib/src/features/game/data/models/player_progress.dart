@@ -16,7 +16,6 @@ int points = 0;
    String? currentCategoryId;
    String? currentLevelId;
    List<String> completedLevelIds = [];
-   List<int> completedWorldIds = [];
    List<String> completedCategoryIds = [];
    List<String> purchasedItemIds = [];
    List<String> earnedRewardIds = [];
@@ -60,7 +59,6 @@ int points = 0;
   /// Call after loading from Isar to ensure all lists are growable.
   void ensureMutableLists() {
     completedLevelIds = List<String>.from(completedLevelIds);
-    completedWorldIds = List<int>.from(completedWorldIds);
     completedCategoryIds = List<String>.from(completedCategoryIds);
     earnedRewardIds = List<String>.from(earnedRewardIds);
     unlockedSkinIds = List<String>.from(unlockedSkinIds);

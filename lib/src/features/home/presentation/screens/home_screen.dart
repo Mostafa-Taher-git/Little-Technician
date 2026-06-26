@@ -3,8 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:gap/gap.dart';
 import 'package:littletech/src/core/navigation/nav.dart';
-import 'package:littletech/src/features/auth/data/models/user_model.dart';
-import 'package:littletech/src/features/auth/data/services/auth_service.dart';
+import 'package:littletech/src/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:littletech/src/features/solutions/presentation/screens/saved_solutions_screen.dart';
 import 'package:littletech/src/features/solutions/presentation/screens/categories_screen.dart';
 import 'package:littletech/src/features/solutions/presentation/screens/search_screen.dart';
@@ -227,10 +226,10 @@ class _Header extends StatelessWidget {
       children: [
         // Avatar and greeting
         Expanded(
-          child: FutureBuilder<UserModel?>(
-            future: AuthService.getCurrentUser(),
-            builder: (_, snap) {
-              final user = snap.data;
+          child: Builder(
+            builder: (context) {
+              final authState = context.watch<AuthCubit>().state;
+              final user = (authState is LoginSuccess) ? authState.user : (authState is RegisterSuccess) ? authState.user : null;
               return Row(
                 children: [
                   Flexible(

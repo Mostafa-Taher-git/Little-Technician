@@ -451,6 +451,13 @@ class GameCubit extends Cubit<GameState> {
   List<Achievement> _checkAchievements() {
     final progress = state.progress;
     final catsDone = progress.completedCategoryIds.length;
+
+    final categoryLevelCounts = <String, int>{};
+    for (final levelId in progress.completedLevelIds) {
+      final catId = levelId.contains('_') ? levelId.substring(0, levelId.indexOf('_')) : levelId;
+      categoryLevelCounts[catId] = (categoryLevelCounts[catId] ?? 0) + 1;
+    }
+
     final newAchievements = AchievementManager.checkNew(
       levelsCleared: progress.levelsCleared,
       bossesDefeated: progress.bossesDefeated,
@@ -458,6 +465,7 @@ class GameCubit extends Cubit<GameState> {
       rewardsEarned: progress.earnedRewardIds.length,
       streak: StreakTracker.calculateStreak(progress.playDates),
       categoriesCompleted: catsDone,
+      categoryLevelCounts: categoryLevelCounts,
       alreadyUnlockedIds: progress.unlockedAchievementIds,
     );
     for (final a in newAchievements) {

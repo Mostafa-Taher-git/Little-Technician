@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
-import 'package:littletech/src/features/auth/data/models/user_model.dart';
-import 'package:littletech/src/features/auth/data/services/auth_service.dart';
+import 'package:littletech/src/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:littletech/src/core/constants/category_manager.dart';
 import 'package:littletech/src/features/game/constants/game_data.dart';
 import 'package:littletech/src/features/game/constants/reward_pool.dart';
@@ -26,10 +25,10 @@ class StatsScreen extends StatelessWidget {
         title: const Text('Character Sheet'),
         backgroundColor: Colors.transparent,
       ),
-      body: FutureBuilder<UserModel?>(
-        future: AuthService.getCurrentUser(),
-        builder: (_, snap) {
-          final user = snap.data;
+      body: Builder(
+        builder: (context) {
+          final authState = context.watch<AuthCubit>().state;
+          final user = (authState is LoginSuccess) ? authState.user : (authState is RegisterSuccess) ? authState.user : null;
           return BlocBuilder<GameCubit, GameState>(
             builder: (_, state) {
               final p = state.progress;

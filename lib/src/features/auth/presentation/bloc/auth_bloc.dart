@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:littletech/src/features/auth/data/models/user_model.dart';
 import 'package:littletech/src/features/auth/data/services/auth_service.dart';
 
 // ── States ────────────────────────────────────────────────────────────────────
@@ -11,9 +12,15 @@ class AuthInitial extends AuthState {}
 
 class AuthLoading extends AuthState {}
 
-class LoginSuccess extends AuthState {}
+class LoginSuccess extends AuthState {
+  final UserModel user;
+  const LoginSuccess(this.user);
+}
 
-class RegisterSuccess extends AuthState {}
+class RegisterSuccess extends AuthState {
+  final UserModel user;
+  const RegisterSuccess(this.user);
+}
 
 class LogoutSuccess extends AuthState {}
 
@@ -27,6 +34,13 @@ class AuthError extends AuthState {
 class AuthCubit extends Cubit<AuthState> {
   AuthCubit() : super(AuthInitial());
 
+  UserModel? get currentUser {
+    final s = state;
+    if (s is LoginSuccess) return s.user;
+    if (s is RegisterSuccess) return s.user;
+    return null;
+  }
+
   Future<void> login({
     required String username,
     required String password,
@@ -34,7 +48,8 @@ class AuthCubit extends Cubit<AuthState> {
     emit(AuthLoading());
     final ok = await AuthService.login(username: username, password: password);
     if (ok) {
-      emit(LoginSuccess());
+      final user = await AuthService.getCurrentUser();
+      emit(LoginSuccess(user!));
     } else {
       emit(const AuthError('Invalid username or password.'));
     }
@@ -52,7 +67,8 @@ class AuthCubit extends Cubit<AuthState> {
       avatarIcon: avatarIcon,
     );
     if (ok) {
-      emit(RegisterSuccess());
+      final user = await AuthService.getCurrentUser();
+      emit(RegisterSuccess(user!));
     } else {
       emit(const AuthError('Username already exists.'));
     }

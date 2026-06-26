@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:littletech/src/core/navigation/nav.dart';
-import 'package:littletech/src/features/auth/data/models/user_model.dart';
 import 'package:littletech/src/features/auth/data/services/auth_service.dart';
 import 'package:littletech/src/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:littletech/src/features/auth/presentation/screens/login_screen.dart';
@@ -26,10 +25,10 @@ class SettingsScreen extends StatelessWidget {
         padding: const EdgeInsets.all(20),
         children: [
           // Profile card
-          FutureBuilder<UserModel?>(
-            future: AuthService.getCurrentUser(),
-            builder: (_, snap) {
-              final user = snap.data;
+          Builder(
+            builder: (context) {
+              final authState = context.watch<AuthCubit>().state;
+              final user = (authState is LoginSuccess) ? authState.user : (authState is RegisterSuccess) ? authState.user : null;
               return Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
@@ -160,10 +159,10 @@ class SettingsScreen extends StatelessWidget {
             scheme: scheme,
           ),
           const Gap(8),
-          FutureBuilder<UserModel?>(
-            future: AuthService.getCurrentUser(),
-            builder: (_, snap) {
-              final user = snap.data;
+          Builder(
+            builder: (context) {
+              final authState = context.watch<AuthCubit>().state;
+              final user = (authState is LoginSuccess) ? authState.user : (authState is RegisterSuccess) ? authState.user : null;
               final username = user?.username ?? 'User';
               return _SettingsTile(
                 icon: Icons.delete_forever,

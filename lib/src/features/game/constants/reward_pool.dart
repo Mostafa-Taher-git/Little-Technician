@@ -322,6 +322,30 @@ class RewardPool {
       icon: Icons.water_drop,
     ),
     RewardDef(
+      id: 'theme_medieval',
+      type: RewardType.theme,
+      value: 'medieval',
+      rarity: Rarity.epic,
+      displayName: 'Medieval Theme',
+      icon: Icons.castle,
+    ),
+    RewardDef(
+      id: 'theme_dungeon',
+      type: RewardType.theme,
+      value: 'dungeon',
+      rarity: Rarity.epic,
+      displayName: 'Dungeon Theme',
+      icon: Icons.dark_mode,
+    ),
+    RewardDef(
+      id: 'theme_arcane',
+      type: RewardType.theme,
+      value: 'arcane',
+      rarity: Rarity.epic,
+      displayName: 'Arcane Theme',
+      icon: Icons.auto_fix_high,
+    ),
+    RewardDef(
       id: 'skin_cyber',
       type: RewardType.skin,
       value: 'cyber',
@@ -527,6 +551,14 @@ class RewardPool {
       rarity: Rarity.legendary,
       displayName: 'Neon Nights Theme',
       icon: Icons.nights_stay,
+    ),
+    RewardDef(
+      id: 'theme_dragon_fire',
+      type: RewardType.theme,
+      value: 'dragon_fire',
+      rarity: Rarity.legendary,
+      displayName: 'Dragon Fire Theme',
+      icon: Icons.local_fire_department,
     ),
   ];
 

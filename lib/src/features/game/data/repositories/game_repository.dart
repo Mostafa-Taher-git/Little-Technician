@@ -80,13 +80,6 @@ class GameRepository {
     await saveProgress(progress);
   }
 
-  Future<void> completeWorld(PlayerProgress progress, int worldId) async {
-    if (!progress.completedWorldIds.contains(worldId)) {
-      progress.completedWorldIds.add(worldId);
-    }
-    await saveProgress(progress);
-  }
-
   Future<void> completeCategory(PlayerProgress progress, String categoryId) async {
     if (!progress.completedCategoryIds.contains(categoryId)) {
       progress.completedCategoryIds.add(categoryId);
@@ -240,7 +233,6 @@ class GameRepository {
           c.problemKeys.map((p) => GameData.levelId(c.id, p)),
         ))
       )
-      ..completedWorldIds = List<int>.generate(CategoryManager.all.length, (i) => i)
       ..earnedRewardIds = List<String>.from(RewardPool.all.map((r) => r.id))
       ..unlockedSkinIds = List<String>.from(SkinTierManager.skins.map((s) => s.id))
       ..purchasedItemIds = List<String>.from(RewardPool.all.where((r) => r.type != RewardType.skin).map((r) => r.id))

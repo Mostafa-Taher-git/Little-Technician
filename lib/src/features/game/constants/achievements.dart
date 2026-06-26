@@ -18,6 +18,7 @@ class Achievement {
   final int requirement;
   final IconData icon;
   final List<AchievementReward> rewards;
+  final String? categoryId;
 
   const Achievement({
     required this.id,
@@ -27,6 +28,7 @@ class Achievement {
     required this.requirement,
     required this.icon,
     this.rewards = const [],
+    this.categoryId,
   });
 }
 
@@ -152,6 +154,7 @@ class AchievementManager {
 
       icon: Icons.memory,
       rewards: [AchievementReward(rewardId: 'icon_chip', type: RewardType.icon)],
+      categoryId: 'ram',
     ),
     Achievement(
       id: 'storage_master',
@@ -162,6 +165,7 @@ class AchievementManager {
 
       icon: Icons.storage,
       rewards: [AchievementReward(rewardId: 'icon_battery', type: RewardType.icon)],
+      categoryId: 'storage',
     ),
     Achievement(
       id: 'display_guru',
@@ -172,6 +176,7 @@ class AchievementManager {
 
       icon: Icons.monitor,
       rewards: [AchievementReward(rewardId: 'icon_satellite', type: RewardType.icon)],
+      categoryId: 'display',
     ),
     Achievement(
       id: 'gaming_pro',
@@ -182,6 +187,7 @@ class AchievementManager {
 
       icon: Icons.sports_esports,
       rewards: [AchievementReward(rewardId: 'icon_laptop', type: RewardType.icon)],
+      categoryId: 'gaming',
     ),
 
     // ── Bosses ──────────────────────────────────────────────────────────────
@@ -649,21 +655,28 @@ class AchievementManager {
     required int streak,
     int categoriesCompleted = 0,
     int weeklyBossesDefeated = 0,
+    Map<String, int> categoryLevelCounts = const {},
     List<String> alreadyUnlockedIds = const [],
   }) {
     final newAchievements = <Achievement>[];
 
     for (final a in all) {
       if (alreadyUnlockedIds.contains(a.id)) continue;
-      final progress = switch (a.type) {
-        AchievementType.levels => levelsCleared,
-        AchievementType.bosses => bossesDefeated,
-        AchievementType.points => points,
-        AchievementType.rewards => rewardsEarned,
-        AchievementType.streak => streak,
-        AchievementType.categories => categoriesCompleted,
-        AchievementType.weeklyBosses => weeklyBossesDefeated,
-      };
+
+      int progress;
+      if (a.categoryId != null && a.type == AchievementType.levels) {
+        progress = categoryLevelCounts[a.categoryId!] ?? 0;
+      } else {
+        progress = switch (a.type) {
+          AchievementType.levels => levelsCleared,
+          AchievementType.bosses => bossesDefeated,
+          AchievementType.points => points,
+          AchievementType.rewards => rewardsEarned,
+          AchievementType.streak => streak,
+          AchievementType.categories => categoriesCompleted,
+          AchievementType.weeklyBosses => weeklyBossesDefeated,
+        };
+      }
       if (progress >= a.requirement) {
         newAchievements.add(a);
       }

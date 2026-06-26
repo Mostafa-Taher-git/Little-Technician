@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:littletech/src/Core/services/rule_engine.dart';
+import 'package:littletech/src/core/services/rule_engine.dart';
 
 void main() {
   group('RuleEngine Tests', () {
