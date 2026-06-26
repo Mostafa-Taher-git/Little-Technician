@@ -4,6 +4,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:gap/gap.dart';
 import 'package:littletech/src/core/navigation/nav.dart';
 import 'package:littletech/src/features/game/constants/game_data.dart';
+import 'package:littletech/src/features/game/constants/prep_data.dart';
 import 'package:littletech/src/features/game/domain/cubit/game_cubit.dart';
 import 'package:littletech/src/features/game/presentation/screens/problem_screen.dart';
 
@@ -26,223 +27,8 @@ class _TrapsScreenState extends State<TrapsScreen> {
   final List<bool> _userAnswers = [];
   final List<bool> _trapResults = [];
 
-  static const _traps = {
-    // ── World 1 ──
-    'cpu_high_usage': [
-      {'statement': 'Task Manager can be opened with Ctrl+Shift+Esc', 'isTrue': true},
-      {'statement': 'High CPU usage is always caused by a virus', 'isTrue': false},
-    ],
-    'cpu_overheating': [
-      {'statement': 'Dust buildup inside a PC can block airflow and cause overheating', 'isTrue': true},
-      {'statement': 'Opening the BIOS always fixes overheating problems', 'isTrue': false},
-      {'statement': 'Thermal paste helps transfer heat from the CPU to the cooler', 'isTrue': true},
-    ],
-    'computer_not_turning_on': [
-      {'statement': 'A flipped PSU switch can prevent a PC from turning on', 'isTrue': true},
-      {'statement': 'If the PC doesn\'t turn on, you must replace the motherboard', 'isTrue': false},
-    ],
-    'beep_codes': [
-      {'statement': 'Beep codes are produced by the motherboard BIOS during POST', 'isTrue': true},
-      {'statement': 'A single short beep always means there is a critical hardware failure', 'isTrue': false},
-      {'statement': 'Different BIOS manufacturers use different beep code patterns', 'isTrue': true},
-    ],
-    'ram_not_detected': [
-      {'statement': 'Reseating RAM sticks can fix detection issues', 'isTrue': true},
-      {'statement': 'If RAM is not detected, it is always broken and must be replaced', 'isTrue': false},
-      {'statement': 'RAM modules can only be installed in one specific slot', 'isTrue': false},
-    ],
-
-    // ── World 2 ──
-    'pc_wont_boot': [
-      {'statement': 'A corrupted bootloader can prevent the PC from booting', 'isTrue': true},
-      {'statement': 'If the PC won\'t boot, you should always reinstall Windows immediately', 'isTrue': false},
-      {'statement': 'Checking boot order in BIOS is a valid troubleshooting step', 'isTrue': true},
-    ],
-    'boot_loop': [
-      {'statement': 'A failing hard drive can cause a boot loop', 'isTrue': true},
-      {'statement': 'Boot loops are always caused by a virus', 'isTrue': false},
-      {'statement': 'Safe Mode can help diagnose what is causing a boot loop', 'isTrue': true},
-    ],
-    'bsod': [
-      {'statement': 'The stop code on a BSOD helps identify the problem', 'isTrue': true},
-      {'statement': 'BSODs only happen on old computers', 'isTrue': false},
-    ],
-    'os_running_slow': [
-      {'statement': 'Too many startup programs can slow down the operating system', 'isTrue': true},
-      {'statement': 'Adding more RAM never helps with a slow OS', 'isTrue': false},
-      {'statement': 'Disk fragmentation can reduce performance on mechanical hard drives', 'isTrue': true},
-    ],
-    'no_sound': [
-      {'statement': 'Checking the audio output device settings is a good first step', 'isTrue': true},
-      {'statement': 'If there is no sound, the speakers are always broken', 'isTrue': false},
-      {'statement': 'Audio drivers can become corrupted and cause sound issues', 'isTrue': true},
-    ],
-
-    // ── World 3 ──
-    'mouse_not_responding': [
-      {'statement': 'A faulty USB port can cause the mouse to stop responding', 'isTrue': true},
-      {'statement': 'If the mouse stops working, you must replace it immediately', 'isTrue': false},
-      {'statement': 'Updating or reinstalling mouse drivers can resolve the issue', 'isTrue': true},
-    ],
-    'cursor_lagging': [
-      {'statement': 'High system resource usage can cause cursor lag', 'isTrue': true},
-      {'statement': 'Cursor lag always means the mouse sensor is dirty', 'isTrue': false},
-      {'statement': 'A failing hard drive can indirectly cause cursor lag', 'isTrue': true},
-    ],
-    'keyboard_not_responding': [
-      {'statement': 'Disconnecting and reconnecting the keyboard can fix recognition issues', 'isTrue': true},
-      {'statement': 'A non-responsive keyboard always needs to be replaced', 'isTrue': false},
-      {'statement': 'Sticky keys settings can sometimes interfere with normal typing', 'isTrue': true},
-    ],
-    'printer_offline': [
-      {'statement': 'A loose USB or network cable can make a printer appear offline', 'isTrue': true},
-      {'statement': 'An offline printer always has a broken printhead', 'isTrue': false},
-      {'statement': 'Restarting the print spooler service can bring a printer back online', 'isTrue': true},
-    ],
-    'paper_jam': [
-      {'statement': 'Using the correct paper size and type helps prevent paper jams', 'isTrue': true},
-      {'statement': 'Pulling paper out forcefully is the safest way to clear a jam', 'isTrue': false},
-      {'statement': 'Overloading the paper tray can increase the chance of a jam', 'isTrue': true},
-    ],
-
-    // ── World 4 ──
-    'program_crashes': [
-      {'statement': 'A missing software dependency can cause a program to crash on launch', 'isTrue': true},
-      {'statement': 'Program crashes are always caused by hardware failure', 'isTrue': false},
-      {'statement': 'Running the program as administrator can sometimes fix permission-related crashes', 'isTrue': true},
-    ],
-    'no_internet': [
-      {'statement': 'Flushing the DNS cache can help restore internet connectivity', 'isTrue': true},
-      {'statement': 'If one device has no internet, the entire network must be down', 'isTrue': false},
-      {'statement': 'A loose Ethernet cable can cause a complete loss of internet', 'isTrue': true},
-    ],
-    'slow_internet': [
-      {'statement': 'Other devices or programs using bandwidth can slow down your internet', 'isTrue': true},
-      {'statement': 'A faster internet plan always eliminates all lag and buffering', 'isTrue': false},
-      {'statement': 'Wi-Fi signal interference from other devices can reduce internet speed', 'isTrue': true},
-    ],
-    'dns_issues': [
-      {'statement': 'Changing to a public DNS server like Google DNS can resolve DNS issues', 'isTrue': true},
-      {'statement': 'DNS issues always mean your internet service provider is at fault', 'isTrue': false},
-      {'statement': 'Incorrect DNS settings can prevent websites from loading', 'isTrue': true},
-    ],
-    'vpn_not_connecting': [
-      {'statement': 'A firewall or antivirus program can block VPN connections', 'isTrue': true},
-      {'statement': 'If a VPN won\'t connect, the VPN service is always down', 'isTrue': false},
-      {'statement': 'Switching VPN server locations can sometimes resolve connection issues', 'isTrue': true},
-    ],
-
-    // ── World 5 ──
-    'hard_drive_not_detected': [
-      {'statement': 'A loose SATA or power cable can prevent the hard drive from being detected', 'isTrue': true},
-      {'statement': 'If the BIOS doesn\'t detect the drive, the drive is always dead', 'isTrue': false},
-      {'statement': 'Checking BIOS settings to ensure the SATA port is enabled is a valid step', 'isTrue': true},
-    ],
-    'disk_full': [
-      {'statement': 'Temporary files and cache can take up significant disk space over time', 'isTrue': true},
-      {'statement': 'A disk being full never affects system performance', 'isTrue': false},
-      {'statement': 'Uninstalling unused programs frees up disk space', 'isTrue': true},
-    ],
-    'no_display_output': [
-      {'statement': 'A monitor set to the wrong input source can show no display', 'isTrue': true},
-      {'statement': 'No display output always means the GPU is dead', 'isTrue': false},
-      {'statement': 'Re-seating the graphics card can sometimes fix display issues', 'isTrue': true},
-    ],
-    'flickering_screen': [
-      {'statement': 'A loose display cable can cause the screen to flicker', 'isTrue': true},
-      {'statement': 'Screen flickering is always caused by a virus', 'isTrue': false},
-      {'statement': 'Outdated graphics drivers are a common cause of screen flickering', 'isTrue': true},
-    ],
-    'dead_pixels': [
-      {'statement': 'Dead pixels are permanent defects on an LCD or OLED display', 'isTrue': true},
-      {'statement': 'Dead pixels can always be fixed by running a pixel-fix video', 'isTrue': false},
-      {'statement': 'Stuck pixels appear as a single color that does not change', 'isTrue': true},
-    ],
-
-    // ── World 6 ──
-    'battery_draining': [
-      {'statement': 'Background apps and services can drain battery life faster', 'isTrue': true},
-      {'statement': 'Turning off the phone completely prevents all battery drain', 'isTrue': false},
-      {'statement': 'Reducing screen brightness extends battery life', 'isTrue': true},
-    ],
-    'phone_overheating': [
-      {'statement': 'Using resource-intensive apps like games or GPS can cause a phone to overheat', 'isTrue': true},
-      {'statement': 'A phone overheating always means the battery needs to be replaced', 'isTrue': false},
-      {'statement': 'Charging a phone while using heavy apps can increase its temperature', 'isTrue': true},
-    ],
-    'phone_apps_crashing': [
-      {'statement': 'Clearing the app cache can fix crashes', 'isTrue': true},
-      {'statement': 'App crashes always mean the phone needs a factory reset', 'isTrue': false},
-      {'statement': 'Insufficient storage space can cause apps to crash unexpectedly', 'isTrue': true},
-    ],
-    'phone_not_charging': [
-      {'statement': 'Debris or lint in the charging port can prevent a proper connection', 'isTrue': true},
-      {'statement': 'If a phone won\'t charge, the battery is always defective', 'isTrue': false},
-      {'statement': 'Trying a different cable and charger helps identify the faulty component', 'isTrue': true},
-    ],
-    'slow_phone': [
-      {'statement': 'Too many background apps running can slow down a phone', 'isTrue': true},
-      {'statement': 'A slow phone always has outdated hardware and cannot be improved', 'isTrue': false},
-      {'statement': 'Clearing cached data can help improve phone performance', 'isTrue': true},
-    ],
-
-    // ── World 7 ──
-    'game_crashing': [
-      {'statement': 'Outdated graphics drivers are a common cause of game crashes', 'isTrue': true},
-      {'statement': 'If a game crashes, the console or PC is always broken', 'isTrue': false},
-      {'statement': 'Lowering in-game graphics settings can prevent crashes on weaker hardware', 'isTrue': true},
-    ],
-    'low_fps': [
-      {'statement': 'Closing background applications can improve game frame rates', 'isTrue': true},
-      {'statement': 'Low FPS always means the internet connection is slow', 'isTrue': false},
-      {'statement': 'Overheating hardware can cause the system to throttle and reduce FPS', 'isTrue': true},
-    ],
-    'controller_not_connecting': [
-      {'statement': 'Resetting the controller and re-pairing it can fix connection issues', 'isTrue': true},
-      {'statement': 'A controller that won\'t connect is always broken beyond repair', 'isTrue': false},
-      {'statement': 'Low battery levels can prevent a wireless controller from connecting', 'isTrue': true},
-    ],
-    'game_audio_stutter': [
-      {'statement': 'Other programs using the audio device can cause in-game audio stutter', 'isTrue': true},
-      {'statement': 'Audio stutter in games always means the speakers are broken', 'isTrue': false},
-      {'statement': 'Updating audio drivers can resolve game audio stutter issues', 'isTrue': true},
-    ],
-    'gpu_driver_crash': [
-      {'statement': 'A GPU driver crash can cause the screen to go black temporarily', 'isTrue': true},
-      {'statement': 'GPU driver crashes always mean the graphics card is physically damaged', 'isTrue': false},
-      {'statement': 'Rolling back to a previous stable driver version can fix driver crashes', 'isTrue': true},
-    ],
-
-    // ── World 8 ──
-    'smart_device_offline': [
-      {'statement': 'A weak Wi-Fi signal can cause a smart device to appear offline', 'isTrue': true},
-      {'statement': 'If a smart device is offline, it must be replaced with a new one', 'isTrue': false},
-      {'statement': 'Power cycling the device and router can often restore connectivity', 'isTrue': true},
-    ],
-    'voice_assistant_not_responding': [
-      {'statement': 'A muted microphone or physical mute button can prevent the assistant from hearing you', 'isTrue': true},
-      {'statement': 'Voice assistants stop responding only when the device is broken', 'isTrue': false},
-      {'statement': 'Background noise can interfere with voice recognition', 'isTrue': true},
-    ],
-    'smart_light_not_connecting': [
-      {'statement': 'The smart light must be within range of the Wi-Fi or hub to connect', 'isTrue': true},
-      {'statement': 'Smart lights that won\'t connect are always defective', 'isTrue': false},
-      {'statement': 'Resetting the light to factory settings can resolve pairing issues', 'isTrue': true},
-    ],
-    'home_hub_setup_failed': [
-      {'statement': 'An unstable internet connection can cause hub setup to fail', 'isTrue': true},
-      {'statement': 'A failed hub setup always means the hub is incompatible with your devices', 'isTrue': false},
-      {'statement': 'Ensuring the hub firmware is up to date can fix setup problems', 'isTrue': true},
-    ],
-    'automation_not_triggering': [
-      {'statement': 'Incorrect time or location settings can prevent automations from triggering', 'isTrue': true},
-      {'statement': 'If an automation fails once, it is permanently broken', 'isTrue': false},
-      {'statement': 'Checking the automation conditions and actions can reveal configuration errors', 'isTrue': true},
-    ],
-  };
-
   List<Map<String, dynamic>> get _levelTraps {
-    return _traps[widget.level.id] ?? [
+    return PrepData.traps[widget.level.id] ?? [
       {'statement': 'Identifying symptoms is the first troubleshooting step', 'isTrue': true},
       {'statement': 'You should replace a device before trying to fix it', 'isTrue': false},
       {'statement': 'Restarting can fix many tech problems', 'isTrue': true},
@@ -464,7 +250,7 @@ class _TrapsScreenState extends State<TrapsScreen> {
                 ),
                 const Gap(4),
                 Text(
-                  _passed ? 'Passed!' : 'Failed — continue anyway',
+                  _passed ? 'Passed!' : 'Failed â€” continue anyway',
                   style: const TextStyle(color: Colors.white70, fontSize: 14),
                 ),
               ],
