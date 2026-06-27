@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:isar/isar.dart';
-import 'package:littletech/src/core/navigation/nav.dart';
 import 'package:littletech/src/features/auth/data/services/auth_service.dart';
 import 'package:littletech/src/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:littletech/src/features/auth/presentation/screens/login_screen.dart';
@@ -23,6 +22,7 @@ class LittleTechApp extends StatefulWidget {
 
 class _LittleTechAppState extends State<LittleTechApp> {
   int? _userId;
+  final _navKey = GlobalKey<NavigatorState>();
 
   @override
   void initState() {
@@ -42,10 +42,18 @@ class _LittleTechAppState extends State<LittleTechApp> {
       if (!mounted) return;
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
+        final nav = _navKey.currentState;
+        if (nav == null) return;
         if (_userId != null) {
-          Nav.replaceAll(context, const HomeScreen());
+          nav.pushAndRemoveUntil(
+            MaterialPageRoute(builder: (_) => const HomeScreen()),
+            (_) => false,
+          );
         } else {
-          Nav.replaceAll(context, const LoginScreen());
+          nav.pushAndRemoveUntil(
+            MaterialPageRoute(builder: (_) => const LoginScreen()),
+            (_) => false,
+          );
         }
       });
     });
@@ -94,6 +102,7 @@ class _LittleTechAppState extends State<LittleTechApp> {
         ],
         child: BlocBuilder<ThemeCubit, ThemeData>(
           builder: (_, theme) => MaterialApp(
+            navigatorKey: _navKey,
             title: 'LittleTech',
             debugShowCheckedModeBanner: false,
             theme: theme,
