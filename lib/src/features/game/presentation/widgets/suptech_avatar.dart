@@ -328,6 +328,9 @@ class _SkinPainter extends CustomPainter {
       );
     }
 
+    // === FACE MASK (theme-specific per accessory) ===
+    _drawFaceMask(canvas, skin, s, faceCY, faceW, faceH, eyeY, eyeSpacing, eyeR, outlinePaint);
+
     // === ACCESSORIES ===
     _drawAccessory(canvas, skin, headCY, headR, s, accentPaint, outlinePaint);
 
@@ -347,6 +350,150 @@ class _SkinPainter extends CustomPainter {
         glowPaint,
       );
     }
+  }
+
+  void _drawFaceMask(Canvas canvas, SkinDefinition skin, double s,
+      double faceCY, double faceW, double faceH,
+      double eyeY, double eyeSpacing, double eyeR,
+      Paint outlinePaint) {
+
+    final maskPaint = Paint()
+      ..color = skin.accentColor.withValues(alpha: 0.85)
+      ..style = PaintingStyle.fill;
+
+    final slitHeight = eyeR * 2 + 3 * s;
+
+    // Eye slit cutout — shared by all mask styles
+    final eyeSlit = Path()
+      ..addRect(Rect.fromCenter(
+        center: Offset(0, eyeY + 0.5 * s),
+        width: faceW - 6 * s,
+        height: slitHeight,
+      ));
+
+    final maskTop = faceCY - faceH / 2;
+    final maskBot = faceCY + faceH / 2;
+    final maskL = -faceW / 2 + 1 * s;
+    final maskR = faceW / 2 - 1 * s;
+
+    Path maskPath;
+
+    switch (skin.accessory) {
+      case SupTechAccessory.antenna:
+        // ── Tech mask — angular top edge with antenna notch ──
+        maskPath = Path()
+          ..moveTo(maskL, maskBot)
+          ..lineTo(maskL, faceCY - 2 * s)
+          ..quadraticBezierTo(maskL, maskTop + 2 * s, -3 * s, maskTop)
+          ..lineTo(-1 * s, maskTop - 2 * s)
+          ..lineTo(1 * s, maskTop - 2 * s)
+          ..lineTo(3 * s, maskTop)
+          ..quadraticBezierTo(maskR, maskTop + 2 * s, maskR, faceCY - 2 * s)
+          ..lineTo(maskR, maskBot)
+          ..quadraticBezierTo(maskR, maskBot + 1.5 * s, 0, maskBot + 1.5 * s)
+          ..quadraticBezierTo(maskL, maskBot + 1.5 * s, maskL, maskBot)
+          ..close();
+        break;
+
+      case SupTechAccessory.headband:
+        // ── Ninja wrap — tied at back, fabric folds at cheeks ──
+        maskPath = Path()
+          ..moveTo(maskL - 1 * s, maskBot + 2 * s)
+          ..quadraticBezierTo(maskL, faceCY, maskL + 1 * s, maskTop + 1 * s)
+          ..quadraticBezierTo(0, maskTop - 1 * s, maskR - 1 * s, maskTop + 1 * s)
+          ..quadraticBezierTo(maskR, faceCY, maskR + 1 * s, maskBot + 2 * s)
+          ..quadraticBezierTo(0, maskBot + 3 * s, maskL - 1 * s, maskBot + 2 * s)
+          ..close();
+        break;
+
+      case SupTechAccessory.pointedHat:
+        // ── Hood-integrated — mask flows upward into hat brim ──
+        maskPath = Path()
+          ..moveTo(maskL, maskBot)
+          ..lineTo(maskL, faceCY)
+          ..quadraticBezierTo(maskL, maskTop - 1 * s, -4 * s, maskTop - 3 * s)
+          ..quadraticBezierTo(0, maskTop - 5 * s, 4 * s, maskTop - 3 * s)
+          ..quadraticBezierTo(maskR, maskTop - 1 * s, maskR, faceCY)
+          ..lineTo(maskR, maskBot)
+          ..quadraticBezierTo(maskR, maskBot + 1.5 * s, 0, maskBot + 1.5 * s)
+          ..quadraticBezierTo(maskL, maskBot + 1.5 * s, maskL, maskBot)
+          ..close();
+        break;
+
+      case SupTechAccessory.crown:
+        // ── Royal mask — ornate scalloped top edge ──
+        final sw = 3 * s;
+        maskPath = Path()
+          ..moveTo(maskL, maskBot)
+          ..lineTo(maskL, faceCY - 1 * s)
+          ..quadraticBezierTo(maskL, maskTop + 1 * s, maskL + sw, maskTop)
+          ..quadraticBezierTo(maskL + sw * 2, maskTop - 2 * s, maskL + sw * 3, maskTop)
+          ..quadraticBezierTo(0, maskTop - 3 * s, maskR - sw * 3, maskTop)
+          ..quadraticBezierTo(maskR - sw * 2, maskTop - 2 * s, maskR - sw, maskTop)
+          ..quadraticBezierTo(maskR, maskTop + 1 * s, maskR, faceCY - 1 * s)
+          ..lineTo(maskR, maskBot)
+          ..quadraticBezierTo(maskR, maskBot + 1.5 * s, 0, maskBot + 1.5 * s)
+          ..quadraticBezierTo(maskL, maskBot + 1.5 * s, maskL, maskBot)
+          ..close();
+        break;
+
+      case SupTechAccessory.gear:
+        // ── Armored mask — angular/chunky shape ──
+        maskPath = Path()
+          ..moveTo(maskL, maskBot)
+          ..lineTo(maskL, faceCY + 2 * s)
+          ..lineTo(maskL - 1 * s, faceCY)
+          ..lineTo(maskL, maskTop + 2 * s)
+          ..lineTo(maskL + 2 * s, maskTop)
+          ..lineTo(maskR - 2 * s, maskTop)
+          ..lineTo(maskR, maskTop + 2 * s)
+          ..lineTo(maskR + 1 * s, faceCY)
+          ..lineTo(maskR, faceCY + 2 * s)
+          ..lineTo(maskR, maskBot)
+          ..quadraticBezierTo(maskR, maskBot + 1.5 * s, 0, maskBot + 1.5 * s)
+          ..quadraticBezierTo(maskL, maskBot + 1.5 * s, maskL, maskBot)
+          ..close();
+        break;
+
+      case SupTechAccessory.cape:
+        // ── Veiled mask — long bottom blending into cape ──
+        maskPath = Path()
+          ..moveTo(maskL, maskBot + 4 * s)
+          ..lineTo(maskL, faceCY - 1 * s)
+          ..quadraticBezierTo(maskL, maskTop, 0, maskTop - 1 * s)
+          ..quadraticBezierTo(maskR, maskTop, maskR, faceCY - 1 * s)
+          ..lineTo(maskR, maskBot + 4 * s)
+          ..quadraticBezierTo(maskR, maskBot + 5 * s, 0, maskBot + 5 * s)
+          ..quadraticBezierTo(maskL, maskBot + 5 * s, maskL, maskBot + 4 * s)
+          ..close();
+        break;
+
+      case SupTechAccessory.none:
+        // ── Default balaclava — full rounded face covering ──
+        maskPath = Path()
+          ..addRRect(RRect.fromRectAndRadius(
+            Rect.fromCenter(
+              center: Offset(0, faceCY + 0.5 * s),
+              width: faceW - 2 * s,
+              height: faceH + 2 * s,
+            ),
+            Radius.circular(6 * s),
+          ));
+        break;
+    }
+
+    final maskWithSlit = Path.combine(PathOperation.difference, maskPath, eyeSlit);
+    canvas.drawPath(maskWithSlit, maskPaint);
+    canvas.drawPath(maskWithSlit, outlinePaint);
+
+    // Mouth/vent line
+    final ventPaint = Paint()
+      ..color = Colors.black.withValues(alpha: 0.25)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.0 * s
+      ..strokeCap = StrokeCap.round;
+    final ventY = eyeY + eyeR + 3.5 * s;
+    canvas.drawLine(Offset(-3 * s, ventY), Offset(3 * s, ventY), ventPaint);
   }
 
   void _drawAccessory(Canvas canvas, SkinDefinition skin, double headCY,
@@ -410,30 +557,6 @@ class _SkinPainter extends CustomPainter {
             Offset(headR - 2 * s, headCY - headR - 2 * s),
             0.8 * s,
             jewelPaint);
-        break;
-      case SupTechAccessory.visor:
-        final visorPaint = Paint()
-          ..color = skin.accentColor.withValues(alpha: 0.7)
-          ..style = PaintingStyle.fill;
-        final visorPath = Path()
-          ..addRRect(RRect.fromRectAndRadius(
-            Rect.fromCenter(
-                center: Offset(0, headCY + 1.5 * s),
-                width: headR * 2 - 2 * s,
-                height: 3.5 * s),
-            Radius.circular(1.5 * s),
-          ));
-        canvas.drawPath(visorPath, visorPaint);
-        canvas.drawPath(visorPath, outlinePaint);
-        final reflectPaint = Paint()
-          ..color = Colors.white.withValues(alpha: 0.4)
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 1.0 * s;
-        canvas.drawLine(
-          Offset(-headR + 3 * s, headCY + 1.5 * s),
-          Offset(-headR + 7 * s, headCY + 1.5 * s),
-          reflectPaint,
-        );
         break;
       case SupTechAccessory.pointedHat:
         final hatPaint = Paint()

@@ -201,8 +201,6 @@ class SupTechConceptSheet extends StatelessWidget {
         return 'Headband';
       case SupTechAccessory.crown:
         return 'Crown';
-      case SupTechAccessory.visor:
-        return 'Visor';
       case SupTechAccessory.pointedHat:
         return 'Pointed Hat';
       case SupTechAccessory.cape:
@@ -222,8 +220,6 @@ class SupTechConceptSheet extends StatelessWidget {
         return Icons.horizontal_rule;
       case SupTechAccessory.crown:
         return Icons.account_tree;
-      case SupTechAccessory.visor:
-        return Icons.visibility;
       case SupTechAccessory.pointedHat:
         return Icons.architecture;
       case SupTechAccessory.cape:

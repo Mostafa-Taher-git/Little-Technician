@@ -5,7 +5,7 @@ enum SkinTier {
   cyber, shadow, neon, phoenix, titan, void_, glitch, frost, chrono, spectre, viper, spark
 }
 
-enum SupTechAccessory { none, antenna, headband, pointedHat, crown, visor, gear, cape }
+enum SupTechAccessory { none, antenna, headband, pointedHat, crown, gear, cape }
 
 class SkinDefinition {
   final String id;
@@ -156,7 +156,6 @@ class SkinTierManager {
       isRewardSkin: true,
       bodyColor: Color(0xFF059669),
       accentColor: Color(0xFF34D399),
-      accessory: SupTechAccessory.visor,
     ),
     SkinDefinition(
       id: 'engineer',
@@ -204,7 +203,7 @@ class SkinTierManager {
       isRewardSkin: true,
       bodyColor: Color(0xFF581C87),
       accentColor: Color(0xFF7C3AED),
-      accessory: SupTechAccessory.visor,
+      accessory: SupTechAccessory.cape,
     ),
     SkinDefinition(
       id: 'neon',
@@ -312,7 +311,7 @@ class SkinTierManager {
       isRewardSkin: true,
       bodyColor: Color(0xFF15803D),
       accentColor: Color(0xFF86EFAC),
-      accessory: SupTechAccessory.visor,
+      accessory: SupTechAccessory.headband,
     ),
     SkinDefinition(
       id: 'spark',
