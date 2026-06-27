@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:littletech/src/features/game/constants/skin_tiers.dart';
 
-class SupTechAvatar extends StatefulWidget {
+class SupTechAvatar extends StatelessWidget {
   final double size;
   final bool isGlowing;
   final String? skinId;
@@ -16,58 +16,15 @@ class SupTechAvatar extends StatefulWidget {
   });
 
   @override
-  State<SupTechAvatar> createState() => _SupTechAvatarState();
-}
-
-class _SupTechAvatarState extends State<SupTechAvatar>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 3),
-    );
-    if (widget.isGlowing) {
-      _controller.repeat(reverse: true);
-    }
-  }
-
-  @override
-  void didUpdateWidget(SupTechAvatar old) {
-    super.didUpdateWidget(old);
-    if (widget.isGlowing && !_controller.isAnimating) {
-      _controller.repeat(reverse: true);
-    } else if (!widget.isGlowing && _controller.isAnimating) {
-      _controller.stop();
-      _controller.value = 0;
-    }
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: widget.size,
-      height: widget.size,
-      child: AnimatedBuilder(
-        animation: _controller,
-        builder: (context, child) {
-          return CustomPaint(
-            painter: _SkinPainter(
-              skinId: widget.skinId,
-              isGlowing: widget.isGlowing,
-              animationValue: _controller.value,
-            ),
-          );
-        },
+      width: size,
+      height: size,
+      child: CustomPaint(
+        painter: _SkinPainter(
+          skinId: skinId,
+          isGlowing: isGlowing,
+        ),
       ),
     );
   }
@@ -76,12 +33,10 @@ class _SupTechAvatarState extends State<SupTechAvatar>
 class _SkinPainter extends CustomPainter {
   final String? skinId;
   final bool isGlowing;
-  final double animationValue;
 
   _SkinPainter({
     required this.skinId,
     required this.isGlowing,
-    required this.animationValue,
   });
 
   @override
@@ -373,16 +328,6 @@ class _SkinPainter extends CustomPainter {
       );
     }
 
-    // === EYE WISPS (energy leaking from eyes) ===
-    if (isGlowing) {
-      _drawEyeWisps(canvas, skin, s, eyeY, eyeSpacing, eyeR * 2, eyeR * 2);
-    }
-
-    // === CHEST WISPS (emanating from center of robe) ===
-    if (isGlowing) {
-      _drawChestWisps(canvas, skin, s, bodyTopY + 3 * s);
-    }
-
     // === ACCESSORIES ===
     _drawAccessory(canvas, skin, headCY, headR, s, accentPaint, outlinePaint);
 
@@ -402,125 +347,6 @@ class _SkinPainter extends CustomPainter {
         glowPaint,
       );
     }
-  }
-
-  void _drawEyeWisps(Canvas canvas, SkinDefinition skin, double s,
-      double eyeY, double eyeSpacing, double eyeW, double eyeH) {
-    final anim = animationValue;
-
-    for (final dx in [-eyeSpacing, eyeSpacing]) {
-      final wispAlpha = 0.3 + sin(anim * pi * 2 + dx) * 0.1;
-      final dir = dx < 0 ? -1.0 : 1.0;
-      final wOff = sin(anim * pi * 2 + (dx < 0 ? 0.0 : 1.0)) * 1.5 * s;
-
-      canvas.drawPath(
-        Path()
-          ..moveTo(dx + dir * eyeW / 2, eyeY - eyeH / 3 + wOff)
-          ..quadraticBezierTo(
-              dx + dir * 5 * s, eyeY - 4 * s + wOff,
-              dx + dir * 7 * s, eyeY - 2 * s + wOff),
-        Paint()
-          ..color = skin.accentColor.withValues(alpha: wispAlpha)
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 1.5 * s
-          ..strokeCap = StrokeCap.round,
-      );
-    }
-  }
-
-  void _drawChestWisps(Canvas canvas, SkinDefinition skin, double s,
-      double robeTopY) {
-    final anim = animationValue;
-    final originY = robeTopY + 4 * s;
-
-    // Wisp 1: upper left spiral
-    final w1 = sin(anim * pi * 2) * 2 * s;
-    canvas.drawPath(
-      Path()
-        ..moveTo(-3 * s, originY + w1)
-        ..quadraticBezierTo(
-            -8 * s, originY - 6 * s + w1, -13 * s, originY - 3 * s + w1)
-        ..quadraticBezierTo(
-            -16 * s, originY - 1 * s + w1, -13 * s, originY + 3 * s + w1),
-      Paint()
-        ..color = skin.accentColor.withValues(alpha: 0.4)
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 2.0 * s
-        ..strokeCap = StrokeCap.round,
-    );
-
-    // Wisp 2: lower left
-    final w2 = cos(anim * pi * 2) * 2 * s;
-    canvas.drawPath(
-      Path()
-        ..moveTo(-3 * s, originY + 3 * s + w2)
-        ..quadraticBezierTo(
-            -7 * s, originY + 6 * s + w2, -11 * s, originY + 8 * s + w2)
-        ..quadraticBezierTo(-14 * s, originY + 9 * s + w2, -12 * s,
-            originY + 12 * s + w2),
-      Paint()
-        ..color = skin.accentColor.withValues(alpha: 0.35)
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 1.8 * s
-        ..strokeCap = StrokeCap.round,
-    );
-
-    // Wisp 3: upper right spiral
-    final w3 = sin(anim * pi * 2 + 1) * 2 * s;
-    canvas.drawPath(
-      Path()
-        ..moveTo(3 * s, originY + w3)
-        ..quadraticBezierTo(
-            8 * s, originY - 6 * s + w3, 13 * s, originY - 3 * s + w3)
-        ..quadraticBezierTo(
-            16 * s, originY - 1 * s + w3, 13 * s, originY + 3 * s + w3),
-      Paint()
-        ..color = skin.accentColor.withValues(alpha: 0.4)
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 2.0 * s
-        ..strokeCap = StrokeCap.round,
-    );
-
-    // Wisp 4: lower right
-    final w4 = cos(anim * pi * 2 + 1) * 2 * s;
-    canvas.drawPath(
-      Path()
-        ..moveTo(3 * s, originY + 3 * s + w4)
-        ..quadraticBezierTo(
-            7 * s, originY + 6 * s + w4, 11 * s, originY + 8 * s + w4)
-        ..quadraticBezierTo(14 * s, originY + 9 * s + w4, 12 * s,
-            originY + 12 * s + w4),
-      Paint()
-        ..color = skin.accentColor.withValues(alpha: 0.35)
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 1.8 * s
-        ..strokeCap = StrokeCap.round,
-    );
-
-    // Wisp 5: top center
-    final w5 = sin(anim * pi * 2 + 2) * 1.5 * s;
-    canvas.drawPath(
-      Path()
-        ..moveTo(0, originY + w5)
-        ..quadraticBezierTo(
-            -2 * s, originY - 8 * s + w5, -3 * s, originY - 12 * s + w5),
-      Paint()
-        ..color = skin.accentColor.withValues(alpha: 0.3)
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 1.5 * s
-        ..strokeCap = StrokeCap.round,
-    );
-    canvas.drawPath(
-      Path()
-        ..moveTo(0, originY + w5)
-        ..quadraticBezierTo(
-            2 * s, originY - 7 * s + w5, 4 * s, originY - 11 * s + w5),
-      Paint()
-        ..color = skin.accentColor.withValues(alpha: 0.25)
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 1.3 * s
-        ..strokeCap = StrokeCap.round,
-    );
   }
 
   void _drawAccessory(Canvas canvas, SkinDefinition skin, double headCY,
@@ -673,6 +499,5 @@ class _SkinPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant _SkinPainter old) =>
       old.skinId != skinId ||
-      old.isGlowing != isGlowing ||
-      old.animationValue != animationValue;
+      old.isGlowing != isGlowing;
 }
