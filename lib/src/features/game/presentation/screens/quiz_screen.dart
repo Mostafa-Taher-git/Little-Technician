@@ -29,7 +29,7 @@ class _QuizScreenState extends State<QuizScreen> {
   final List<int> _userAnswers = [];
 
   List<Map<String, dynamic>> get _levelQuestions {
-    return PrepData.quiz[widget.level.id] ?? [
+    return PrepData.quiz[PrepData.key(widget.level.id)] ?? [
       {
         'question': 'What is the first step in troubleshooting any tech problem?',
         'options': ['Identify the symptoms', 'Replace the device', 'Call for help', 'Ignore the problem'],

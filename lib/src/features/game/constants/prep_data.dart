@@ -1,7 +1,23 @@
+library;
+
 /// Shared prep-screen data — quiz questions, scenarios, traps, and spot-the-mistake
 /// content for all 40 levels.
+import 'package:littletech/src/core/constants/category_manager.dart';
+
 class PrepData {
   PrepData._();
+
+  /// Strip the category prefix from a full level ID to get the prep-data key.
+  /// 'core_components_high_cpu_usage' → 'high_cpu_usage'
+  static String key(String levelId) {
+    for (final cat in CategoryManager.all) {
+      final prefix = '${cat.id}_';
+      if (levelId.startsWith(prefix)) {
+        return levelId.substring(prefix.length);
+      }
+    }
+    return levelId;
+  }
 
   static const Map<String, List<Map<String, dynamic>>> quiz = {
     'cpu_high_usage': [

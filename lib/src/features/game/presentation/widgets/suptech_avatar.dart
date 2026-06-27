@@ -105,8 +105,9 @@ class _SkinPainter extends CustomPainter {
     final accentPaint = Paint()
       ..color = skin.accentColor
       ..style = PaintingStyle.fill;
+    final isLightBody = ThemeData.estimateBrightnessForColor(skin.bodyColor) == Brightness.light;
     final outlinePaint = Paint()
-      ..color = Colors.black87
+      ..color = isLightBody ? const Color(0xFF94A3B8) : Colors.black87
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2.5 * s
       ..strokeCap = StrokeCap.round

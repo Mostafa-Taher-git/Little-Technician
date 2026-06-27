@@ -9,6 +9,7 @@ import 'package:littletech/src/features/game/constants/skin_tiers.dart';
 import 'package:littletech/src/features/game/data/models/player_progress.dart';
 import 'package:littletech/src/features/game/data/repositories/game_repository.dart';
 import 'package:littletech/src/features/game/constants/streak_tracker.dart';
+import 'package:littletech/src/core/constants/category_manager.dart';
 
 class GameState {
   final PlayerProgress progress;
@@ -448,13 +449,20 @@ class GameCubit extends Cubit<GameState> {
     }
   }
 
+  String _extractCategoryId(String levelId) {
+    for (final cat in CategoryManager.all) {
+      if (levelId.startsWith('${cat.id}_')) return cat.id;
+    }
+    return levelId;
+  }
+
   List<Achievement> _checkAchievements() {
     final progress = state.progress;
     final catsDone = progress.completedCategoryIds.length;
 
     final categoryLevelCounts = <String, int>{};
     for (final levelId in progress.completedLevelIds) {
-      final catId = levelId.contains('_') ? levelId.substring(0, levelId.indexOf('_')) : levelId;
+      final catId = _extractCategoryId(levelId);
       categoryLevelCounts[catId] = (categoryLevelCounts[catId] ?? 0) + 1;
     }
 

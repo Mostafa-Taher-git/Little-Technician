@@ -28,7 +28,7 @@ class _ScenarioScreenState extends State<ScenarioScreen> {
 
   List<Map<String, dynamic>> get _levelScenarios {
     return [
-      PrepData.scenarios[widget.level.id] ?? {
+      PrepData.scenarios[PrepData.key(widget.level.id)] ?? {
         'scenario': 'A troubleshooting situation has arisen. What is your first step?',
         'correctAction': 'Identify the symptoms and gather information',
         'wrongActions': ['Replace all components', 'Ignore the problem', 'Buy a new device'],

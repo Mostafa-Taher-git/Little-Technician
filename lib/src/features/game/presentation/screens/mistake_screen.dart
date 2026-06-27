@@ -24,7 +24,7 @@ class _MistakeScreenState extends State<MistakeScreen> {
   bool _showExplanation = false;
 
   Map<String, dynamic> get _levelMistake {
-    return PrepData.mistakes[widget.level.id] ?? {
+    return PrepData.mistakes[PrepData.key(widget.level.id)] ?? {
       'steps': [
         {'text': 'Identify the symptoms of the problem', 'isWrong': false},
         {'text': 'Research common causes for these symptoms', 'isWrong': false},

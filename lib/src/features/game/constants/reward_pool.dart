@@ -222,15 +222,6 @@ class RewardPool {
       frameColor: Color(0xFF10B981),
     ),
     RewardDef(
-      id: 'frame_neon',
-      type: RewardType.nicknameFrame,
-      value: 'neon_frame',
-      rarity: Rarity.epic,
-      displayName: 'Neon Frame',
-      icon: Icons.lightbulb_outline,
-      frameColor: Color(0xFF22D3EE),
-    ),
-    RewardDef(
       id: 'skin_hacker',
       type: RewardType.skin,
       value: 'hacker',
@@ -248,6 +239,15 @@ class RewardPool {
     ),
 
     // Epic rewards (12%)
+    RewardDef(
+      id: 'frame_neon',
+      type: RewardType.nicknameFrame,
+      value: 'neon_frame',
+      rarity: Rarity.epic,
+      displayName: 'Neon Frame',
+      icon: Icons.lightbulb_outline,
+      frameColor: Color(0xFF22D3EE),
+    ),
     RewardDef(
       id: 'icon_robot',
       type: RewardType.icon,

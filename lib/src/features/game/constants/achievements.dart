@@ -124,6 +124,7 @@ class AchievementManager {
 
       icon: Icons.shield,
       rewards: [AchievementReward(rewardId: 'icon_robot', type: RewardType.icon)],
+      categoryId: 'security',
     ),
     Achievement(
       id: 'network_fixer',
@@ -134,6 +135,7 @@ class AchievementManager {
 
       icon: Icons.wifi,
       rewards: [AchievementReward(rewardId: 'icon_wifi', type: RewardType.icon)],
+      categoryId: 'networking',
     ),
     Achievement(
       id: 'boot_doctor',
@@ -144,6 +146,7 @@ class AchievementManager {
 
       icon: Icons.desktop_windows,
       rewards: [AchievementReward(rewardId: 'icon_server', type: RewardType.icon)],
+      categoryId: 'operating_system',
     ),
     Achievement(
       id: 'memory_wizard',

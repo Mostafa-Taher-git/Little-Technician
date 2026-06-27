@@ -28,7 +28,7 @@ class _TrapsScreenState extends State<TrapsScreen> {
   final List<bool> _trapResults = [];
 
   List<Map<String, dynamic>> get _levelTraps {
-    return PrepData.traps[widget.level.id] ?? [
+    return PrepData.traps[PrepData.key(widget.level.id)] ?? [
       {'statement': 'Identifying symptoms is the first troubleshooting step', 'isTrue': true},
       {'statement': 'You should replace a device before trying to fix it', 'isTrue': false},
       {'statement': 'Restarting can fix many tech problems', 'isTrue': true},
