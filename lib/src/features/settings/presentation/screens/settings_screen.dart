@@ -151,8 +151,7 @@ class SettingsScreen extends StatelessWidget {
               );
               if (confirm == true) {
                 if (context.mounted) {
-                  context.read<AuthCubit>().logout();
-                  Nav.replaceAll(context, const LoginScreen());
+                  await context.read<AuthCubit>().logout();
                 }
               }
             },
@@ -210,8 +209,7 @@ class SettingsScreen extends StatelessWidget {
                         await AuthService.deleteUser(uid);
                       }
                       if (context.mounted) {
-                        context.read<AuthCubit>().logout();
-                        Nav.replaceAll(context, const LoginScreen());
+                        await context.read<AuthCubit>().logout();
                       }
                     }
                   }
