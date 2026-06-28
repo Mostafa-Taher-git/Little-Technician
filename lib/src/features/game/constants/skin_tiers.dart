@@ -7,8 +7,6 @@ enum SkinTier {
 
 enum SupTechExpression { neutral, happy, angry, surprised, determined, wink, sleep, error }
 
-enum SkinVariant { default_, ninja, wizard, tech, armored, phoenix, void_ }
-
 enum SupTechHeadAccessory { none, antenna, crown, wizardHat, ninjaHeadband, visor, horns, crest }
 
 enum SupTechEarAccessory { none, headset, scarf, earGlow }
@@ -31,7 +29,6 @@ class SkinDefinition {
   final String id;
   final String name;
   final SkinTier tier;
-  final SkinVariant variant;
   final String description;
   final int levelsRequired;
   final IconData previewIcon;
@@ -47,7 +44,6 @@ class SkinDefinition {
     required this.id,
     required this.name,
     required this.tier,
-    this.variant = SkinVariant.default_,
     required this.description,
     required this.levelsRequired,
     required this.previewIcon,
@@ -124,7 +120,6 @@ class SkinTierManager {
       id: 'default',
       name: 'Default SupTech',
       tier: SkinTier.default_,
-      variant: SkinVariant.default_,
       description: 'A dark hooded chibi with a gray robe and blue glow',
       levelsRequired: 0,
       previewIcon: Icons.auto_awesome,
@@ -136,7 +131,6 @@ class SkinTierManager {
       id: 'rookie',
       name: 'Tech Rookie',
       tier: SkinTier.rookie,
-      variant: SkinVariant.default_,
       description: 'A blue-robed novice with an antenna for detecting signals',
       levelsRequired: 5,
       previewIcon: Icons.auto_awesome_mosaic,
@@ -148,7 +142,6 @@ class SkinTierManager {
       id: 'ninja',
       name: 'Network Ninja',
       tier: SkinTier.ninja,
-      variant: SkinVariant.ninja,
       description: 'A purple hooded stealth specialist with a headset',
       levelsRequired: 15,
       previewIcon: Icons.auto_awesome_motion,
@@ -161,7 +154,6 @@ class SkinTierManager {
       id: 'wizard',
       name: 'System Wizard',
       tier: SkinTier.wizard,
-      variant: SkinVariant.wizard,
       description: 'A brown-robed mage with deep system knowledge',
       levelsRequired: 30,
       previewIcon: Icons.workspace_premium,
@@ -174,7 +166,6 @@ class SkinTierManager {
       id: 'golden',
       name: 'Golden SupTech',
       tier: SkinTier.golden,
-      variant: SkinVariant.armored,
       description: 'A dark-robed figure crowned with golden authority',
       levelsRequired: 50,
       previewIcon: Icons.auto_awesome,
@@ -187,7 +178,6 @@ class SkinTierManager {
       id: 'hacker',
       name: 'Hacker',
       tier: SkinTier.hacker,
-      variant: SkinVariant.tech,
       description: 'A green phantom who sees through firewalls',
       levelsRequired: 0,
       previewIcon: Icons.terminal,
@@ -202,7 +192,6 @@ class SkinTierManager {
       id: 'engineer',
       name: 'Engineer',
       tier: SkinTier.engineer,
-      variant: SkinVariant.armored,
       description: 'An indigo-robed builder with gear of creation',
       levelsRequired: 0,
       previewIcon: Icons.engineering,
@@ -216,7 +205,6 @@ class SkinTierManager {
       id: 'grandmaster',
       name: 'Grandmaster',
       tier: SkinTier.grandmaster,
-      variant: SkinVariant.wizard,
       description: 'An amber legend radiating golden power',
       levelsRequired: 0,
       previewIcon: Icons.auto_awesome,
@@ -230,7 +218,6 @@ class SkinTierManager {
       id: 'cyber',
       name: 'Cyber Scout',
       tier: SkinTier.cyber,
-      variant: SkinVariant.tech,
       description: 'A cyan scout with enhanced digital senses',
       levelsRequired: 0,
       previewIcon: Icons.phonelink,
@@ -244,7 +231,6 @@ class SkinTierManager {
       id: 'shadow',
       name: 'Shadow Coder',
       tier: SkinTier.shadow,
-      variant: SkinVariant.ninja,
       description: 'A dark phantom who moves unseen through firewalls',
       levelsRequired: 0,
       previewIcon: Icons.visibility_off,
@@ -258,7 +244,6 @@ class SkinTierManager {
       id: 'neon',
       name: 'Neon Rider',
       tier: SkinTier.neon,
-      variant: SkinVariant.tech,
       description: 'A green-glowing speedster powered by pure energy',
       levelsRequired: 0,
       previewIcon: Icons.bolt,
@@ -272,7 +257,6 @@ class SkinTierManager {
       id: 'phoenix',
       name: 'Phoenix Coder',
       tier: SkinTier.phoenix,
-      variant: SkinVariant.phoenix,
       description: 'An orange flame reborn from every system crash',
       levelsRequired: 0,
       previewIcon: Icons.local_fire_department,
@@ -285,7 +269,6 @@ class SkinTierManager {
       id: 'titan',
       name: 'Titan Tech',
       tier: SkinTier.titan,
-      variant: SkinVariant.armored,
       description: 'A steel-gray colossus of hardware engineering',
       levelsRequired: 0,
       previewIcon: Icons.hardware,
@@ -299,7 +282,6 @@ class SkinTierManager {
       id: 'void_',
       name: 'Void Walker',
       tier: SkinTier.void_,
-      variant: SkinVariant.void_,
       description: 'A deep purple entity from the digital void',
       levelsRequired: 0,
       previewIcon: Icons.all_inclusive,
@@ -314,7 +296,6 @@ class SkinTierManager {
       id: 'glitch',
       name: 'Glitch Master',
       tier: SkinTier.glitch,
-      variant: SkinVariant.tech,
       description: 'A pink-glitched anomaly bending reality',
       levelsRequired: 0,
       previewIcon: Icons.bug_report,
@@ -328,7 +309,6 @@ class SkinTierManager {
       id: 'frost',
       name: 'Frost Byte',
       tier: SkinTier.frost,
-      variant: SkinVariant.default_,
       description: 'An ice-cold specialist who freezes system errors',
       levelsRequired: 0,
       previewIcon: Icons.ac_unit,
@@ -340,7 +320,6 @@ class SkinTierManager {
       id: 'chrono',
       name: 'Chrono Tech',
       tier: SkinTier.chrono,
-      variant: SkinVariant.wizard,
       description: 'A golden time-bender mastering system clocks',
       levelsRequired: 0,
       previewIcon: Icons.schedule,
@@ -354,7 +333,6 @@ class SkinTierManager {
       id: 'spectre',
       name: 'Spectre Admin',
       tier: SkinTier.spectre,
-      variant: SkinVariant.phoenix,
       description: 'A white phantom with supreme admin access',
       levelsRequired: 0,
       previewIcon: Icons.admin_panel_settings,
@@ -368,7 +346,6 @@ class SkinTierManager {
       id: 'viper',
       name: 'Viper Security',
       tier: SkinTier.viper,
-      variant: SkinVariant.ninja,
       description: 'A green venomous defender against digital threats',
       levelsRequired: 0,
       previewIcon: Icons.security,
@@ -382,7 +359,6 @@ class SkinTierManager {
       id: 'spark',
       name: 'Spark Circuit',
       tier: SkinTier.spark,
-      variant: SkinVariant.default_,
       description: 'An electric yellow powerhouse surging with energy',
       levelsRequired: 0,
       previewIcon: Icons.electric_bolt,

@@ -674,31 +674,128 @@ class _SkinPainter extends CustomPainter {
 
   void _drawHeadAccessory(Canvas canvas, SkinDefinition skin, double s,
       double headCY, double headR, double hoodPeakY) {
-    if (skin.headAccessory == SupTechHeadAccessory.none) return;
+    switch (skin.headAccessory) {
+      case SupTechHeadAccessory.none:
+        return;
+      case SupTechHeadAccessory.antenna:
+        _drawAntenna(canvas, skin, s, hoodPeakY);
+      case SupTechHeadAccessory.crown:
+        _drawCrown(canvas, skin, s, hoodPeakY);
+      case SupTechHeadAccessory.wizardHat:
+        _drawWizardHat(canvas, skin, s, hoodPeakY);
+      case SupTechHeadAccessory.ninjaHeadband:
+        _drawHeadband(canvas, skin, s, headCY, headR, hoodPeakY);
+      case SupTechHeadAccessory.visor:
+        _drawVisor(canvas, skin, s, headCY, headR);
+      case SupTechHeadAccessory.horns:
+        _drawHorns(canvas, skin, s, headCY, headR, hoodPeakY);
+      case SupTechHeadAccessory.crest:
+        _drawCrest(canvas, skin, s, hoodPeakY);
+    }
+  }
 
+  void _drawAntenna(Canvas canvas, SkinDefinition skin, double s, double hoodPeakY) {
     final peakY = hoodPeakY - 1 * s;
-
-    // Stem
     canvas.drawLine(
       Offset(0, peakY),
       Offset(0, peakY - 7 * s),
-      Paint()
-        ..color = Colors.black87
-        ..strokeWidth = 2.0 * s
-        ..strokeCap = StrokeCap.round,
+      Paint()..color = Colors.black87..strokeWidth = 2.0 * s..strokeCap = StrokeCap.round,
     );
-    // Tip glow
     final tipCenter = Offset(0, peakY - 7 * s);
-    canvas.drawCircle(
-      tipCenter,
-      2.5 * s,
-      Paint()
-        ..shader = RadialGradient(colors: [
-          skin.accentColor,
-          skin.accentColor.withValues(alpha: 0.0),
-        ]).createShader(Rect.fromCircle(center: tipCenter, radius: 3 * s)),
-    );
+    canvas.drawCircle(tipCenter, 2.5 * s,
+      Paint()..shader = RadialGradient(colors: [
+        skin.accentColor, skin.accentColor.withValues(alpha: 0.0),
+      ]).createShader(Rect.fromCircle(center: tipCenter, radius: 3 * s)));
     canvas.drawCircle(tipCenter, 1.5 * s, Paint()..color = skin.accentColor);
+  }
+
+  void _drawCrown(Canvas canvas, SkinDefinition skin, double s, double hoodPeakY) {
+    final peakY = hoodPeakY - 2 * s;
+    final crownPaint = Paint()..color = skin.accentColor;
+    final jewelPaint = Paint()..color = const Color(0xFFE11D48);
+    final path = Path()
+      ..moveTo(-6 * s, peakY)
+      ..lineTo(-5 * s, peakY - 6 * s)
+      ..lineTo(-3 * s, peakY - 3 * s)
+      ..lineTo(0, peakY - 8 * s)
+      ..lineTo(3 * s, peakY - 3 * s)
+      ..lineTo(5 * s, peakY - 6 * s)
+      ..lineTo(6 * s, peakY);
+    canvas.drawPath(path, crownPaint..style = PaintingStyle.fill);
+    canvas.drawPath(path, Paint()..color = Colors.black87..style = PaintingStyle.stroke..strokeWidth = 1 * s);
+    canvas.drawCircle(Offset(0, peakY - 8 * s), 1.2 * s, jewelPaint);
+  }
+
+  void _drawWizardHat(Canvas canvas, SkinDefinition skin, double s, double hoodPeakY) {
+    final peakY = hoodPeakY - 2 * s;
+    final hatPaint = Paint()..color = const Color(0xFF1E293B);
+    final bandPaint = Paint()..color = skin.accentColor;
+    final cone = Path()
+      ..moveTo(-6 * s, peakY)
+      ..lineTo(6 * s, peakY)
+      ..lineTo(0, peakY - 14 * s);
+    canvas.drawPath(cone, hatPaint);
+    canvas.drawPath(cone, Paint()..color = Colors.black87..style = PaintingStyle.stroke..strokeWidth = 1 * s);
+    canvas.drawRect(Rect.fromLTWH(-6 * s, peakY - 1.5 * s, 12 * s, 2.5 * s), bandPaint);
+    // Star on tip
+    canvas.drawCircle(Offset(0, peakY - 14 * s), 1.5 * s, Paint()..color = skin.accentColor);
+  }
+
+  void _drawHeadband(Canvas canvas, SkinDefinition skin, double s, double headCY, double headR, double hoodPeakY) {
+    final bandY = headCY - headR * 0.3;
+    final bandPaint = Paint()..color = skin.accentColor;
+    canvas.drawRect(Rect.fromLTWH(-headR - 2 * s, bandY - 1.5 * s, headR * 2 + 4 * s, 3 * s), bandPaint);
+    // Tails
+    final tailPath = Path()
+      ..moveTo(-headR - 2 * s, bandY + 1.5 * s)
+      ..quadraticBezierTo(-headR - 6 * s, bandY + 8 * s, -headR - 3 * s, bandY + 12 * s)
+      ..moveTo(headR + 2 * s, bandY + 1.5 * s)
+      ..quadraticBezierTo(headR + 6 * s, bandY + 8 * s, headR + 3 * s, bandY + 12 * s);
+    canvas.drawPath(tailPath, Paint()..color = skin.accentColor..style = PaintingStyle.stroke..strokeWidth = 2 * s);
+  }
+
+  void _drawVisor(Canvas canvas, SkinDefinition skin, double s, double headCY, double headR) {
+    final visorY = headCY + headR * 0.15;
+    final visorPaint = Paint()..color = skin.accentColor.withValues(alpha: 0.7);
+    final visorPath = Path()
+      ..addRRect(RRect.fromRectAndRadius(
+        Rect.fromCenter(center: Offset(0, visorY), width: headR * 1.6, height: headR * 0.7),
+        Radius.circular(3 * s),
+      ));
+    canvas.drawPath(visorPath, visorPaint);
+    // Lens glow
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        Rect.fromCenter(center: Offset(0, visorY), width: headR * 1.2, height: headR * 0.35),
+        Radius.circular(2 * s),
+      ),
+      Paint()..color = Colors.white.withValues(alpha: 0.15),
+    );
+  }
+
+  void _drawHorns(Canvas canvas, SkinDefinition skin, double s, double headCY, double headR, double hoodPeakY) {
+    final hornPaint = Paint()..color = skin.accentColor;
+    final hornBaseY = hoodPeakY - 1 * s;
+    for (final dir in [-1, 1]) {
+      final hornPath = Path()
+        ..moveTo(dir * headR * 0.4, hornBaseY)
+        ..quadraticBezierTo(dir * headR * 0.9, hornBaseY - 6 * s, dir * headR * 0.6, hornBaseY - 10 * s)
+        ..quadraticBezierTo(dir * headR * 0.4, hornBaseY - 7 * s, dir * headR * 0.25, hornBaseY - 1 * s);
+      canvas.drawPath(hornPath, hornPaint);
+      canvas.drawPath(hornPath, Paint()..color = Colors.black87..style = PaintingStyle.stroke..strokeWidth = 0.8 * s);
+    }
+  }
+
+  void _drawCrest(Canvas canvas, SkinDefinition skin, double s, double hoodPeakY) {
+    final peakY = hoodPeakY - 1 * s;
+    final crestPaint = Paint()..color = skin.accentColor;
+    final crestPath = Path()
+      ..moveTo(0, peakY - 8 * s)
+      ..lineTo(-3 * s, peakY)
+      ..lineTo(0, peakY - 2 * s)
+      ..lineTo(3 * s, peakY);
+    canvas.drawPath(crestPath, crestPaint);
+    canvas.drawPath(crestPath, Paint()..color = Colors.black87..style = PaintingStyle.stroke..strokeWidth = 0.8 * s);
   }
 
   // ─────────────────────────────────────────────
@@ -707,53 +804,72 @@ class _SkinPainter extends CustomPainter {
 
   void _drawEarAccessory(Canvas canvas, SkinDefinition skin, double s,
       double headCY, double headR) {
-    if (skin.earAccessory == SupTechEarAccessory.none) return;
+    switch (skin.earAccessory) {
+      case SupTechEarAccessory.none:
+        return;
+      case SupTechEarAccessory.headset:
+        _drawHeadset(canvas, skin, s, headCY, headR);
+      case SupTechEarAccessory.scarf:
+        _drawScarf(canvas, skin, s, headCY, headR);
+      case SupTechEarAccessory.earGlow:
+        _drawEarGlow(canvas, skin, s, headCY, headR);
+    }
+  }
 
-    final bandPaint = Paint()
-      ..color = skin.accentColor
-      ..style = PaintingStyle.fill;
-    final isLightBody =
-        ThemeData.estimateBrightnessForColor(skin.bodyColor) == Brightness.light;
+  void _drawHeadset(Canvas canvas, SkinDefinition skin, double s,
+      double headCY, double headR) {
+    final bandPaint = Paint()..color = skin.accentColor..style = PaintingStyle.fill;
+    final isLightBody = ThemeData.estimateBrightnessForColor(skin.bodyColor) == Brightness.light;
     final outlinePaint = Paint()
       ..color = isLightBody ? const Color(0xFF94A3B8) : Colors.black87
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.5 * s
-      ..strokeCap = StrokeCap.round;
-
-    // Band across top
+      ..style = PaintingStyle.stroke..strokeWidth = 1.5 * s..strokeCap = StrokeCap.round;
     final bandPath = Path()
-      ..addOval(Rect.fromCenter(
-          center: Offset(0, headCY - 1 * s),
-          width: headR * 2 + 6 * s,
-          height: 3.5 * s))
-      ..addOval(Rect.fromCenter(
-          center: Offset(0, headCY - 1 * s),
-          width: headR * 2 - 1 * s,
-          height: 1.2 * s));
+      ..addOval(Rect.fromCenter(center: Offset(0, headCY - 1 * s), width: headR * 2 + 6 * s, height: 3.5 * s))
+      ..addOval(Rect.fromCenter(center: Offset(0, headCY - 1 * s), width: headR * 2 - 1 * s, height: 1.2 * s));
     canvas.drawPath(bandPath, bandPaint);
     canvas.drawPath(bandPath, outlinePaint);
-
-    // Ear cups
-    final cupPaint = Paint()
-      ..color = skin.accentColor.withValues(alpha: 0.85)
-      ..style = PaintingStyle.fill;
+    final cupPaint = Paint()..color = skin.accentColor.withValues(alpha: 0.85)..style = PaintingStyle.fill;
     for (final dx in [-headR - 2 * s, headR + 2 * s]) {
       canvas.drawRRect(
-        RRect.fromRectAndRadius(
-          Rect.fromCenter(
-              center: Offset(dx, headCY + 1 * s), width: 3 * s, height: 5 * s),
-          Radius.circular(1.5 * s),
-        ),
+        RRect.fromRectAndRadius(Rect.fromCenter(center: Offset(dx, headCY + 1 * s), width: 3 * s, height: 5 * s), Radius.circular(1.5 * s)),
         cupPaint,
       );
       canvas.drawRRect(
-        RRect.fromRectAndRadius(
-          Rect.fromCenter(
-              center: Offset(dx, headCY + 1 * s), width: 3 * s, height: 5 * s),
-          Radius.circular(1.5 * s),
-        ),
+        RRect.fromRectAndRadius(Rect.fromCenter(center: Offset(dx, headCY + 1 * s), width: 3 * s, height: 5 * s), Radius.circular(1.5 * s)),
         outlinePaint,
       );
+    }
+  }
+
+  void _drawScarf(Canvas canvas, SkinDefinition skin, double s, double headCY, double headR) {
+    final scarfPaint = Paint()..color = skin.accentColor;
+    final neckY = headCY + headR * 0.6;
+    // Wrap around neck
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        Rect.fromLTWH(-headR - 1 * s, neckY - 2 * s, headR * 2 + 2 * s, 5 * s),
+        Radius.circular(2 * s),
+      ),
+      scarfPaint,
+    );
+    // Tail
+    final tailPath = Path()
+      ..moveTo(-headR, neckY + 3 * s)
+      ..quadraticBezierTo(-headR - 5 * s, neckY + 8 * s, -headR - 3 * s, neckY + 14 * s);
+    canvas.drawPath(tailPath, Paint()..color = skin.accentColor..style = PaintingStyle.stroke..strokeWidth = 3.5 * s..strokeCap = StrokeCap.round);
+    canvas.drawPath(tailPath, Paint()..color = Colors.black87..style = PaintingStyle.stroke..strokeWidth = 1 * s);
+  }
+
+  void _drawEarGlow(Canvas canvas, SkinDefinition skin, double s, double headCY, double headR) {
+    final glowPaint = Paint();
+    for (final dx in [-headR * 0.7, headR * 0.7]) {
+      final center = Offset(dx, headCY);
+      canvas.drawCircle(center, 3 * s,
+        glowPaint..shader = RadialGradient(colors: [
+          skin.accentColor,
+          skin.accentColor.withValues(alpha: 0.0),
+        ]).createShader(Rect.fromCircle(center: center, radius: 3 * s)));
+      canvas.drawCircle(center, 1.5 * s, Paint()..color = skin.accentColor);
     }
   }
 
@@ -763,12 +879,26 @@ class _SkinPainter extends CustomPainter {
 
   void _drawChestAccessory(Canvas canvas, SkinDefinition skin, double s,
       double bodyTopY, double bodyBotY) {
-    if (skin.chestAccessory == SupTechChestAccessory.none) return;
+    switch (skin.chestAccessory) {
+      case SupTechChestAccessory.none:
+        return;
+      case SupTechChestAccessory.badge:
+        _drawBadge(canvas, skin, s, bodyTopY, bodyBotY);
+      case SupTechChestAccessory.cape:
+        _drawCape(canvas, skin, s, bodyTopY, bodyBotY);
+      case SupTechChestAccessory.codeScroll:
+        _drawCodeScroll(canvas, skin, s, bodyTopY, bodyBotY);
+      case SupTechChestAccessory.gear:
+        _drawGear(canvas, skin, s, bodyTopY, bodyBotY);
+      case SupTechChestAccessory.flameEmblem:
+        _drawFlameEmblem(canvas, skin, s, bodyTopY, bodyBotY);
+      case SupTechChestAccessory.staff:
+        _drawStaff(canvas, skin, s, bodyTopY, bodyBotY);
+    }
+  }
 
-    // Center in body
+  void _drawBadge(Canvas canvas, SkinDefinition skin, double s, double bodyTopY, double bodyBotY) {
     final badgeY = bodyTopY + (bodyBotY - bodyTopY) * 0.45;
-
-    // ST letters
     if (skin.showLogo) {
       final textSpan = TextSpan(
         text: 'ST',
@@ -778,14 +908,8 @@ class _SkinPainter extends CustomPainter {
           color: Colors.white,
           fontFamily: 'Montserrat',
           shadows: [
-            Shadow(
-              color: skin.accentColor,
-              blurRadius: 6 * s,
-            ),
-            Shadow(
-              color: skin.accentColor,
-              blurRadius: 2 * s,
-            ),
+            Shadow(color: skin.accentColor, blurRadius: 6 * s),
+            Shadow(color: skin.accentColor, blurRadius: 2 * s),
           ],
         ),
       );
@@ -798,6 +922,92 @@ class _SkinPainter extends CustomPainter {
         Offset(-textPainter.width / 2, badgeY - textPainter.height / 2),
       );
     }
+  }
+
+  void _drawCape(Canvas canvas, SkinDefinition skin, double s, double bodyTopY, double bodyBotY) {
+    final capePaint = Paint()..color = skin.bodyColor.withValues(alpha: 0.7);
+    final capePath = Path()
+      ..moveTo(-6 * s, bodyTopY + 2 * s)
+      ..lineTo(-8 * s, bodyBotY)
+      ..lineTo(8 * s, bodyBotY)
+      ..lineTo(6 * s, bodyTopY + 2 * s);
+    canvas.drawPath(capePath, capePaint);
+    canvas.drawPath(capePath, Paint()..color = skin.accentColor..style = PaintingStyle.stroke..strokeWidth = 0.8 * s);
+  }
+
+  void _drawCodeScroll(Canvas canvas, SkinDefinition skin, double s, double bodyTopY, double bodyBotY) {
+    final scrollY = bodyTopY + (bodyBotY - bodyTopY) * 0.4;
+    final scrollPaint = Paint()..color = const Color(0xFFFEF3C7);
+    final scrollRect = RRect.fromRectAndRadius(
+      Rect.fromCenter(center: Offset(0, scrollY), width: 6 * s, height: 8 * s),
+      Radius.circular(1 * s),
+    );
+    canvas.drawRRect(scrollRect, scrollPaint);
+    canvas.drawRRect(scrollRect, Paint()..color = Colors.brown..style = PaintingStyle.stroke..strokeWidth = 0.8 * s);
+    // Code lines
+    for (var i = 0; i < 3; i++) {
+      canvas.drawLine(
+        Offset(-2 * s, scrollY - 2 * s + i * 2.5 * s),
+        Offset(-2 * s + 3 * s, scrollY - 2 * s + i * 2.5 * s),
+        Paint()..color = Colors.black54..strokeWidth = 0.8 * s..strokeCap = StrokeCap.round,
+      );
+    }
+  }
+
+  void _drawGear(Canvas canvas, SkinDefinition skin, double s, double bodyTopY, double bodyBotY) {
+    final gearY = bodyTopY + (bodyBotY - bodyTopY) * 0.45;
+    final gearPaint = Paint()..color = skin.accentColor;
+    // Center circle
+    canvas.drawCircle(Offset(0, gearY), 4 * s, gearPaint..style = PaintingStyle.fill);
+    canvas.drawCircle(Offset(0, gearY), 4 * s, Paint()..color = Colors.black87..style = PaintingStyle.stroke..strokeWidth = 0.8 * s);
+    // Teeth
+    for (var i = 0; i < 6; i++) {
+      final angle = i * 3.14159 / 3;
+      final cx = 5.5 * s * cos(angle);
+      final cy = 5.5 * s * sin(angle);
+      canvas.drawCircle(Offset(cx, cy + gearY), 1.5 * s, gearPaint..style = PaintingStyle.fill);
+    }
+    // Inner hole
+    canvas.drawCircle(Offset(0, gearY), 1.5 * s, Paint()..color = Colors.black87);
+  }
+
+  void _drawFlameEmblem(Canvas canvas, SkinDefinition skin, double s, double bodyTopY, double bodyBotY) {
+    final flameY = bodyTopY + (bodyBotY - bodyTopY) * 0.45;
+    final flamePaint = Paint()..color = const Color(0xFFF97316);
+    final flamePath = Path()
+      ..moveTo(0, flameY - 5 * s)
+      ..quadraticBezierTo(3 * s, flameY - 1 * s, 4 * s, flameY + 1 * s)
+      ..quadraticBezierTo(2 * s, flameY + 3 * s, 0, flameY + 4 * s)
+      ..quadraticBezierTo(-2 * s, flameY + 3 * s, -4 * s, flameY + 1 * s)
+      ..quadraticBezierTo(-3 * s, flameY - 1 * s, 0, flameY - 5 * s);
+    canvas.drawPath(flamePath, flamePaint);
+    canvas.drawPath(flamePath, Paint()..color = Colors.black87..style = PaintingStyle.stroke..strokeWidth = 0.8 * s);
+    // Inner glow
+    final innerFlame = Path()
+      ..moveTo(0, flameY - 2 * s)
+      ..quadraticBezierTo(1.5 * s, flameY, 2 * s, flameY + 1 * s)
+      ..quadraticBezierTo(1 * s, flameY + 2 * s, 0, flameY + 2.5 * s)
+      ..quadraticBezierTo(-1 * s, flameY + 2 * s, -2 * s, flameY + 1 * s)
+      ..quadraticBezierTo(-1.5 * s, flameY, 0, flameY - 2 * s);
+    canvas.drawPath(innerFlame, Paint()..color = const Color(0xFFFDE68A));
+  }
+
+  void _drawStaff(Canvas canvas, SkinDefinition skin, double s, double bodyTopY, double bodyBotY) {
+    final staffX = 6 * s;
+    // Staff shaft
+    canvas.drawLine(
+      Offset(staffX, bodyTopY + 2 * s),
+      Offset(staffX, bodyBotY - 2 * s),
+      Paint()..color = const Color(0xFF78350F)..strokeWidth = 1.5 * s..strokeCap = StrokeCap.round,
+    );
+    // Top crystal
+    final crystalCenter = Offset(staffX, bodyTopY + 1 * s);
+    canvas.drawCircle(crystalCenter, 2 * s, Paint()..color = skin.accentColor);
+    canvas.drawCircle(crystalCenter, 3 * s,
+      Paint()..shader = RadialGradient(colors: [
+        skin.accentColor.withValues(alpha: 0.4),
+        skin.accentColor.withValues(alpha: 0.0),
+      ]).createShader(Rect.fromCircle(center: crystalCenter, radius: 3 * s)));
   }
 
   // ─────────────────────────────────────────────

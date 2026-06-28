@@ -77,17 +77,17 @@ class _BossScreenState extends State<BossScreen>
     if (diagnosis.isEmpty) return;
 
     _diagnosisLocked = true;
-    final correct = diagnosis['correct'] as int;
+    final correct = (diagnosis['correct'] as int?) ?? 0;
     final cubit = context.read<GameCubit>();
 
     if (selectedIndex == correct) {
       cubit.attackBoss(damage: 3);
       setState(() {
-        _diagnosisResult = diagnosis['flavor'] as String;
+        _diagnosisResult = (diagnosis['flavor'] as String?) ?? 'Correct diagnosis.';
       });
     } else {
       setState(() {
-        _diagnosisResult = diagnosis['failFlavor'] as String;
+        _diagnosisResult = (diagnosis['failFlavor'] as String?) ?? 'Incorrect diagnosis.';
       });
     }
 
@@ -107,18 +107,18 @@ class _BossScreenState extends State<BossScreen>
     final cubit = context.read<GameCubit>();
     final rng = Random();
     final roll = rng.nextInt(100) + 1;
-    final success = strategy['success'] as int;
-    final damage = strategy['damage'] as int;
+    final success = (strategy['success'] as int?) ?? 50;
+    final damage = (strategy['damage'] as int?) ?? 1;
 
     if (roll <= success) {
       cubit.attackBoss(damage: damage);
       setState(() {
-        _lastOutcome = strategy['flavor'] as String;
+        _lastOutcome = (strategy['flavor'] as String?) ?? 'Strategy succeeded!';
         _currentPhase = 2;
       });
     } else {
       setState(() {
-        _lastOutcome = strategy['failFlavor'] as String;
+        _lastOutcome = (strategy['failFlavor'] as String?) ?? 'Strategy failed.';
         _currentPhase = 2;
       });
     }
@@ -221,7 +221,7 @@ class _BossScreenState extends State<BossScreen>
         );
       }
 
-      final options = diagnosis['options'] as List<String>;
+      final options = (diagnosis['options'] as List<dynamic>?)?.cast<String>() ?? <String>[];
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -244,7 +244,7 @@ class _BossScreenState extends State<BossScreen>
               border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
             ),
             child: Text(
-              diagnosis['symptoms'] as String,
+              (diagnosis['symptoms'] as String?) ?? 'Unknown symptoms',
               style: TextStyle(
                 color: Colors.white.withValues(alpha: 0.8),
                 fontSize: 13,

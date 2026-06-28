@@ -1,7 +1,5 @@
-library;
-
-/// Shared prep-screen data — quiz questions, scenarios, traps, and spot-the-mistake
-/// content for all 40 levels.
+// Shared prep-screen data — quiz questions, scenarios, traps, and spot-the-mistake
+// content for all 40 levels.
 import 'package:littletech/src/core/constants/category_manager.dart';
 
 class PrepData {

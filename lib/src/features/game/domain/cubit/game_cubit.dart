@@ -210,10 +210,12 @@ class GameCubit extends Cubit<GameState> {
 
   void _safePersist(List<Future<void> Function()> ops) {
     Future.wait(ops.map((op) => op()))
-      .then((_) => emit(state.copyWith(persistError: false)))
+      .then((_) {
+        if (!isClosed) emit(state.copyWith(persistError: false));
+      })
       .catchError((e, st) {
         debugPrint('Persist error: $e\n$st');
-        emit(state.copyWith(persistError: true));
+        if (!isClosed) emit(state.copyWith(persistError: true));
       });
   }
 
@@ -365,8 +367,9 @@ class GameCubit extends Cubit<GameState> {
     }
   }
 
-  void refreshProgress() {
-    emit(state.copyWith(progress: state.progress));
+  Future<void> refreshProgress() async {
+    final p = await _repository.loadProgress(_userId);
+    if (p != null && !isClosed) emit(state.copyWith(progress: p));
   }
 
   void addPoints(int amount) {

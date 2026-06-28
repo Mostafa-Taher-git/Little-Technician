@@ -30,7 +30,7 @@ class GameRepository {
       ..activeFrameId = null
       ..themeId = null
       ..unlockedSkinIds = ['default']
-      ..earnedRewardIds = ['skin_default'];
+      ..earnedRewardIds = [];
     await _isar.writeTxn(() async {
       await _isar.playerProgress.put(progress);
     });

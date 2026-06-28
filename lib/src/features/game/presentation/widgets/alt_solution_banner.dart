@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:littletech/src/features/game/constants/game_data.dart';
+import 'package:littletech/src/features/game/constants/prep_data.dart';
 
 class AltSolutionBanner extends StatelessWidget {
   final WorldDef world;
@@ -35,7 +36,7 @@ class AltSolutionBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final alts = _alternatives[level.id] ?? [
+    final alts = _alternatives[PrepData.key(level.id)] ?? [
       'Try searching the exact error message on Google or forums',
       'Check the manufacturer website for known issues with this device',
       'Consider asking a fellow IT professional for a second opinion',
