@@ -5,7 +5,25 @@ enum SkinTier {
   cyber, shadow, neon, phoenix, titan, void_, glitch, frost, chrono, spectre, viper, spark
 }
 
-enum SupTechAccessory { none, antenna, headband, pointedHat, crown, gear, cape }
+enum SupTechExpression { neutral, happy, angry, surprised, determined, wink, sleep, error }
+
+enum SupTechHeadAccessory { none, antenna }
+
+enum SupTechEarAccessory { none, headset }
+
+enum SupTechChestAccessory { none, badge }
+
+class AvatarState {
+  final SupTechExpression expression;
+  final bool blinking;
+  final Offset lookDirection;
+
+  const AvatarState({
+    this.expression = SupTechExpression.neutral,
+    this.blinking = false,
+    this.lookDirection = Offset.zero,
+  });
+}
 
 class SkinDefinition {
   final String id;
@@ -17,7 +35,10 @@ class SkinDefinition {
   final bool isRewardSkin;
   final Color bodyColor;
   final Color accentColor;
-  final SupTechAccessory accessory;
+  final SupTechHeadAccessory headAccessory;
+  final SupTechEarAccessory earAccessory;
+  final SupTechChestAccessory chestAccessory;
+  final bool showLogo;
 
   const SkinDefinition({
     required this.id,
@@ -29,7 +50,10 @@ class SkinDefinition {
     this.isRewardSkin = false,
     required this.bodyColor,
     required this.accentColor,
-    this.accessory = SupTechAccessory.none,
+    this.headAccessory = SupTechHeadAccessory.none,
+    this.earAccessory = SupTechEarAccessory.none,
+    this.chestAccessory = SupTechChestAccessory.none,
+    this.showLogo = true,
   });
 
   Color get color {
@@ -96,11 +120,12 @@ class SkinTierManager {
       id: 'default',
       name: 'Default SupTech',
       tier: SkinTier.default_,
-      description: 'A dark hooded chibi with a gray robe and silver glow',
+      description: 'A dark hooded chibi with a gray robe and blue glow',
       levelsRequired: 0,
       previewIcon: Icons.auto_awesome,
-      bodyColor: Color(0xFF6B7280),
-      accentColor: Color(0xFF9CA3AF),
+      bodyColor: Color(0xFF5A626A),
+      accentColor: Color(0xFF38BDF8),
+      chestAccessory: SupTechChestAccessory.badge,
     ),
     SkinDefinition(
       id: 'rookie',
@@ -111,29 +136,28 @@ class SkinTierManager {
       previewIcon: Icons.auto_awesome_mosaic,
       bodyColor: Color(0xFF2563EB),
       accentColor: Color(0xFF60A5FA),
-      accessory: SupTechAccessory.antenna,
+      headAccessory: SupTechHeadAccessory.antenna,
     ),
     SkinDefinition(
       id: 'ninja',
       name: 'Network Ninja',
       tier: SkinTier.ninja,
-      description: 'A purple hooded stealth specialist with a headband',
+      description: 'A purple hooded stealth specialist with a headset',
       levelsRequired: 15,
       previewIcon: Icons.auto_awesome_motion,
       bodyColor: Color(0xFF7C3AED),
       accentColor: Color(0xFFA78BFA),
-      accessory: SupTechAccessory.headband,
+      earAccessory: SupTechEarAccessory.headset,
     ),
     SkinDefinition(
       id: 'wizard',
       name: 'System Wizard',
       tier: SkinTier.wizard,
-      description: 'A brown-robed mage with a pointed hat of knowledge',
+      description: 'A brown-robed mage with deep system knowledge',
       levelsRequired: 30,
       previewIcon: Icons.workspace_premium,
       bodyColor: Color(0xFF92400E),
       accentColor: Color(0xFFF59E0B),
-      accessory: SupTechAccessory.pointedHat,
     ),
     SkinDefinition(
       id: 'golden',
@@ -144,54 +168,55 @@ class SkinTierManager {
       previewIcon: Icons.auto_awesome,
       bodyColor: Color(0xFFDC2626),
       accentColor: Color(0xFFFCD34D),
-      accessory: SupTechAccessory.crown,
+      chestAccessory: SupTechChestAccessory.badge,
     ),
     SkinDefinition(
       id: 'hacker',
       name: 'Hacker',
       tier: SkinTier.hacker,
-      description: 'A green-veiled phantom who sees through firewalls',
+      description: 'A green phantom who sees through firewalls',
       levelsRequired: 0,
       previewIcon: Icons.terminal,
       isRewardSkin: true,
       bodyColor: Color(0xFF059669),
       accentColor: Color(0xFF34D399),
+      earAccessory: SupTechEarAccessory.headset,
     ),
     SkinDefinition(
       id: 'engineer',
       name: 'Engineer',
       tier: SkinTier.engineer,
-      description: 'An indigo-robed builder with a gear of creation',
+      description: 'An indigo-robed builder with gear of creation',
       levelsRequired: 0,
       previewIcon: Icons.engineering,
       isRewardSkin: true,
       bodyColor: Color(0xFF4338CA),
       accentColor: Color(0xFF818CF8),
-      accessory: SupTechAccessory.gear,
+      chestAccessory: SupTechChestAccessory.badge,
     ),
     SkinDefinition(
       id: 'grandmaster',
       name: 'Grandmaster',
       tier: SkinTier.grandmaster,
-      description: 'An amber-caped legend radiating golden power',
+      description: 'An amber legend radiating golden power',
       levelsRequired: 0,
       previewIcon: Icons.auto_awesome,
       isRewardSkin: true,
       bodyColor: Color(0xFFD97706),
       accentColor: Color(0xFFFDE68A),
-      accessory: SupTechAccessory.cape,
+      chestAccessory: SupTechChestAccessory.badge,
     ),
     SkinDefinition(
       id: 'cyber',
       name: 'Cyber Scout',
       tier: SkinTier.cyber,
-      description: 'A cyan-robed scout with enhanced digital senses',
+      description: 'A cyan scout with enhanced digital senses',
       levelsRequired: 0,
       previewIcon: Icons.phonelink,
       isRewardSkin: true,
       bodyColor: Color(0xFF06B6D4),
       accentColor: Color(0xFF22D3EE),
-      accessory: SupTechAccessory.headband,
+      earAccessory: SupTechEarAccessory.headset,
     ),
     SkinDefinition(
       id: 'shadow',
@@ -203,7 +228,7 @@ class SkinTierManager {
       isRewardSkin: true,
       bodyColor: Color(0xFF581C87),
       accentColor: Color(0xFF7C3AED),
-      accessory: SupTechAccessory.cape,
+      showLogo: false,
     ),
     SkinDefinition(
       id: 'neon',
@@ -215,19 +240,19 @@ class SkinTierManager {
       isRewardSkin: true,
       bodyColor: Color(0xFF16A34A),
       accentColor: Color(0xFF4ADE80),
-      accessory: SupTechAccessory.antenna,
+      headAccessory: SupTechHeadAccessory.antenna,
     ),
     SkinDefinition(
       id: 'phoenix',
       name: 'Phoenix Coder',
       tier: SkinTier.phoenix,
-      description: 'An orange-robed flame reborn from every system crash',
+      description: 'An orange flame reborn from every system crash',
       levelsRequired: 0,
       previewIcon: Icons.local_fire_department,
       isRewardSkin: true,
       bodyColor: Color(0xFFEA580C),
       accentColor: Color(0xFFFB923C),
-      accessory: SupTechAccessory.crown,
+      chestAccessory: SupTechChestAccessory.badge,
     ),
     SkinDefinition(
       id: 'titan',
@@ -239,7 +264,7 @@ class SkinTierManager {
       isRewardSkin: true,
       bodyColor: Color(0xFF475569),
       accentColor: Color(0xFF94A3B8),
-      accessory: SupTechAccessory.gear,
+      chestAccessory: SupTechChestAccessory.badge,
     ),
     SkinDefinition(
       id: 'void_',
@@ -251,7 +276,8 @@ class SkinTierManager {
       isRewardSkin: true,
       bodyColor: Color(0xFF4C1D95),
       accentColor: Color(0xFF7C3AED),
-      accessory: SupTechAccessory.cape,
+      earAccessory: SupTechEarAccessory.headset,
+      showLogo: false,
     ),
     SkinDefinition(
       id: 'glitch',
@@ -263,7 +289,7 @@ class SkinTierManager {
       isRewardSkin: true,
       bodyColor: Color(0xFFDB2777),
       accentColor: Color(0xFFF472B6),
-      accessory: SupTechAccessory.headband,
+      earAccessory: SupTechEarAccessory.headset,
     ),
     SkinDefinition(
       id: 'frost',
@@ -275,7 +301,6 @@ class SkinTierManager {
       isRewardSkin: true,
       bodyColor: Color(0xFF0284C7),
       accentColor: Color(0xFF7DD3FC),
-      accessory: SupTechAccessory.pointedHat,
     ),
     SkinDefinition(
       id: 'chrono',
@@ -287,19 +312,19 @@ class SkinTierManager {
       isRewardSkin: true,
       bodyColor: Color(0xFFCA8A04),
       accentColor: Color(0xFFFACC15),
-      accessory: SupTechAccessory.crown,
+      chestAccessory: SupTechChestAccessory.badge,
     ),
     SkinDefinition(
       id: 'spectre',
       name: 'Spectre Admin',
       tier: SkinTier.spectre,
-      description: 'A white phantom with supreme administrative access',
+      description: 'A white phantom with supreme admin access',
       levelsRequired: 0,
       previewIcon: Icons.admin_panel_settings,
       isRewardSkin: true,
       bodyColor: Color(0xFFE2E8F0),
       accentColor: Color(0xFFF1F5F9),
-      accessory: SupTechAccessory.cape,
+      showLogo: false,
     ),
     SkinDefinition(
       id: 'viper',
@@ -311,7 +336,7 @@ class SkinTierManager {
       isRewardSkin: true,
       bodyColor: Color(0xFF15803D),
       accentColor: Color(0xFF86EFAC),
-      accessory: SupTechAccessory.headband,
+      earAccessory: SupTechEarAccessory.headset,
     ),
     SkinDefinition(
       id: 'spark',
@@ -323,7 +348,7 @@ class SkinTierManager {
       isRewardSkin: true,
       bodyColor: Color(0xFFEAB308),
       accentColor: Color(0xFFFDE047),
-      accessory: SupTechAccessory.antenna,
+      headAccessory: SupTechHeadAccessory.antenna,
     ),
   ];
 
