@@ -229,7 +229,8 @@ class GameCubit extends Cubit<GameState> {
 
     final totalPoints = basePoints + bonusPoints;
     final world = state.currentWorld;
-    final isWorldComplete = world != null && GameData.isWorldComplete(world, progress.completedLevelIds);
+    final completedWithCurrent = [...progress.completedLevelIds, level.id];
+    final isWorldComplete = world != null && GameData.isWorldComplete(world, completedWithCurrent);
 
     // Draw reward safely — ensure state always emits even if reward fails
     RewardDef? reward;
@@ -248,6 +249,7 @@ class GameCubit extends Cubit<GameState> {
       ],
       if (reward != null) () => _repository.addReward(progress, reward!.id),
       if (reward?.type == RewardType.skin) () => _repository.unlockSkin(progress, reward!.value),
+      if (reward?.type == RewardType.theme) () => _repository.setTheme(progress, reward!.value),
       () => _repository.recordPlayDate(progress),
     ];
 
@@ -304,6 +306,7 @@ class GameCubit extends Cubit<GameState> {
         () => _repository.saveProgress(progress..setWeeklyBossCompleted()),
       if (reward != null) () => _repository.addReward(progress, reward!.id),
       if (reward?.type == RewardType.skin) () => _repository.unlockSkin(progress, reward!.value),
+      if (reward?.type == RewardType.theme) () => _repository.setTheme(progress, reward!.value),
     ];
 
     _safePersist(persistOps);
