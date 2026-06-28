@@ -66,7 +66,13 @@ class AuthService {
     final prefs = await _prefs;
     final raw = prefs.getString(_usersKey);
     if (raw == null) return [];
-    final list = jsonDecode(raw) as List;
+    final List list;
+    try {
+      list = jsonDecode(raw) as List;
+    } on FormatException {
+      await prefs.remove(_usersKey);
+      return [];
+    }
     final users = list.map((e) => UserModel.fromJson(e as Map<String, dynamic>)).toList();
     bool migrated = false;
     for (var i = 0; i < users.length; i++) {

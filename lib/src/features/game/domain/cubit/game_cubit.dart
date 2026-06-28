@@ -209,11 +209,12 @@ class GameCubit extends Cubit<GameState> {
   }
 
   void _safePersist(List<Future<void> Function()> ops) {
-    Future.wait(ops.map((op) => op())).catchError((e, st) {
-      debugPrint('Persist error: $e\n$st');
-      emit(state.copyWith(persistError: true));
-      return <void>[];
-    });
+    Future.wait(ops.map((op) => op()))
+      .then((_) => emit(state.copyWith(persistError: false)))
+      .catchError((e, st) {
+        debugPrint('Persist error: $e\n$st');
+        emit(state.copyWith(persistError: true));
+      });
   }
 
   void _completeLevel(PlayerProgress progress, int finalStepIndex) {

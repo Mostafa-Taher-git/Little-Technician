@@ -49,7 +49,11 @@ class AuthCubit extends Cubit<AuthState> {
     final ok = await AuthService.login(username: username, password: password);
     if (ok) {
       final user = await AuthService.getCurrentUser();
-      emit(LoginSuccess(user!));
+      if (user == null) {
+        emit(const AuthError('Login succeeded but user not found.'));
+        return;
+      }
+      emit(LoginSuccess(user));
     } else {
       emit(const AuthError('Invalid username or password.'));
     }
@@ -68,7 +72,11 @@ class AuthCubit extends Cubit<AuthState> {
     );
     if (ok) {
       final user = await AuthService.getCurrentUser();
-      emit(RegisterSuccess(user!));
+      if (user == null) {
+        emit(const AuthError('Registration succeeded but user not found.'));
+        return;
+      }
+      emit(RegisterSuccess(user));
     } else {
       emit(const AuthError('Username already exists.'));
     }

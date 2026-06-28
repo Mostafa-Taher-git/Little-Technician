@@ -62,7 +62,7 @@ class SkinDefinition {
       SkinTier.rookie => const Color(0xFF2563EB),
       SkinTier.ninja => const Color(0xFF7C3AED),
       SkinTier.wizard => const Color(0xFF92400E),
-      SkinTier.golden => const Color(0xFFDC2626),
+      SkinTier.golden => const Color(0xFFD97706),
       SkinTier.hacker => const Color(0xFF059669),
       SkinTier.engineer => const Color(0xFF4338CA),
       SkinTier.grandmaster => const Color(0xFFD97706),

@@ -23,6 +23,7 @@ class LittleTechApp extends StatefulWidget {
 class _LittleTechAppState extends State<LittleTechApp> {
   int? _userId;
   final _navKey = GlobalKey<NavigatorState>();
+  int _authChangeSeq = 0;
 
   @override
   void initState() {
@@ -38,10 +39,11 @@ class _LittleTechAppState extends State<LittleTechApp> {
   }
 
   void _onAuthChanged() {
+    final seq = ++_authChangeSeq;
     _loadUserId().then((_) {
-      if (!mounted) return;
+      if (!mounted || seq != _authChangeSeq) return;
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!mounted) return;
+        if (!mounted || seq != _authChangeSeq) return;
         final nav = _navKey.currentState;
         if (nav == null) return;
         if (_userId != null) {
@@ -80,7 +82,7 @@ class _LittleTechAppState extends State<LittleTechApp> {
         listeners: [
           BlocListener<AuthCubit, AuthState>(
             listener: (_, state) {
-              if (state is LoginSuccess || state is RegisterSuccess || state is LogoutSuccess) {
+              if (state is LoginSuccess || state is LogoutSuccess) {
                 _onAuthChanged();
               }
             },
@@ -103,9 +105,12 @@ class _LittleTechAppState extends State<LittleTechApp> {
             BlocListener<GameCubit, GameState>(
               listenWhen: (prev, curr) => !prev.persistError && curr.persistError,
               listener: (context, state) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Failed to save progress')),
-                );
+                final navCtx = _navKey.currentContext;
+                if (navCtx != null) {
+                  ScaffoldMessenger.of(navCtx).showSnackBar(
+                    const SnackBar(content: Text('Failed to save progress')),
+                  );
+                }
               },
             ),
         ],

@@ -21,6 +21,7 @@ class ScenarioScreen extends StatefulWidget {
 class _ScenarioScreenState extends State<ScenarioScreen> {
   int _currentQuestion = 0;
   int _correctCount = 0;
+  int _correctIndex = 0;
   bool _isAnswered = false;
   bool _showResults = false;
   final List<int> _userAnswers = [];
@@ -53,8 +54,7 @@ class _ScenarioScreenState extends State<ScenarioScreen> {
 
   void _answer(int index) {
     if (_isAnswered) return;
-    const correctIndex = 0;
-    final isCorrect = index == correctIndex;
+    final isCorrect = index == _correctIndex;
 
     setState(() {
       _isAnswered = true;
@@ -98,7 +98,9 @@ class _ScenarioScreenState extends State<ScenarioScreen> {
     final wrongActions = List<String>.from(q['wrongActions'] as List);
     final explanation = q['explanation'] as String;
 
-    final options = [correctAction, ...wrongActions]..shuffle();
+    final shuffled = List.of([correctAction, ...wrongActions])..shuffle();
+    _correctIndex = shuffled.indexOf(correctAction);
+    final options = shuffled;
     final isFollowUp = _currentQuestion > 0;
 
     return Scaffold(

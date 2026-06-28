@@ -26,9 +26,16 @@ class ReviewScreen extends StatelessWidget {
       body: BlocBuilder<GameCubit, GameState>(
         builder: (_, state) {
           final raw = state.progress.getPrepResult(level.id);
-          final prepData = raw != null
-              ? json.decode(raw) as Map<String, dynamic>
-              : <String, dynamic>{};
+          Map<String, dynamic> prepData;
+          if (raw != null) {
+            try {
+              prepData = json.decode(raw) as Map<String, dynamic>;
+            } catch (_) {
+              prepData = <String, dynamic>{};
+            }
+          } else {
+            prepData = <String, dynamic>{};
+          }
           final quiz = prepData['quiz'] as Map<String, dynamic>?;
           final ordering = prepData['ordering'] as Map<String, dynamic>?;
           final traps = prepData['traps'] as Map<String, dynamic>?;
