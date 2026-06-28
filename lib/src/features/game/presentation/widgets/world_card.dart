@@ -71,6 +71,7 @@ class WorldCard extends StatelessWidget {
                 accent: hasBossProgress
                     ? bossColor.withValues(alpha: 0.05)
                     : scheme.secondary.withValues(alpha: 0.05),
+                seed: world.id.hashCode,
               ),
               foregroundPainter: _ScrollEdgePainter(
                 color: scheme.outline.withValues(alpha: 0.15),
@@ -221,15 +222,16 @@ class WorldCard extends StatelessWidget {
 class _ParchmentTexturePainter extends CustomPainter {
   final Color color;
   final Color accent;
+  final int seed;
 
-  _ParchmentTexturePainter({required this.color, required this.accent});
+  _ParchmentTexturePainter({required this.color, required this.accent, required this.seed});
 
   @override
   void paint(Canvas canvas, Size size) {
     final bgPaint = Paint()..color = color;
     canvas.drawRect(Offset.zero & size, bgPaint);
 
-    final rng = Random(42);
+    final rng = Random(seed);
     for (var i = 0; i < 20; i++) {
       final x = rng.nextDouble() * size.width;
       final y = rng.nextDouble() * size.height;

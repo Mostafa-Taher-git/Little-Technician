@@ -24,6 +24,7 @@ class GameState {
   final int pointsMultiplier;
   final BossEncounterDef? currentBoss;
   final List<Achievement> newlyUnlockedAchievements;
+  final bool persistError;
 
   const GameState({
     required this.progress,
@@ -38,6 +39,7 @@ class GameState {
     this.pointsMultiplier = 1,
     this.currentBoss,
     this.newlyUnlockedAchievements = const [],
+    this.persistError = false,
   });
 
   GameState copyWith({
@@ -53,6 +55,7 @@ class GameState {
     int? pointsMultiplier,
     BossEncounterDef? currentBoss,
     List<Achievement>? newlyUnlockedAchievements,
+    bool? persistError,
   }) {
     return GameState(
       progress: progress ?? this.progress,
@@ -67,6 +70,7 @@ class GameState {
       pointsMultiplier: pointsMultiplier ?? this.pointsMultiplier,
       currentBoss: currentBoss ?? this.currentBoss,
       newlyUnlockedAchievements: newlyUnlockedAchievements ?? this.newlyUnlockedAchievements,
+      persistError: persistError ?? this.persistError,
     );
   }
 
@@ -206,7 +210,8 @@ class GameCubit extends Cubit<GameState> {
 
   void _safePersist(List<Future<void> Function()> ops) {
     Future.wait(ops.map((op) => op())).catchError((e, st) {
-      debugPrint('Persist error: $e');
+      debugPrint('Persist error: $e\n$st');
+      emit(state.copyWith(persistError: true));
       return <void>[];
     });
   }

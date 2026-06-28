@@ -99,6 +99,15 @@ class _LittleTechAppState extends State<LittleTechApp> {
                 }
               },
             ),
+          if (_userId != null)
+            BlocListener<GameCubit, GameState>(
+              listenWhen: (prev, curr) => !prev.persistError && curr.persistError,
+              listener: (context, state) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Failed to save progress')),
+                );
+              },
+            ),
         ],
         child: BlocBuilder<ThemeCubit, ThemeData>(
           builder: (_, theme) => MaterialApp(
