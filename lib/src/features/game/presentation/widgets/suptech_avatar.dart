@@ -129,14 +129,37 @@ class _SkinPainter extends CustomPainter {
     final eyeSpacing    =  3 * s;
     final eyeR          =  3 * s;
 
-    _drawBody(canvas, skin, s, bodyTopY, bodyBotY, robeShoulderW, robeBaseW);
-    _drawHead(canvas, skin, s, headCY, headR, hoodBaseY, hoodTopR, hoodBottomR, hoodPeakY);
+    switch (skin.variant) {
+      case SkinVariant.ninja:
+        _drawNinjaVariant(canvas, skin, s);
+        break;
+      case SkinVariant.wizard:
+        _drawWizardVariant(canvas, skin, s);
+        break;
+      case SkinVariant.tech:
+        _drawTechVariant(canvas, skin, s);
+        break;
+      case SkinVariant.armored:
+        _drawArmoredVariant(canvas, skin, s);
+        break;
+      case SkinVariant.phoenix:
+        _drawPhoenixVariant(canvas, skin, s);
+        break;
+      case SkinVariant.void_:
+        _drawVoidVariant(canvas, skin, s);
+        break;
+      case SkinVariant.default_:
+        _drawBody(canvas, skin, s, bodyTopY, bodyBotY, robeShoulderW, robeBaseW);
+        _drawHead(canvas, skin, s, headCY, headR, hoodBaseY, hoodTopR, hoodBottomR, hoodPeakY);
+        break;
+    }
     _drawFace(canvas, skin, s, faceCY, faceW, faceH);
     _drawEyes(canvas, skin, s, eyeY, eyeSpacing, eyeR, faceCY);
     _drawMouth(canvas, skin, s, faceCY);
     _drawHeadAccessory(canvas, skin, s, headCY, headR, hoodPeakY);
     _drawEarAccessory(canvas, skin, s, headCY, headR);
     _drawChestAccessory(canvas, skin, s, bodyTopY, bodyBotY);
+    _drawUniqueDetail(canvas, skin, s);
     _drawGlow(canvas, skin, s);
 
     canvas.restore();
@@ -288,6 +311,406 @@ class _SkinPainter extends CustomPainter {
         ..quadraticBezierTo(headR / 2, hoodPeakY - 1.5 * s, 8 * s, hoodPeakY + 3 * s),
       highlightPaint,
     );
+  }
+
+  // ─────────────────────────────────────────────
+  // Face void (large dark opening)
+  // ─────────────────────────────────────────────
+
+  // ─────────────────────────────────────────────
+  // VARIANT: Ninja — slim body, tight flat hood
+  // ─────────────────────────────────────────────
+
+  void _drawNinjaVariant(Canvas canvas, SkinDefinition skin, double s) {
+    final bodyPaint = Paint()..color = skin.bodyColor..style = PaintingStyle.fill;
+    final isLightBody = ThemeData.estimateBrightnessForColor(skin.bodyColor) == Brightness.light;
+    final outlinePaint = Paint()
+      ..color = isLightBody ? const Color(0xFF94A3B8) : Colors.black87
+      ..style = PaintingStyle.stroke..strokeWidth = 2.5 * s..strokeCap = StrokeCap.round..strokeJoin = StrokeJoin.round;
+
+    // Shadow
+    canvas.drawOval(Rect.fromCenter(center: Offset(0, 14 * s), width: 18 * s, height: 2 * s),
+      Paint()..color = Colors.black.withValues(alpha: 0.10)..style = PaintingStyle.fill);
+
+    // Slim robe body
+    final robePath = Path()
+      ..moveTo(-6 * s, -1 * s)
+      ..lineTo(6 * s, -1 * s)
+      ..quadraticBezierTo(8 * s, 5 * s, 9 * s, 12 * s)
+      ..quadraticBezierTo(4.5 * s, 13.5 * s, 0, 13 * s)
+      ..quadraticBezierTo(-4.5 * s, 13.5 * s, -9 * s, 12 * s)
+      ..quadraticBezierTo(-8 * s, 5 * s, -6 * s, -1 * s)
+      ..close();
+    canvas.drawPath(robePath, bodyPaint);
+    canvas.drawPath(robePath, outlinePaint);
+
+    // Tight flat hood — lower dome, wider base
+    final hoodPath = Path()
+      ..moveTo(-12 * s, -2 * s)
+      ..cubicTo(-12 * s, -14 * s, -9 * s, -22 * s, 0, -24 * s)
+      ..cubicTo(9 * s, -22 * s, 12 * s, -14 * s, 12 * s, -2 * s)
+      ..quadraticBezierTo(6 * s, 1 * s, 0, 0.5 * s)
+      ..quadraticBezierTo(-6 * s, 1 * s, -12 * s, -2 * s)
+      ..close();
+    canvas.drawPath(hoodPath, bodyPaint);
+    canvas.drawPath(hoodPath, outlinePaint);
+
+    // Fold lines
+    final foldPaint = Paint()..color = Colors.black.withValues(alpha: 0.10)..style = PaintingStyle.stroke..strokeWidth = 1.0 * s..strokeCap = StrokeCap.round;
+    canvas.drawPath(Path()..moveTo(-2 * s, 0)..quadraticBezierTo(-3 * s, 6 * s, -5 * s, 12 * s), foldPaint);
+    canvas.drawPath(Path()..moveTo(2 * s, 0)..quadraticBezierTo(3 * s, 6 * s, 5 * s, 12 * s), foldPaint);
+
+    // Bottom glow
+    canvas.drawOval(Rect.fromCenter(center: Offset(0, 13.5 * s), width: 16 * s, height: 3 * s),
+      Paint()..shader = LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter,
+        colors: [skin.accentColor.withValues(alpha: 0.0), skin.accentColor],
+      ).createShader(Rect.fromCenter(center: Offset(0, 13.5 * s), width: 16 * s, height: 3 * s))
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3));
+  }
+
+  // ─────────────────────────────────────────────
+  // VARIANT: Wizard — wide flowing robes, tall pointed hat area
+  // ─────────────────────────────────────────────
+
+  void _drawWizardVariant(Canvas canvas, SkinDefinition skin, double s) {
+    final bodyPaint = Paint()..color = skin.bodyColor..style = PaintingStyle.fill;
+    final isLightBody = ThemeData.estimateBrightnessForColor(skin.bodyColor) == Brightness.light;
+    final outlinePaint = Paint()
+      ..color = isLightBody ? const Color(0xFF94A3B8) : Colors.black87
+      ..style = PaintingStyle.stroke..strokeWidth = 2.5 * s..strokeCap = StrokeCap.round..strokeJoin = StrokeJoin.round;
+
+    // Shadow
+    canvas.drawOval(Rect.fromCenter(center: Offset(0, 15 * s), width: 26 * s, height: 2.5 * s),
+      Paint()..color = Colors.black.withValues(alpha: 0.10)..style = PaintingStyle.fill);
+
+    // Wide flowing robe
+    final robePath = Path()
+      ..moveTo(-8 * s, -1 * s)
+      ..lineTo(8 * s, -1 * s)
+      ..quadraticBezierTo(12 * s, 5 * s, 14 * s, 13 * s)
+      ..quadraticBezierTo(7 * s, 15 * s, 0, 14 * s)
+      ..quadraticBezierTo(-7 * s, 15 * s, -14 * s, 13 * s)
+      ..quadraticBezierTo(-12 * s, 5 * s, -8 * s, -1 * s)
+      ..close();
+    canvas.drawPath(robePath, bodyPaint);
+    canvas.drawPath(robePath, outlinePaint);
+
+    // Stars pattern on robe
+    final starPaint = Paint()..color = skin.accentColor.withValues(alpha: 0.3)..style = PaintingStyle.fill;
+    for (final pos in [Offset(-4 * s, 5 * s), Offset(3 * s, 8 * s), Offset(-2 * s, 11 * s)]) {
+      _drawStar(canvas, pos, 1.2 * s, starPaint);
+    }
+
+    // Tall hood with pointed top
+    final hoodPath = Path()
+      ..moveTo(-13 * s, -3 * s)
+      ..cubicTo(-13 * s, -16 * s, -8 * s, -28 * s, 0, -32 * s)
+      ..cubicTo(8 * s, -28 * s, 13 * s, -16 * s, 13 * s, -3 * s)
+      ..quadraticBezierTo(7 * s, 1 * s, 0, -0.5 * s)
+      ..quadraticBezierTo(-7 * s, 1 * s, -13 * s, -3 * s)
+      ..close();
+    canvas.drawPath(hoodPath, bodyPaint);
+    canvas.drawPath(hoodPath, outlinePaint);
+
+    // Fold lines
+    final foldPaint = Paint()..color = Colors.black.withValues(alpha: 0.10)..style = PaintingStyle.stroke..strokeWidth = 1.0 * s..strokeCap = StrokeCap.round;
+    canvas.drawPath(Path()..moveTo(-3 * s, 0)..quadraticBezierTo(-5 * s, 6 * s, -7 * s, 13 * s), foldPaint);
+    canvas.drawPath(Path()..moveTo(3 * s, 0)..quadraticBezierTo(5 * s, 6 * s, 7 * s, 13 * s), foldPaint);
+
+    // Bottom glow
+    canvas.drawOval(Rect.fromCenter(center: Offset(0, 14.5 * s), width: 24 * s, height: 4 * s),
+      Paint()..shader = LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter,
+        colors: [skin.accentColor.withValues(alpha: 0.0), skin.accentColor],
+      ).createShader(Rect.fromCenter(center: Offset(0, 14.5 * s), width: 24 * s, height: 4 * s))
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3));
+  }
+
+  void _drawStar(Canvas canvas, Offset center, double r, Paint paint) {
+    final path = Path();
+    for (var i = 0; i < 5; i++) {
+      final angle = i * 2 * pi / 5 - pi / 2;
+      final innerAngle = angle + pi / 5;
+      final outerR = r;
+      final innerR = r * 0.4;
+      if (i == 0) {
+        path.moveTo(center.dx + outerR * cos(angle), center.dy + outerR * sin(angle));
+      } else {
+        path.lineTo(center.dx + outerR * cos(angle), center.dy + outerR * sin(angle));
+      }
+      path.lineTo(center.dx + innerR * cos(innerAngle), center.dy + innerR * sin(innerAngle));
+    }
+    path.close();
+    canvas.drawPath(path, paint);
+  }
+
+  // ─────────────────────────────────────────────
+  // VARIANT: Tech — hoodie-style hood, slim-medium body
+  // ─────────────────────────────────────────────
+
+  void _drawTechVariant(Canvas canvas, SkinDefinition skin, double s) {
+    final bodyPaint = Paint()..color = skin.bodyColor..style = PaintingStyle.fill;
+    final isLightBody = ThemeData.estimateBrightnessForColor(skin.bodyColor) == Brightness.light;
+    final outlinePaint = Paint()
+      ..color = isLightBody ? const Color(0xFF94A3B8) : Colors.black87
+      ..style = PaintingStyle.stroke..strokeWidth = 2.5 * s..strokeCap = StrokeCap.round..strokeJoin = StrokeJoin.round;
+
+    // Shadow
+    canvas.drawOval(Rect.fromCenter(center: Offset(0, 14 * s), width: 22 * s, height: 2.5 * s),
+      Paint()..color = Colors.black.withValues(alpha: 0.10)..style = PaintingStyle.fill);
+
+    // Medium robe
+    final robePath = Path()
+      ..moveTo(-7 * s, -1 * s)
+      ..lineTo(7 * s, -1 * s)
+      ..quadraticBezierTo(9 * s, 5 * s, 10 * s, 12 * s)
+      ..quadraticBezierTo(5 * s, 14 * s, 0, 13 * s)
+      ..quadraticBezierTo(-5 * s, 14 * s, -10 * s, 12 * s)
+      ..quadraticBezierTo(-9 * s, 5 * s, -7 * s, -1 * s)
+      ..close();
+    canvas.drawPath(robePath, bodyPaint);
+    canvas.drawPath(robePath, outlinePaint);
+
+    // Circuit lines on robe
+    final circuitPaint = Paint()..color = skin.accentColor.withValues(alpha: 0.25)..style = PaintingStyle.stroke..strokeWidth = 0.8 * s..strokeCap = StrokeCap.round;
+    canvas.drawLine(Offset(-3 * s, 2 * s), Offset(-3 * s, 8 * s), circuitPaint);
+    canvas.drawLine(Offset(-3 * s, 8 * s), Offset(0, 10 * s), circuitPaint);
+    canvas.drawLine(Offset(3 * s, 3 * s), Offset(3 * s, 7 * s), circuitPaint);
+    canvas.drawLine(Offset(3 * s, 7 * s), Offset(1 * s, 9 * s), circuitPaint);
+    // Circuit nodes
+    for (final pos in [Offset(-3 * s, 8 * s), Offset(0, 10 * s), Offset(3 * s, 7 * s), Offset(1 * s, 9 * s)]) {
+      canvas.drawCircle(pos, 0.8 * s, Paint()..color = skin.accentColor.withValues(alpha: 0.4));
+    }
+
+    // Hoodie hood — slightly wider, with hood lip at bottom
+    final hoodPath = Path()
+      ..moveTo(-13 * s, -3 * s)
+      ..cubicTo(-13 * s, -17 * s, -10 * s, -26 * s, 0, -28 * s)
+      ..cubicTo(10 * s, -26 * s, 13 * s, -17 * s, 13 * s, -3 * s)
+      ..quadraticBezierTo(7 * s, 1.5 * s, 0, 1 * s)
+      ..quadraticBezierTo(-7 * s, 1.5 * s, -13 * s, -3 * s)
+      ..close();
+    canvas.drawPath(hoodPath, bodyPaint);
+    canvas.drawPath(hoodPath, outlinePaint);
+
+    // Hood lip / collar line
+    canvas.drawPath(
+      Path()
+        ..moveTo(-10 * s, -2 * s)
+        ..quadraticBezierTo(-5 * s, 2 * s, 0, 1 * s)
+        ..quadraticBezierTo(5 * s, 2 * s, 10 * s, -2 * s),
+      Paint()..color = skin.accentColor.withValues(alpha: 0.3)..style = PaintingStyle.stroke..strokeWidth = 1.5 * s..strokeCap = StrokeCap.round,
+    );
+
+    // Bottom glow
+    canvas.drawOval(Rect.fromCenter(center: Offset(0, 13.5 * s), width: 18 * s, height: 3.5 * s),
+      Paint()..shader = LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter,
+        colors: [skin.accentColor.withValues(alpha: 0.0), skin.accentColor],
+      ).createShader(Rect.fromCenter(center: Offset(0, 13.5 * s), width: 18 * s, height: 3.5 * s))
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3));
+  }
+
+  // ─────────────────────────────────────────────
+  // VARIANT: Armored — bulky body, shoulder plates, helmet hood
+  // ─────────────────────────────────────────────
+
+  void _drawArmoredVariant(Canvas canvas, SkinDefinition skin, double s) {
+    final bodyPaint = Paint()..color = skin.bodyColor..style = PaintingStyle.fill;
+    final isLightBody = ThemeData.estimateBrightnessForColor(skin.bodyColor) == Brightness.light;
+    final outlinePaint = Paint()
+      ..color = isLightBody ? const Color(0xFF94A3B8) : Colors.black87
+      ..style = PaintingStyle.stroke..strokeWidth = 2.5 * s..strokeCap = StrokeCap.round..strokeJoin = StrokeJoin.round;
+    final platePaint = Paint()..color = skin.accentColor.withValues(alpha: 0.3)..style = PaintingStyle.fill;
+    final plateOutline = Paint()..color = Colors.black87..style = PaintingStyle.stroke..strokeWidth = 0.8 * s;
+
+    // Shadow
+    canvas.drawOval(Rect.fromCenter(center: Offset(0, 15 * s), width: 26 * s, height: 3 * s),
+      Paint()..color = Colors.black.withValues(alpha: 0.10)..style = PaintingStyle.fill);
+
+    // Bulky robe
+    final robePath = Path()
+      ..moveTo(-9 * s, -1 * s)
+      ..lineTo(9 * s, -1 * s)
+      ..quadraticBezierTo(11 * s, 6 * s, 12 * s, 13 * s)
+      ..quadraticBezierTo(6 * s, 15 * s, 0, 14 * s)
+      ..quadraticBezierTo(-6 * s, 15 * s, -12 * s, 13 * s)
+      ..quadraticBezierTo(-11 * s, 6 * s, -9 * s, -1 * s)
+      ..close();
+    canvas.drawPath(robePath, bodyPaint);
+    canvas.drawPath(robePath, outlinePaint);
+
+    // Shoulder plates
+    for (final dir in [-1, 1]) {
+      final platePath = Path()
+        ..moveTo(dir * 8 * s, 0)
+        ..lineTo(dir * 13 * s, 1 * s)
+        ..lineTo(dir * 12 * s, 5 * s)
+        ..lineTo(dir * 8 * s, 4 * s)
+        ..close();
+      canvas.drawPath(platePath, platePaint);
+      canvas.drawPath(platePath, plateOutline);
+    }
+
+    // Chest plate
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(Rect.fromCenter(center: Offset(0, 4 * s), width: 8 * s, height: 6 * s), Radius.circular(1.5 * s)),
+      platePaint,
+    );
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(Rect.fromCenter(center: Offset(0, 4 * s), width: 8 * s, height: 6 * s), Radius.circular(1.5 * s)),
+      plateOutline,
+    );
+
+    // Helmet hood — angular, armored
+    final hoodPath = Path()
+      ..moveTo(-14 * s, -3 * s)
+      ..lineTo(-12 * s, -20 * s)
+      ..lineTo(-4 * s, -28 * s)
+      ..lineTo(0, -29 * s)
+      ..lineTo(4 * s, -28 * s)
+      ..lineTo(12 * s, -20 * s)
+      ..lineTo(14 * s, -3 * s)
+      ..quadraticBezierTo(7 * s, 1 * s, 0, -0.5 * s)
+      ..quadraticBezierTo(-7 * s, 1 * s, -14 * s, -3 * s)
+      ..close();
+    canvas.drawPath(hoodPath, bodyPaint);
+    canvas.drawPath(hoodPath, outlinePaint);
+
+    // Helmet ridge
+    canvas.drawLine(Offset(0, -29 * s), Offset(0, -10 * s),
+      Paint()..color = skin.accentColor..style = PaintingStyle.stroke..strokeWidth = 2 * s..strokeCap = StrokeCap.round);
+
+    // Bottom glow
+    canvas.drawOval(Rect.fromCenter(center: Offset(0, 14.5 * s), width: 22 * s, height: 4 * s),
+      Paint()..shader = LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter,
+        colors: [skin.accentColor.withValues(alpha: 0.0), skin.accentColor],
+      ).createShader(Rect.fromCenter(center: Offset(0, 14.5 * s), width: 22 * s, height: 4 * s))
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3));
+  }
+
+  // ─────────────────────────────────────────────
+  // VARIANT: Phoenix — wing cape, flame-like edges
+  // ─────────────────────────────────────────────
+
+  void _drawPhoenixVariant(Canvas canvas, SkinDefinition skin, double s) {
+    final bodyPaint = Paint()..color = skin.bodyColor..style = PaintingStyle.fill;
+    final isLightBody = ThemeData.estimateBrightnessForColor(skin.bodyColor) == Brightness.light;
+    final outlinePaint = Paint()
+      ..color = isLightBody ? const Color(0xFF94A3B8) : Colors.black87
+      ..style = PaintingStyle.stroke..strokeWidth = 2.5 * s..strokeCap = StrokeCap.round..strokeJoin = StrokeJoin.round;
+
+    // Shadow
+    canvas.drawOval(Rect.fromCenter(center: Offset(0, 14 * s), width: 24 * s, height: 2.5 * s),
+      Paint()..color = Colors.black.withValues(alpha: 0.10)..style = PaintingStyle.fill);
+
+    // Wing cape (behind body)
+    final wingPaint = Paint()..color = skin.accentColor.withValues(alpha: 0.35)..style = PaintingStyle.fill;
+    // Left wing
+    final leftWing = Path()
+      ..moveTo(-7 * s, 0)
+      ..quadraticBezierTo(-18 * s, -5 * s, -20 * s, 5 * s)
+      ..quadraticBezierTo(-16 * s, 10 * s, -10 * s, 12 * s)
+      ..close();
+    canvas.drawPath(leftWing, wingPaint);
+    canvas.drawPath(leftWing, Paint()..color = skin.accentColor..style = PaintingStyle.stroke..strokeWidth = 0.8 * s);
+    // Right wing
+    final rightWing = Path()
+      ..moveTo(7 * s, 0)
+      ..quadraticBezierTo(18 * s, -5 * s, 20 * s, 5 * s)
+      ..quadraticBezierTo(16 * s, 10 * s, 10 * s, 12 * s)
+      ..close();
+    canvas.drawPath(rightWing, wingPaint);
+    canvas.drawPath(rightWing, Paint()..color = skin.accentColor..style = PaintingStyle.stroke..strokeWidth = 0.8 * s);
+
+    // Flame-like robe bottom
+    final robePath = Path()
+      ..moveTo(-7 * s, -1 * s)
+      ..lineTo(7 * s, -1 * s)
+      ..quadraticBezierTo(9 * s, 5 * s, 10 * s, 11 * s)
+      ..quadraticBezierTo(7 * s, 13 * s, 4 * s, 11 * s)
+      ..quadraticBezierTo(2 * s, 14 * s, 0, 12 * s)
+      ..quadraticBezierTo(-2 * s, 14 * s, -4 * s, 11 * s)
+      ..quadraticBezierTo(-7 * s, 13 * s, -10 * s, 11 * s)
+      ..quadraticBezierTo(-9 * s, 5 * s, -7 * s, -1 * s)
+      ..close();
+    canvas.drawPath(robePath, bodyPaint);
+    canvas.drawPath(robePath, outlinePaint);
+
+    // Default dome hood
+    final hoodPath = Path()
+      ..moveTo(-13 * s, -3 * s)
+      ..cubicTo(-13 * s, -18 * s, -10 * s, -27 * s, 0, -28 * s)
+      ..cubicTo(10 * s, -27 * s, 13 * s, -18 * s, 13 * s, -3 * s)
+      ..quadraticBezierTo(7 * s, 1 * s, 0, -0.5 * s)
+      ..quadraticBezierTo(-7 * s, 1 * s, -13 * s, -3 * s)
+      ..close();
+    canvas.drawPath(hoodPath, bodyPaint);
+    canvas.drawPath(hoodPath, outlinePaint);
+
+    // Bottom glow
+    canvas.drawOval(Rect.fromCenter(center: Offset(0, 13 * s), width: 20 * s, height: 4 * s),
+      Paint()..shader = LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter,
+        colors: [skin.accentColor.withValues(alpha: 0.0), skin.accentColor],
+      ).createShader(Rect.fromCenter(center: Offset(0, 13 * s), width: 20 * s, height: 4 * s))
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3));
+  }
+
+  // ─────────────────────────────────────────────
+  // VARIANT: Void — ethereal wisps, semi-transparent edges
+  // ─────────────────────────────────────────────
+
+  void _drawVoidVariant(Canvas canvas, SkinDefinition skin, double s) {
+    final bodyPaint = Paint()..color = skin.bodyColor..style = PaintingStyle.fill;
+    final isLightBody = ThemeData.estimateBrightnessForColor(skin.bodyColor) == Brightness.light;
+    final outlinePaint = Paint()
+      ..color = isLightBody ? const Color(0xFF94A3B8) : Colors.black87
+      ..style = PaintingStyle.stroke..strokeWidth = 2.5 * s..strokeCap = StrokeCap.round..strokeJoin = StrokeJoin.round;
+
+    // Shadow
+    canvas.drawOval(Rect.fromCenter(center: Offset(0, 14 * s), width: 22 * s, height: 2.5 * s),
+      Paint()..color = Colors.black.withValues(alpha: 0.10)..style = PaintingStyle.fill);
+
+    // Wispy robe — irregular bottom edge
+    final robePath = Path()
+      ..moveTo(-7 * s, -1 * s)
+      ..lineTo(7 * s, -1 * s)
+      ..quadraticBezierTo(10 * s, 5 * s, 11 * s, 10 * s)
+      ..quadraticBezierTo(8 * s, 12 * s, 5 * s, 10 * s)
+      ..quadraticBezierTo(2 * s, 14 * s, 0, 11 * s)
+      ..quadraticBezierTo(-2 * s, 14 * s, -5 * s, 10 * s)
+      ..quadraticBezierTo(-8 * s, 12 * s, -11 * s, 10 * s)
+      ..quadraticBezierTo(-10 * s, 5 * s, -7 * s, -1 * s)
+      ..close();
+    canvas.drawPath(robePath, bodyPaint);
+    canvas.drawPath(robePath, outlinePaint);
+
+    // Void wisps (floating particles)
+    final wispPaint = Paint()..style = PaintingStyle.fill;
+    final rng = skin.id.length;
+    for (var i = 0; i < 5; i++) {
+      final wx = (-6 + i * 3) * s;
+      final wy = (2 + (rng + i) % 5 * 2) * s;
+      final wr = (0.8 + (i % 3) * 0.4) * s;
+      wispPaint.color = skin.accentColor.withValues(alpha: 0.2 + (i % 3) * 0.1);
+      canvas.drawCircle(Offset(wx, wy), wr, wispPaint);
+    }
+
+    // Default dome hood
+    final hoodPath = Path()
+      ..moveTo(-13 * s, -3 * s)
+      ..cubicTo(-13 * s, -18 * s, -10 * s, -27 * s, 0, -28 * s)
+      ..cubicTo(10 * s, -27 * s, 13 * s, -18 * s, 13 * s, -3 * s)
+      ..quadraticBezierTo(7 * s, 1 * s, 0, -0.5 * s)
+      ..quadraticBezierTo(-7 * s, 1 * s, -13 * s, -3 * s)
+      ..close();
+    canvas.drawPath(hoodPath, bodyPaint);
+    canvas.drawPath(hoodPath, outlinePaint);
+
+    // Bottom glow (extra ethereal)
+    canvas.drawOval(Rect.fromCenter(center: Offset(0, 13 * s), width: 22 * s, height: 5 * s),
+      Paint()..shader = LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter,
+        colors: [skin.accentColor.withValues(alpha: 0.0), skin.accentColor.withValues(alpha: 0.6)],
+      ).createShader(Rect.fromCenter(center: Offset(0, 13 * s), width: 22 * s, height: 5 * s))
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4));
   }
 
   // ─────────────────────────────────────────────
@@ -1008,6 +1431,167 @@ class _SkinPainter extends CustomPainter {
         skin.accentColor.withValues(alpha: 0.4),
         skin.accentColor.withValues(alpha: 0.0),
       ]).createShader(Rect.fromCircle(center: crystalCenter, radius: 3 * s)));
+  }
+
+  // ─────────────────────────────────────────────
+  // Unique detail per skin
+  // ─────────────────────────────────────────────
+
+  void _drawUniqueDetail(Canvas canvas, SkinDefinition skin, double s) {
+    switch (skin.id) {
+      case 'hacker': _drawHackerDetail(canvas, skin, s); break;
+      case 'ninja': _drawNinjaDetail(canvas, skin, s); break;
+      case 'wizard': _drawWizardDetail(canvas, skin, s); break;
+      case 'golden': _drawGoldenDetail(canvas, skin, s); break;
+      case 'engineer': _drawEngineerDetail(canvas, skin, s); break;
+      case 'grandmaster': _drawGrandmasterDetail(canvas, skin, s); break;
+      case 'cyber': _drawCyberDetail(canvas, skin, s); break;
+      case 'shadow': _drawShadowDetail(canvas, skin, s); break;
+      case 'neon': _drawNeonDetail(canvas, skin, s); break;
+      case 'phoenix': _drawPhoenixDetail(canvas, skin, s); break;
+      case 'titan': _drawTitanDetail(canvas, skin, s); break;
+      case 'void_': _drawVoidDetail(canvas, skin, s); break;
+      case 'glitch': _drawGlitchDetail(canvas, skin, s); break;
+      case 'frost': _drawFrostDetail(canvas, skin, s); break;
+      case 'chrono': _drawChronoDetail(canvas, skin, s); break;
+      case 'spectre': _drawSpectreDetail(canvas, skin, s); break;
+      case 'viper': _drawViperDetail(canvas, skin, s); break;
+      case 'spark': _drawSparkDetail(canvas, skin, s); break;
+      case 'rookie': _drawRookieDetail(canvas, skin, s); break;
+      default: break;
+    }
+  }
+
+  void _drawHackerDetail(Canvas canvas, SkinDefinition skin, double s) {
+    final promptPaint = Paint()..color = skin.accentColor..style = PaintingStyle.stroke..strokeWidth = 0.8 * s..strokeCap = StrokeCap.round;
+    final py = -2 * s;
+    canvas.drawLine(Offset(-3 * s, py), Offset(-1 * s, py), promptPaint);
+    canvas.drawLine(Offset(-1 * s, py), Offset(-1 * s, py + 2 * s), promptPaint);
+  }
+
+  void _drawNinjaDetail(Canvas canvas, SkinDefinition skin, double s) {
+    final starPaint = Paint()..color = skin.accentColor..style = PaintingStyle.fill;
+    _drawStar(canvas, Offset(6 * s, 6 * s), 1.0 * s, starPaint);
+  }
+
+  void _drawWizardDetail(Canvas canvas, SkinDefinition skin, double s) {
+    final moonPaint = Paint()..color = skin.accentColor..style = PaintingStyle.fill;
+    canvas.drawArc(
+      Rect.fromCenter(center: Offset(-5 * s, -18 * s), width: 3 * s, height: 3 * s),
+      -pi * 0.3, pi * 1.4, false, moonPaint);
+  }
+
+  void _drawGoldenDetail(Canvas canvas, SkinDefinition skin, double s) {
+    canvas.drawCircle(Offset(0, -20 * s), 4 * s,
+      Paint()..shader = RadialGradient(colors: [
+        skin.accentColor.withValues(alpha: 0.4), skin.accentColor.withValues(alpha: 0.0),
+      ]).createShader(Rect.fromCircle(center: Offset(0, -20 * s), radius: 5 * s)));
+  }
+
+  void _drawEngineerDetail(Canvas canvas, SkinDefinition skin, double s) {
+    final wrenchPaint = Paint()..color = skin.accentColor..style = PaintingStyle.stroke..strokeWidth = 1.2 * s..strokeCap = StrokeCap.round;
+    canvas.drawLine(Offset(5 * s, 3 * s), Offset(5 * s, 9 * s), wrenchPaint);
+    canvas.drawCircle(Offset(5 * s, 3 * s), 1.5 * s, Paint()..style = PaintingStyle.stroke..color = skin.accentColor..strokeWidth = 1 * s);
+  }
+
+  void _drawGrandmasterDetail(Canvas canvas, SkinDefinition skin, double s) {
+    final glowPaint = Paint()..color = skin.accentColor.withValues(alpha: 0.2);
+    canvas.drawCircle(Offset(0, -22 * s), 6 * s, glowPaint);
+  }
+
+  void _drawCyberDetail(Canvas canvas, SkinDefinition skin, double s) {
+    final scanPaint = Paint()..color = skin.accentColor.withValues(alpha: 0.2)..style = PaintingStyle.stroke..strokeWidth = 0.6 * s;
+    for (var i = 0; i < 3; i++) {
+      final y = -4 * s + i * 3 * s;
+      canvas.drawLine(Offset(-6 * s, y), Offset(6 * s, y), scanPaint);
+    }
+  }
+
+  void _drawShadowDetail(Canvas canvas, SkinDefinition skin, double s) {
+    final shadowPaint = Paint()..color = skin.accentColor.withValues(alpha: 0.15);
+    canvas.drawOval(Rect.fromCenter(center: Offset(2 * s, -4 * s), width: 12 * s, height: 16 * s), shadowPaint);
+  }
+
+  void _drawNeonDetail(Canvas canvas, SkinDefinition skin, double s) {
+    final neonPaint = Paint()..color = skin.accentColor..style = PaintingStyle.stroke..strokeWidth = 1.5 * s..strokeCap = StrokeCap.round
+      ..maskFilter = MaskFilter.blur(BlurStyle.normal, 1 * s);
+    canvas.drawLine(Offset(-6 * s, 2 * s), Offset(-6 * s, 10 * s), neonPaint);
+    canvas.drawLine(Offset(6 * s, 2 * s), Offset(6 * s, 10 * s), neonPaint);
+  }
+
+  void _drawPhoenixDetail(Canvas canvas, SkinDefinition skin, double s) {
+    final flamePaint = Paint()..color = skin.accentColor;
+    for (final dx in [-4, 0, 4]) {
+      final fh = (2 + (dx.abs() ~/ 2)) * s;
+      canvas.drawPath(
+        Path()
+          ..moveTo(dx * s, 12 * s)
+          ..quadraticBezierTo(dx * s + 1 * s, 12 * s - fh * 0.6, dx * s, 12 * s - fh)
+          ..quadraticBezierTo(dx * s - 1 * s, 12 * s - fh * 0.6, dx * s, 12 * s),
+        flamePaint,
+      );
+    }
+  }
+
+  void _drawTitanDetail(Canvas canvas, SkinDefinition skin, double s) {
+    final boltPaint = Paint()..color = skin.accentColor..style = PaintingStyle.stroke..strokeWidth = 1.2 * s..strokeCap = StrokeCap.round;
+    canvas.drawLine(Offset(-2 * s, -15 * s), Offset(0, -13 * s), boltPaint);
+    canvas.drawLine(Offset(0, -13 * s), Offset(2 * s, -15 * s), boltPaint);
+  }
+
+  void _drawVoidDetail(Canvas canvas, SkinDefinition skin, double s) {
+    final portalPaint = Paint()..color = skin.accentColor.withValues(alpha: 0.3)..style = PaintingStyle.stroke..strokeWidth = 1 * s;
+    canvas.drawCircle(Offset(0, 4 * s), 3 * s, portalPaint);
+    canvas.drawCircle(Offset(0, 4 * s), 1.5 * s, Paint()..color = skin.accentColor.withValues(alpha: 0.15));
+  }
+
+  void _drawGlitchDetail(Canvas canvas, SkinDefinition skin, double s) {
+    final glitchPaint = Paint()..color = skin.accentColor.withValues(alpha: 0.35)..style = PaintingStyle.stroke..strokeWidth = 1 * s;
+    canvas.drawLine(Offset(-6 * s, -2 * s), Offset(6 * s, -2 * s), glitchPaint);
+    canvas.drawLine(Offset(-4 * s, 3 * s), Offset(4 * s, 3 * s), glitchPaint);
+    canvas.drawLine(Offset(-2 * s, 8 * s), Offset(2 * s, 8 * s), glitchPaint);
+  }
+
+  void _drawFrostDetail(Canvas canvas, SkinDefinition skin, double s) {
+    final icePaint = Paint()..color = skin.accentColor..style = PaintingStyle.stroke..strokeWidth = 1 * s..strokeCap = StrokeCap.round;
+    for (final dx in [-4, 0, 4]) {
+      final iy = 12 * s + (dx.abs() % 2) * 1.5 * s;
+      canvas.drawLine(Offset(dx * s, iy), Offset(dx * s, iy + 2 * s), icePaint);
+    }
+  }
+
+  void _drawChronoDetail(Canvas canvas, SkinDefinition skin, double s) {
+    final clockPaint = Paint()..color = skin.accentColor..style = PaintingStyle.stroke..strokeWidth = 1 * s;
+    canvas.drawCircle(Offset(0, 4 * s), 3 * s, clockPaint);
+    canvas.drawLine(Offset(0, 4 * s), Offset(0, 2 * s), clockPaint);
+    canvas.drawLine(Offset(0, 4 * s), Offset(2 * s, 4 * s), clockPaint);
+  }
+
+  void _drawSpectreDetail(Canvas canvas, SkinDefinition skin, double s) {
+    final ghostPaint = Paint()..color = Colors.white.withValues(alpha: 0.15);
+    canvas.drawOval(Rect.fromCenter(center: const Offset(0, 0), width: 14 * s, height: 20 * s), ghostPaint);
+  }
+
+  void _drawViperDetail(Canvas canvas, SkinDefinition skin, double s) {
+    final venomPaint = Paint()..color = skin.accentColor..style = PaintingStyle.fill;
+    for (final pos in [Offset(-3 * s, 10 * s), Offset(3 * s, 11 * s), Offset(0, 12 * s)]) {
+      canvas.drawCircle(pos, 0.6 * s, venomPaint);
+    }
+  }
+
+  void _drawSparkDetail(Canvas canvas, SkinDefinition skin, double s) {
+    final sparkPaint = Paint()..color = skin.accentColor..style = PaintingStyle.stroke..strokeWidth = 1 * s..strokeCap = StrokeCap.round;
+    for (final dx in [-5, 5]) {
+      canvas.drawLine(Offset(dx * s, -2 * s), Offset((dx - 1) * s, 1 * s), sparkPaint);
+      canvas.drawLine(Offset((dx - 1) * s, 1 * s), Offset((dx + 1) * s, 3 * s), sparkPaint);
+    }
+  }
+
+  void _drawRookieDetail(Canvas canvas, SkinDefinition skin, double s) {
+    final dotPaint = Paint()..color = skin.accentColor.withValues(alpha: 0.3);
+    for (var i = 0; i < 3; i++) {
+      canvas.drawCircle(Offset((-2 + i * 2) * s, 6 * s), 0.6 * s, dotPaint);
+    }
   }
 
   // ─────────────────────────────────────────────

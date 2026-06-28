@@ -205,7 +205,7 @@ class SupTechConceptSheet extends StatelessWidget {
       SupTechExpression.surprised, SupTechExpression.determined, SupTechExpression.wink,
     ];
     return SizedBox(
-      height: 120,
+      height: 130,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         itemCount: expressions.length,
@@ -234,9 +234,9 @@ class SupTechConceptSheet extends StatelessWidget {
 
   Widget _buildColorPalette() {
     final colors = [
-      _ColorInfo('Robe', const Color(0xFF667280)), _ColorInfo('Glow', const Color(0xFF9CA3AF)),
-      _ColorInfo('Accent', const Color(0xFF6366F1)), _ColorInfo('Face', const Color(0xFF0F172A)),
-      _ColorInfo('Light', const Color(0xFFE5E7EB)),
+      const _ColorInfo('Robe', Color(0xFF667280)), const _ColorInfo('Glow', Color(0xFF9CA3AF)),
+      const _ColorInfo('Accent', Color(0xFF6366F1)), const _ColorInfo('Face', Color(0xFF0F172A)),
+      const _ColorInfo('Light', Color(0xFFE5E7EB)),
     ];
     return Container(
       padding: const EdgeInsets.all(20),
@@ -565,6 +565,17 @@ void _drawMiniHood(Canvas canvas, double s, Color bodyColor) {
     ..close();
   canvas.drawPath(hoodPath, bodyPaint);
   canvas.drawPath(hoodPath, outlinePaint);
+
+  // Dark tab at top
+  final tabPaint = Paint()..color = const Color(0xFF2D3748)..style = PaintingStyle.fill;
+  final tabPath = Path()
+    ..moveTo(-1.0 * s, -8.5 * s)
+    ..lineTo(1.0 * s, -8.5 * s)
+    ..lineTo(1.0 * s, -6.0 * s)
+    ..lineTo(-1.0 * s, -6.0 * s)
+    ..close();
+  canvas.drawPath(tabPath, tabPaint);
+  canvas.drawPath(tabPath, outlinePaint);
 
   // Hood highlight
   canvas.drawPath(
