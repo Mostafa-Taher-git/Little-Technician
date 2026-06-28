@@ -127,8 +127,8 @@ class SkinTierManager {
       description: 'A dark hooded chibi with a gray robe and blue glow',
       levelsRequired: 0,
       previewIcon: Icons.auto_awesome,
-      bodyColor: Color(0xFF5A626A),
-      accentColor: Color(0xFF38BDF8),
+      bodyColor: Color(0xFF667280),
+      accentColor: Color(0xFF7DB8FF),
       chestAccessory: SupTechChestAccessory.badge,
     ),
     SkinDefinition(

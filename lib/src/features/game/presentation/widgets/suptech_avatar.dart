@@ -118,16 +118,16 @@ class _SkinPainter extends CustomPainter {
     final hoodTopR      = 10 * s;
     final hoodBottomR   = 13 * s;
     final hoodPeakY     = -28 * s;
-    final faceCY        = -8 * s;
-    final faceW         = 16 * s;
-    final faceH         = 21 * s;
+    final faceCY        = -8.8 * s;
+    final faceW         = 23.5 * s;
+    final faceH         = 14.5 * s;
     final bodyTopY      = -1 * s;
     final bodyBotY      = 12 * s;
     final robeShoulderW = 16 * s;
     final robeBaseW     = 22 * s;
     final eyeY          = -8.5 * s;
-    final eyeSpacing    =  3 * s;
-    final eyeR          =  3 * s;
+    final eyeSpacing    =  5.2 * s;
+    final eyeR          =  3.1 * s;
 
     switch (skin.variant) {
       case SkinVariant.ninja:
@@ -719,10 +719,36 @@ class _SkinPainter extends CustomPainter {
 
   void _drawFace(Canvas canvas, SkinDefinition skin, double s,
       double faceCY, double faceW, double faceH) {
+    final faceRect = Rect.fromCenter(
+      center: Offset(0, faceCY),
+      width: faceW,
+      height: faceH,
+    );
+
     canvas.drawOval(
-      Rect.fromCenter(center: Offset(0, faceCY), width: faceW, height: faceH),
+      faceRect.inflate(1.2 * s),
       Paint()
-        ..color = const Color(0xFF050505)
+        ..shader = RadialGradient(
+          colors: [
+            skin.accentColor.withValues(alpha: 0.13),
+            Colors.black.withValues(alpha: 0.0),
+          ],
+        ).createShader(faceRect.inflate(4 * s)),
+    );
+
+    canvas.drawOval(
+      faceRect,
+      Paint()
+        ..shader = const RadialGradient(
+          center: Alignment(0.05, -0.05),
+          radius: 0.95,
+          colors: [
+            Color(0xFF1B2633),
+            Color(0xFF05070B),
+            Color(0xFF020306),
+          ],
+          stops: [0.0, 0.52, 1.0],
+        ).createShader(faceRect)
         ..style = PaintingStyle.fill,
     );
   }
@@ -786,12 +812,10 @@ class _SkinPainter extends CustomPainter {
 
   void _drawHappyEyes(Canvas canvas, SkinDefinition skin, double s,
       double eyeY, double eyeSpacing) {
-    // Downward-curving crescents (like closed happy eyes smiling downward)
     for (final dx in [-eyeSpacing, eyeSpacing]) {
       final path = Path()
-        ..moveTo(dx - 2.8 * s, eyeY - 0.5 * s)
-        ..quadraticBezierTo(dx, eyeY + 2.8 * s, dx + 2.8 * s, eyeY - 0.5 * s);
-      // Glow
+        ..moveTo(dx - 2.4 * s, eyeY + 0.1 * s)
+        ..quadraticBezierTo(dx, eyeY - 2.0 * s, dx + 2.4 * s, eyeY + 0.1 * s);
       canvas.drawPath(
         path,
         Paint()
@@ -901,12 +925,10 @@ class _SkinPainter extends CustomPainter {
 
   void _drawWinkEyes(Canvas canvas, SkinDefinition skin, double s,
       double eyeY, double eyeSpacing, double eyeR) {
-    // Left eye is winked (downward-curving crescent like happy)
     final dxLeft = -eyeSpacing;
     final path = Path()
-      ..moveTo(dxLeft - 2.8 * s, eyeY - 0.5 * s)
-      ..quadraticBezierTo(dxLeft, eyeY + 2.8 * s, dxLeft + 2.8 * s, eyeY - 0.5 * s);
-    // Left eye glow
+      ..moveTo(dxLeft - 2.4 * s, eyeY + 0.1 * s)
+      ..quadraticBezierTo(dxLeft, eyeY - 1.6 * s, dxLeft + 2.4 * s, eyeY + 0.1 * s);
     canvas.drawPath(
       path,
       Paint()

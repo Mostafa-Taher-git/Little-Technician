@@ -2,91 +2,198 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:littletech/src/features/game/constants/skin_tiers.dart';
 
-class SupTechConceptSheet extends StatelessWidget {
+class SupTechConceptSheet extends StatefulWidget {
   final SkinDefinition skin;
   const SupTechConceptSheet({super.key, required this.skin});
+
+  @override
+  State<SupTechConceptSheet> createState() => _SupTechConceptSheetState();
+}
+
+class _SupTechConceptSheetState extends State<SupTechConceptSheet> {
+  final _traitsKey = GlobalKey();
+  final _characterKey = GlobalKey();
+  final _aboutKey = GlobalKey();
+  final _expressionsKey = GlobalKey();
+  final _paletteKey = GlobalKey();
+  final _accessoriesKey = GlobalKey();
+  final _posesKey = GlobalKey();
+
+  SkinDefinition get skin => widget.skin;
 
   @override
   Widget build(BuildContext context) {
     final isWide = MediaQuery.sizeOf(context).width > 720;
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
-      appBar: AppBar(
-        title: const Text(
-          'Concept Sheet: Default SupTech',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
-        ),
-        backgroundColor: const Color(0xFF1E293B),
-        foregroundColor: Colors.white,
-        elevation: 0,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.close, color: Colors.white),
-            onPressed: () => Navigator.of(context).pop(),
+      backgroundColor: const Color(0xFFFDFDFE),
+      body: Stack(
+        children: [
+          SingleChildScrollView(
+            padding: EdgeInsets.fromLTRB(
+              isWide ? 30 : 18,
+              isWide ? 30 : 22,
+              isWide ? 30 : 18,
+              36,
+            ),
+            child: isWide
+                ? _buildWideLayout(context)
+                : _buildNarrowLayout(context),
+          ),
+          Positioned(
+            top: MediaQuery.paddingOf(context).top + 12,
+            right: 16,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.9),
+                borderRadius: BorderRadius.circular(999),
+                border: Border.all(color: const Color(0xFFE8ECF3)),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF253247).withValues(alpha: 0.08),
+                    blurRadius: 18,
+                    offset: const Offset(0, 8),
+                  ),
+                ],
+              ),
+              child: IconButton(
+                icon: const Icon(Icons.close, color: Color(0xFF344256)),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+            ),
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.symmetric(
-          horizontal: isWide ? 48 : 24,
-          vertical: 32,
-        ),
-        child: isWide ? _buildWideLayout(context) : _buildNarrowLayout(context),
+    );
+  }
+
+  Widget _referencePanel({required Widget child, EdgeInsetsGeometry? padding}) {
+    return Container(
+      width: double.infinity,
+      padding: padding ?? const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: const Color(0xFFE9EDF4)),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF253247).withValues(alpha: 0.06),
+            blurRadius: 18,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: child,
+    );
+  }
+
+  Widget _sectionHeader(String title) {
+    return Text(
+      title.toUpperCase(),
+      style: const TextStyle(
+        fontSize: 14,
+        fontWeight: FontWeight.w800,
+        letterSpacing: 3,
+        color: Color(0xFF4777EA),
+      ),
+    );
+  }
+
+  Widget _sectionPanel({
+    required GlobalKey key,
+    required String title,
+    required Widget child,
+    EdgeInsetsGeometry? padding,
+  }) {
+    return KeyedSubtree(
+      key: key,
+      child: _labeledPanel(title, child, padding: padding),
+    );
+  }
+
+  Widget _labeledPanel(String title, Widget child, {EdgeInsetsGeometry? padding}) {
+    return _referencePanel(
+      padding: padding,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _sectionHeader(title),
+          const SizedBox(height: 12),
+          child,
+        ],
       ),
     );
   }
 
   Widget _buildWideLayout(BuildContext context) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        _buildSectionNav(),
+        const SizedBox(height: 22),
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
-              flex: 22,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _sectionTitle('SupTech'),
-                  const SizedBox(height: 8),
-                  Text('SupTech is', style: TextStyle(fontSize: 14, color: Colors.grey[600])),
-                  const SizedBox(height: 12),
-                  _traitChip(Icons.psychology, 'Smart', const Color(0xFF6366F1)),
-                  const SizedBox(height: 8),
-                  _traitChip(Icons.emoji_emotions, 'Helpful', const Color(0xFF10B981)),
-                  const SizedBox(height: 8),
-                  _traitChip(Icons.lock, 'Secure', const Color(0xFF3B82F6)),
-                  const SizedBox(height: 8),
-                  _traitChip(Icons.sentiment_satisfied, 'Friendly', const Color(0xFFF59E0B)),
-                ],
+              child: _sectionPanel(
+                key: _traitsKey,
+                title: 'Traits',
+                child: _buildTraitsSection(),
               ),
             ),
-            const SizedBox(width: 32),
+            const SizedBox(width: 24),
             Expanded(
-              flex: 38,
-              child: _buildMainCharacter(context),
+              child: _sectionPanel(
+                key: _characterKey,
+                title: 'Character',
+                child: _buildMainCharacter(context),
+              ),
             ),
-            const SizedBox(width: 32),
+            const SizedBox(width: 24),
             Expanded(
-              flex: 33,
-              child: _buildAboutCard(),
+              child: _sectionPanel(
+                key: _aboutKey,
+                title: 'About',
+                child: _buildAboutSection(),
+              ),
             ),
           ],
         ),
-        const SizedBox(height: 32),
-        _sectionTitle('Expressions'),
-        const SizedBox(height: 16),
-        _buildExpressionsRow(context),
-        const SizedBox(height: 32),
+        const SizedBox(height: 24),
+        _sectionPanel(
+          key: _expressionsKey,
+          title: 'Expressions',
+          child: _buildExpressionsRow(context),
+          padding: const EdgeInsets.fromLTRB(22, 16, 22, 18),
+        ),
+        const SizedBox(height: 24),
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Expanded(child: _buildColorPalette()),
-            const SizedBox(width: 32),
-            Expanded(child: _buildAccessoriesSection(context)),
-            const SizedBox(width: 32),
-            Expanded(child: _buildPosesSection(context)),
+            Expanded(
+              child: _sectionPanel(
+                key: _paletteKey,
+                title: 'Color Palette',
+                child: _buildColorPalette(),
+                padding: const EdgeInsets.fromLTRB(18, 16, 18, 18),
+              ),
+            ),
+            const SizedBox(width: 24),
+            Expanded(
+              child: _sectionPanel(
+                key: _accessoriesKey,
+                title: 'Accessories',
+                child: _buildAccessoriesSection(context),
+                padding: const EdgeInsets.fromLTRB(18, 16, 18, 18),
+              ),
+            ),
+            const SizedBox(width: 24),
+            Expanded(
+              child: _sectionPanel(
+                key: _posesKey,
+                title: 'Poses',
+                child: _buildPosesSection(context),
+                padding: const EdgeInsets.fromLTRB(18, 16, 18, 18),
+              ),
+            ),
           ],
         ),
       ],
@@ -95,107 +202,268 @@ class SupTechConceptSheet extends StatelessWidget {
 
   Widget _buildNarrowLayout(BuildContext context) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _sectionTitle('SupTech'),
-        const SizedBox(height: 8),
-        Text('SupTech is', style: TextStyle(fontSize: 14, color: Colors.grey[600])),
-        const SizedBox(height: 12),
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: [
-            _traitChip(Icons.psychology, 'Smart', const Color(0xFF6366F1)),
-            _traitChip(Icons.emoji_emotions, 'Helpful', const Color(0xFF10B981)),
-            _traitChip(Icons.lock, 'Secure', const Color(0xFF3B82F6)),
-            _traitChip(Icons.sentiment_satisfied, 'Friendly', const Color(0xFFF59E0B)),
-          ],
+        _buildSectionNav(),
+        const SizedBox(height: 18),
+        _sectionPanel(
+          key: _traitsKey,
+          title: 'Traits',
+          child: _buildTraitsSection(),
         ),
-        const SizedBox(height: 24),
-        _buildMainCharacter(context),
-        const SizedBox(height: 24),
-        _buildAboutCard(),
-        const SizedBox(height: 32),
-        _sectionTitle('Expressions'),
-        const SizedBox(height: 16),
-        _buildExpressionsRow(context),
-        const SizedBox(height: 32),
-        _buildColorPalette(),
-        const SizedBox(height: 32),
-        _buildAccessoriesSection(context),
-        const SizedBox(height: 32),
-        _buildPosesSection(context),
+        const SizedBox(height: 20),
+        _sectionPanel(
+          key: _characterKey,
+          title: 'Character',
+          child: _buildMainCharacter(context),
+        ),
+        const SizedBox(height: 20),
+        _sectionPanel(
+          key: _aboutKey,
+          title: 'About',
+          child: _buildAboutSection(),
+        ),
+        const SizedBox(height: 20),
+        _sectionPanel(
+          key: _expressionsKey,
+          title: 'Expressions',
+          child: _buildExpressionsRow(context),
+          padding: const EdgeInsets.fromLTRB(18, 16, 18, 18),
+        ),
+        const SizedBox(height: 20),
+        _sectionPanel(
+          key: _paletteKey,
+          title: 'Color Palette',
+          child: _buildColorPalette(),
+          padding: const EdgeInsets.fromLTRB(18, 16, 18, 18),
+        ),
+        const SizedBox(height: 20),
+        _sectionPanel(
+          key: _accessoriesKey,
+          title: 'Accessories',
+          child: _buildAccessoriesSection(context),
+          padding: const EdgeInsets.fromLTRB(18, 16, 18, 18),
+        ),
+        const SizedBox(height: 20),
+        _sectionPanel(
+          key: _posesKey,
+          title: 'Poses',
+          child: _buildPosesSection(context),
+          padding: const EdgeInsets.fromLTRB(18, 16, 18, 18),
+        ),
       ],
     );
   }
 
-  Widget _sectionTitle(String title) => Text(
-    title,
-    style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w800, color: Color(0xFF1E293B), letterSpacing: -0.5),
-  );
+  Widget _buildSectionNav() {
+    final navItems = [
+      ('Traits', _traitsKey),
+      ('Character', _characterKey),
+      ('About', _aboutKey),
+      ('Expressions', _expressionsKey),
+      ('Color Palette', _paletteKey),
+      ('Accessories', _accessoriesKey),
+      ('Poses', _posesKey),
+    ];
 
-  Widget _traitChip(IconData icon, String label, Color color) => Container(
-    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-    decoration: BoxDecoration(
-      color: color.withValues(alpha: 0.08),
-      borderRadius: BorderRadius.circular(24),
-      border: Border.all(color: color.withValues(alpha: 0.2)),
-    ),
-    child: Row(
-      mainAxisSize: MainAxisSize.min,
+    return _referencePanel(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: [
+            for (final navItem in navItems) ...[
+              _sectionNavButton(navItem.$1, navItem.$2),
+              if (navItem != navItems.last) const SizedBox(width: 8),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _sectionNavButton(String label, GlobalKey targetKey) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(999),
+      onTap: () => _scrollToSection(targetKey),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+        decoration: BoxDecoration(
+          color: const Color(0xFFF5F8FF),
+          borderRadius: BorderRadius.circular(999),
+          border: Border.all(color: const Color(0xFFDDE7FF)),
+        ),
+        child: Text(
+          label,
+          style: const TextStyle(
+            color: Color(0xFF426AE3),
+            fontSize: 13,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _scrollToSection(GlobalKey targetKey) {
+    final targetContext = targetKey.currentContext;
+    if (targetContext == null) return;
+    Scrollable.ensureVisible(
+      targetContext,
+      duration: const Duration(milliseconds: 360),
+      curve: Curves.easeOutCubic,
+      alignment: 0.06,
+    );
+  }
+
+  Widget _buildTraitsSection() {
+    return Wrap(
+      spacing: 10,
+      runSpacing: 10,
       children: [
-        Icon(icon, size: 18, color: color),
-        const SizedBox(width: 10),
-        Text(label, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: color)),
+        _traitChip(Icons.psychology, 'Smart', const Color(0xFF4777EA)),
+        _traitChip(Icons.emoji_emotions, 'Helpful', const Color(0xFF11A36A)),
+        _traitChip(Icons.lock, 'Secure', const Color(0xFF2777C8)),
+        _traitChip(Icons.sentiment_satisfied, 'Friendly', const Color(0xFFD58B17)),
       ],
-    ),
-  );
+    );
+  }
+
+  Widget _traitChip(IconData icon, String label, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 10),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: color.withValues(alpha: 0.18)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 17, color: color),
+          const SizedBox(width: 8),
+          Text(
+            label,
+            style: TextStyle(
+              color: color,
+              fontSize: 13,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAboutSection() {
+    return Column(
+      children: [
+        _aboutRow('Name', skin.name),
+        _aboutRow('Version', '1.0'),
+        _aboutRow('Framework', 'Flutter'),
+        _aboutRow('Personality', 'Helpful'),
+      ],
+    );
+  }
+
+  Widget _aboutRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 7),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            label,
+            style: const TextStyle(color: Color(0xFF738197), fontSize: 13),
+          ),
+          Flexible(
+            child: Text(
+              value,
+              textAlign: TextAlign.end,
+              style: const TextStyle(
+                color: Color(0xFF263348),
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildColorPalette() {
+    final colors = [
+      ('Robe', skin.bodyColor),
+      ('Glow', skin.accentColor),
+      ('Face', const Color(0xFF05070B)),
+      ('Light', const Color(0xFFFFFFFF)),
+    ];
+
+    return Wrap(
+      spacing: 14,
+      runSpacing: 14,
+      children: [
+        for (final paletteColor in colors)
+          _colorSwatch(paletteColor.$1, paletteColor.$2),
+      ],
+    );
+  }
+
+  Widget _colorSwatch(String label, Color color) {
+    final hex = '#${color.toARGB32().toRadixString(16).substring(2).toUpperCase()}';
+    return SizedBox(
+      width: 70,
+      child: Column(
+        children: [
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: color,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: const Color(0xFFDDE3EE)),
+            ),
+          ),
+          const SizedBox(height: 7),
+          Text(
+            label,
+            style: const TextStyle(color: Color(0xFF45536A), fontSize: 11),
+          ),
+          Text(
+            hex,
+            style: const TextStyle(
+              color: Color(0xFF8C98AA),
+              fontSize: 9,
+              fontFamily: 'monospace',
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   Widget _buildMainCharacter(BuildContext context) => Column(
     children: [
       Container(
-        width: 280,
-        height: 340,
+        width: 386,
+        height: 516,
+        constraints: BoxConstraints(
+          maxWidth: MediaQuery.sizeOf(context).width - 36,
+        ),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(20),
-          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.08), blurRadius: 24, offset: const Offset(0, 8))],
+          border: Border.all(color: const Color(0xFFEFF2F7)),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF253247).withValues(alpha: 0.07),
+              blurRadius: 28,
+              offset: const Offset(0, 10),
+            ),
+          ],
         ),
-        child: CustomPaint(painter: _ConceptPainter(skin: skin), size: const Size(280, 340)),
+        child: CustomPaint(painter: _ConceptPainter(skin: skin), size: const Size(386, 516)),
       ),
-      const SizedBox(height: 12),
-      Text('FRONT VIEW', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, letterSpacing: 2, color: Colors.grey[400])),
-    ],
-  );
-
-  Widget _buildAboutCard() => Container(
-    padding: const EdgeInsets.all(20),
-    decoration: BoxDecoration(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(16),
-      boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.06), blurRadius: 16, offset: const Offset(0, 4))],
-    ),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text('ABOUT SUPTECH', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 1.5, color: Color(0xFF6366F1))),
-        const SizedBox(height: 16),
-        _infoRow('Name', 'SupTech'),
-        const SizedBox(height: 12),
-        _infoRow('Version', '1.0'),
-        const SizedBox(height: 12),
-        _infoRow('Framework', 'Flutter'),
-        const SizedBox(height: 12),
-        _infoRow('Personality', 'Helpful'),
-      ],
-    ),
-  );
-
-  Widget _infoRow(String label, String value) => Row(
-    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-    children: [
-      Text(label, style: TextStyle(fontSize: 13, color: Colors.grey[500])),
-      Text(value, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF1E293B))),
     ],
   );
 
@@ -205,134 +473,108 @@ class SupTechConceptSheet extends StatelessWidget {
       SupTechExpression.surprised, SupTechExpression.determined, SupTechExpression.wink,
     ];
     return SizedBox(
-      height: 130,
+      height: 150,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         itemCount: expressions.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 16),
+        separatorBuilder: (_, __) => const SizedBox(width: 12),
         itemBuilder: (context, index) {
           final expr = expressions[index];
-          return Column(
-            children: [
-              Container(
-                width: 100, height: 100,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.06), blurRadius: 10, offset: const Offset(0, 3))],
+          return Container(
+            width: 188,
+            padding: const EdgeInsets.fromLTRB(10, 12, 10, 14),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: const Color(0xFFE9EDF4)),
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0xFF253247).withValues(alpha: 0.04),
+                  blurRadius: 14,
+                  offset: const Offset(0, 5),
                 ),
-                child: CustomPaint(painter: _ExpressionPainter(skin: skin, expression: expr), size: const Size(100, 100)),
-              ),
-              const SizedBox(height: 8),
-              Text(_expressionName(expr), style: TextStyle(fontSize: 12, color: Colors.grey[500])),
-            ],
+              ],
+            ),
+            child: Column(
+              children: [
+                Expanded(
+                  child: CustomPaint(
+                    painter: _ExpressionPainter(skin: skin, expression: expr),
+                    size: const Size(142, 92),
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  _expressionName(expr),
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: Color(0xFF45536A),
+                  ),
+                ),
+              ],
+            ),
           );
         },
       ),
     );
   }
 
-  Widget _buildColorPalette() {
-    final colors = [
-      const _ColorInfo('Robe', Color(0xFF667280)), const _ColorInfo('Glow', Color(0xFF9CA3AF)),
-      const _ColorInfo('Accent', Color(0xFF6366F1)), const _ColorInfo('Face', Color(0xFF0F172A)),
-      const _ColorInfo('Light', Color(0xFFE5E7EB)),
-    ];
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.06), blurRadius: 16, offset: const Offset(0, 4))],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text('COLOR PALETTE', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 1.5, color: Color(0xFF6366F1))),
-          const SizedBox(height: 16),
-          Wrap(spacing: 12, runSpacing: 12, children: colors.map((c) => _colorSwatch(c)).toList()),
-        ],
-      ),
-    );
-  }
-
-  Widget _colorSwatch(_ColorInfo color) {
-    final hex = '#${color.color.toARGB32().toRadixString(16).substring(2).toUpperCase()}';
-    return Column(
-      children: [
-        Container(width: 44, height: 44, decoration: BoxDecoration(color: color.color, borderRadius: BorderRadius.circular(8), border: Border.all(color: Colors.grey.withValues(alpha: 0.2)))),
-        const SizedBox(height: 6),
-        Text(color.label, style: TextStyle(fontSize: 10, color: Colors.grey[600])),
-        Text(hex, style: TextStyle(fontSize: 9, color: Colors.grey[400], fontFamily: 'monospace')),
-      ],
-    );
-  }
-
-  Widget _buildAccessoriesSection(BuildContext context) => Container(
-    padding: const EdgeInsets.all(20),
-    decoration: BoxDecoration(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(16),
-      boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.06), blurRadius: 16, offset: const Offset(0, 4))],
-    ),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text('ACCESSORIES', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 1.5, color: Color(0xFF6366F1))),
-        const SizedBox(height: 16),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            _accessoryItem('Antenna', 'antenna'),
-            _accessoryItem('Badge', 'badge'),
-            _accessoryItem('Headset', 'headset'),
-          ],
-        ),
-      ],
-    ),
+  Widget _buildAccessoriesSection(BuildContext context) => Wrap(
+    alignment: WrapAlignment.spaceAround,
+    runAlignment: WrapAlignment.center,
+    spacing: 18,
+    runSpacing: 14,
+    children: [
+      _accessoryItem('Antenna', 'antenna'),
+      _accessoryItem('Badge', 'badge'),
+      _accessoryItem('Headset', 'headset'),
+    ],
   );
 
   Widget _accessoryItem(String label, String type) => Column(
     children: [
-      Container(
-        width: 72, height: 72,
-        decoration: BoxDecoration(color: const Color(0xFFF1F5F9), borderRadius: BorderRadius.circular(12)),
-        child: CustomPaint(painter: _AccessoryPainter(skin: skin, type: type), size: const Size(72, 72)),
+      SizedBox(
+        width: 88,
+        height: 76,
+        child: CustomPaint(painter: _AccessoryPainter(skin: skin, type: type), size: const Size(88, 76)),
       ),
-      const SizedBox(height: 6),
-      Text(label, style: TextStyle(fontSize: 11, color: Colors.grey[600])),
+      const SizedBox(height: 8),
+      Text(
+        label,
+        style: const TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+          color: Color(0xFF45536A),
+        ),
+      ),
     ],
   );
 
-  Widget _buildPosesSection(BuildContext context) => Container(
-    padding: const EdgeInsets.all(20),
-    decoration: BoxDecoration(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(16),
-      boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.06), blurRadius: 16, offset: const Offset(0, 4))],
-    ),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text('POSES', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 1.5, color: Color(0xFF6366F1))),
-        const SizedBox(height: 16),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [_poseItem('Wave'), _poseItem('Thinking'), _poseItem('Working')],
-        ),
-      ],
-    ),
+  Widget _buildPosesSection(BuildContext context) => Wrap(
+    alignment: WrapAlignment.spaceAround,
+    runAlignment: WrapAlignment.center,
+    spacing: 18,
+    runSpacing: 14,
+    children: [_poseItem('Wave'), _poseItem('Thinking'), _poseItem('Working')],
   );
 
   Widget _poseItem(String label) => Column(
     children: [
-      Container(
-        width: 72, height: 72,
-        decoration: BoxDecoration(color: const Color(0xFFF1F5F9), borderRadius: BorderRadius.circular(12)),
-        child: CustomPaint(painter: _PosePainter(label: label), size: const Size(72, 72)),
+      SizedBox(
+        width: 98,
+        height: 76,
+        child: CustomPaint(painter: _PosePainter(label: label), size: const Size(98, 76)),
       ),
-      const SizedBox(height: 6),
-      Text(label, style: TextStyle(fontSize: 11, color: Colors.grey[600])),
+      const SizedBox(height: 8),
+      Text(
+        label,
+        style: const TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+          color: Color(0xFF45536A),
+        ),
+      ),
     ],
   );
 
@@ -343,8 +585,6 @@ class SupTechConceptSheet extends StatelessWidget {
     SupTechExpression.sleep => 'Sleep', SupTechExpression.error => 'Error',
   };
 }
-
-class _ColorInfo { final String label; final Color color; const _ColorInfo(this.label, this.color); }
 
 // ═══════════════════════════════════════════════════════
 // Main Concept Painter — exact reference match
@@ -358,11 +598,10 @@ class _ConceptPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     if (size.width == 0 || size.height == 0) return;
     canvas.save();
-    final s = size.width / 60;
-    canvas.translate(size.width / 2, size.height / 2 + 2 * s);
+    final s = size.width / 50;
+    canvas.translate(size.width / 2, size.height / 2 + 9 * s);
 
     final bodyPaint = Paint()..color = skin.bodyColor..style = PaintingStyle.fill;
-    final darkPaint = Paint()..color = const Color(0xFF050505)..style = PaintingStyle.fill;
     final outlinePaint = Paint()
       ..color = Colors.black87
       ..style = PaintingStyle.stroke
@@ -449,16 +688,35 @@ class _ConceptPainter extends CustomPainter {
     );
 
     // ── FACE (dark oval) ──
+    final faceRect = Rect.fromCenter(
+      center: Offset(0, -8.8 * s),
+      width: 23.5 * s,
+      height: 14.5 * s,
+    );
     canvas.drawOval(
-      Rect.fromCenter(center: Offset(0, -8 * s), width: 16 * s, height: 21 * s),
-      darkPaint,
+      faceRect.inflate(1.4 * s),
+      Paint()
+        ..shader = RadialGradient(colors: [
+          skin.accentColor.withValues(alpha: 0.12),
+          skin.accentColor.withValues(alpha: 0.0),
+        ]).createShader(faceRect.inflate(5 * s)),
+    );
+    canvas.drawOval(
+      faceRect,
+      Paint()
+        ..shader = const RadialGradient(
+          center: Alignment(0.05, -0.1),
+          radius: 0.95,
+          colors: [Color(0xFF1B2633), Color(0xFF05070B), Color(0xFF020306)],
+          stops: [0.0, 0.52, 1.0],
+        ).createShader(faceRect),
     );
 
     // ── EYES (white tall ovals with blue glow) ──
     final eyeY = -8.5 * s;
-    final eyeSpacing = 3.0 * s;
-    final eyeRx = 2.0 * s;
-    final eyeRy = 3.0 * s;
+    final eyeSpacing = 5.2 * s;
+    final eyeRx = 1.8 * s;
+    final eyeRy = 3.1 * s;
 
     for (final dx in [-eyeSpacing, eyeSpacing]) {
       final eyeCenter = Offset(dx, eyeY);
@@ -557,11 +815,11 @@ void _drawMiniHood(Canvas canvas, double s, Color bodyColor) {
     ..strokeJoin = StrokeJoin.round;
 
   final hoodPath = Path()
-    ..moveTo(-7 * s, 2 * s)
-    ..cubicTo(-7 * s, -4 * s, -5 * s, -7.5 * s, 0, -8.5 * s)
-    ..cubicTo(5 * s, -7.5 * s, 7 * s, -4 * s, 7 * s, 2 * s)
-    ..quadraticBezierTo(4 * s, 3.2 * s, 0, 2.8 * s)
-    ..quadraticBezierTo(-4 * s, 3.2 * s, -7 * s, 2 * s)
+    ..moveTo(-8.5 * s, 2 * s)
+    ..cubicTo(-8.5 * s, -5.5 * s, -6 * s, -9.6 * s, 0, -10.2 * s)
+    ..cubicTo(6 * s, -9.6 * s, 8.5 * s, -5.5 * s, 8.5 * s, 2 * s)
+    ..quadraticBezierTo(4.6 * s, 4.2 * s, 0, 3.2 * s)
+    ..quadraticBezierTo(-4.6 * s, 4.2 * s, -8.5 * s, 2 * s)
     ..close();
   canvas.drawPath(hoodPath, bodyPaint);
   canvas.drawPath(hoodPath, outlinePaint);
@@ -569,10 +827,10 @@ void _drawMiniHood(Canvas canvas, double s, Color bodyColor) {
   // Dark tab at top
   final tabPaint = Paint()..color = const Color(0xFF2D3748)..style = PaintingStyle.fill;
   final tabPath = Path()
-    ..moveTo(-1.0 * s, -8.5 * s)
-    ..lineTo(1.0 * s, -8.5 * s)
-    ..lineTo(1.0 * s, -6.0 * s)
-    ..lineTo(-1.0 * s, -6.0 * s)
+    ..moveTo(-1.0 * s, -10.2 * s)
+    ..lineTo(1.0 * s, -10.2 * s)
+    ..lineTo(1.0 * s, -7.1 * s)
+    ..lineTo(-1.0 * s, -7.1 * s)
     ..close();
   canvas.drawPath(tabPath, tabPaint);
   canvas.drawPath(tabPath, outlinePaint);
@@ -581,7 +839,7 @@ void _drawMiniHood(Canvas canvas, double s, Color bodyColor) {
   canvas.drawPath(
     Path()
       ..moveTo(-4 * s, -7.5 * s)
-      ..quadraticBezierTo(0, -9 * s, 4 * s, -7.5 * s),
+      ..quadraticBezierTo(0, -10.6 * s, 4 * s, -7.5 * s),
     Paint()
       ..color = Colors.white.withValues(alpha: 0.12)
       ..style = PaintingStyle.stroke
@@ -591,17 +849,33 @@ void _drawMiniHood(Canvas canvas, double s, Color bodyColor) {
 }
 
 void _drawMiniFace(Canvas canvas, double s, {required Color eyeColor}) {
-  final facePaint = Paint()..color = const Color(0xFF050505);
-
-  // Face oval
-  canvas.drawOval(
-    Rect.fromCenter(center: Offset(0, -1 * s), width: 10 * s, height: 8 * s),
-    facePaint,
+  final faceRect = Rect.fromCenter(
+    center: Offset(0, -1.4 * s),
+    width: 13.8 * s,
+    height: 8.8 * s,
   );
 
-  // Eyes
-  for (final dx in [-2.4 * s, 2.4 * s]) {
-    final center = Offset(dx, -1 * s);
+  canvas.drawOval(
+    faceRect.inflate(1.0 * s),
+    Paint()
+      ..shader = RadialGradient(colors: [
+        eyeColor.withValues(alpha: 0.12),
+        eyeColor.withValues(alpha: 0.0),
+      ]).createShader(faceRect.inflate(3 * s)),
+  );
+  canvas.drawOval(
+    faceRect,
+    Paint()
+      ..shader = const RadialGradient(
+        center: Alignment(0, -0.15),
+        radius: 0.95,
+        colors: [Color(0xFF1B2633), Color(0xFF05070B), Color(0xFF020306)],
+        stops: [0.0, 0.5, 1.0],
+      ).createShader(faceRect),
+  );
+
+  for (final dx in [-3.3 * s, 3.3 * s]) {
+    final center = Offset(dx, -1.4 * s);
 
     // Outer glow
     canvas.drawOval(
@@ -639,14 +913,24 @@ class _ExpressionPainter extends CustomPainter {
 
     _drawMiniHood(canvas, s, skin.bodyColor);
 
-    // Face
+    final faceRect = Rect.fromCenter(
+      center: Offset(0, -1.4 * s),
+      width: 13.8 * s,
+      height: 8.8 * s,
+    );
     canvas.drawOval(
-      Rect.fromCenter(center: Offset(0, -1 * s), width: 10 * s, height: 8 * s),
-      Paint()..color = const Color(0xFF050505),
+      faceRect,
+      Paint()
+        ..shader = const RadialGradient(
+          center: Alignment(0, -0.15),
+          radius: 0.95,
+          colors: [Color(0xFF1B2633), Color(0xFF05070B), Color(0xFF020306)],
+          stops: [0.0, 0.5, 1.0],
+        ).createShader(faceRect),
     );
 
-    final eyeSpacing = 2.4 * s;
-    final eyeY = -1.0 * s;
+    final eyeSpacing = 3.3 * s;
+    final eyeY = -1.4 * s;
 
     switch (expression) {
       case SupTechExpression.neutral:
@@ -803,6 +1087,21 @@ class _AccessoryPainter extends CustomPainter {
       );
       canvas.drawCircle(Offset(0, -12 * s), 1.0 * s, Paint()..color = skin.accentColor);
       canvas.drawCircle(Offset(0, -12 * s), 1.0 * s, Paint()..color = skin.accentColor..style = PaintingStyle.stroke..strokeWidth = 0.8 * s);
+    } else if (type == 'badge') {
+      final textSpan = TextSpan(
+        text: 'ST',
+        style: TextStyle(
+          fontSize: 3.0 * s,
+          fontWeight: FontWeight.w800,
+          color: Colors.white,
+          shadows: [
+            Shadow(color: skin.accentColor, blurRadius: 2.5 * s),
+            Shadow(color: skin.accentColor, blurRadius: 1.0 * s),
+          ],
+        ),
+      );
+      final textPainter = TextPainter(text: textSpan, textDirection: TextDirection.ltr)..layout();
+      textPainter.paint(canvas, Offset(-textPainter.width / 2, 5.5 * s - textPainter.height / 2));
     } else if (type == 'headset') {
       for (final dx in [-7 * s, 7 * s]) {
         canvas.drawOval(
@@ -844,7 +1143,7 @@ class _PosePainter extends CustomPainter {
     canvas.translate(size.width / 2, size.height / 2 + 2 * s);
 
     _drawMiniHood(canvas, s, const Color(0xFF667280));
-    _drawMiniFace(canvas, s, eyeColor: const Color(0xFF9CA3AF));
+    _drawMiniFace(canvas, s, eyeColor: const Color(0xFF7DB8FF));
 
     // Small robe
     final robePaint = Paint()..color = const Color(0xFF667280)..style = PaintingStyle.fill;
