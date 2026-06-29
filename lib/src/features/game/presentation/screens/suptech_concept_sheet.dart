@@ -11,40 +11,69 @@ class SupTechConceptSheet extends StatefulWidget {
 }
 
 class _SupTechConceptSheetState extends State<SupTechConceptSheet> {
-  final _traitsKey = GlobalKey();
-  final _characterKey = GlobalKey();
-  final _aboutKey = GlobalKey();
-  final _expressionsKey = GlobalKey();
-  final _paletteKey = GlobalKey();
-  final _accessoriesKey = GlobalKey();
-  final _posesKey = GlobalKey();
-
   SkinDefinition get skin => widget.skin;
 
-  SupTechExpression _selectedExpression = SupTechExpression.neutral;
-  SupTechHeadAccessory _selectedHeadAccessory = SupTechHeadAccessory.none;
-  SupTechEarAccessory _selectedEarAccessory = SupTechEarAccessory.none;
-  SupTechChestAccessory _selectedChestAccessory = SupTechChestAccessory.none;
+  late SupTechExpression _selectedExpression;
+  late SupTechHeadAccessory _selectedHeadAccessory;
+  late SupTechEarAccessory _selectedEarAccessory;
+  late SupTechChestAccessory _selectedChestAccessory;
   String _selectedPose = 'Neutral';
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedExpression = SupTechExpression.neutral;
+    _selectedHeadAccessory = skin.headAccessory;
+    _selectedEarAccessory = skin.earAccessory;
+    _selectedChestAccessory = skin.chestAccessory != SupTechChestAccessory.none
+        ? skin.chestAccessory
+        : (skin.showLogo ? SupTechChestAccessory.badge : SupTechChestAccessory.none);
+  }
 
   void _selectExpression(SupTechExpression expr) {
     setState(() => _selectedExpression = expr);
   }
 
   void _selectHeadAccessory(SupTechHeadAccessory acc) {
-    setState(() => _selectedHeadAccessory = acc);
+    setState(() {
+      _selectedHeadAccessory =
+          _selectedHeadAccessory == acc ? SupTechHeadAccessory.none : acc;
+    });
   }
 
   void _selectEarAccessory(SupTechEarAccessory acc) {
-    setState(() => _selectedEarAccessory = acc);
+    setState(() {
+      _selectedEarAccessory =
+          _selectedEarAccessory == acc ? SupTechEarAccessory.none : acc;
+    });
   }
 
   void _selectChestAccessory(SupTechChestAccessory acc) {
-    setState(() => _selectedChestAccessory = acc);
+    setState(() {
+      _selectedChestAccessory =
+          _selectedChestAccessory == acc ? SupTechChestAccessory.none : acc;
+    });
   }
 
   void _selectPose(String pose) {
-    setState(() => _selectedPose = pose);
+    setState(() => _selectedPose = _selectedPose == pose ? 'Neutral' : pose);
+  }
+
+  bool _isAccessorySelected(
+    SupTechHeadAccessory head,
+    SupTechEarAccessory ear,
+    SupTechChestAccessory chest,
+  ) {
+    if (head != SupTechHeadAccessory.none) {
+      return _selectedHeadAccessory == head;
+    }
+    if (ear != SupTechEarAccessory.none) {
+      return _selectedEarAccessory == ear;
+    }
+    if (chest != SupTechChestAccessory.none) {
+      return _selectedChestAccessory == chest;
+    }
+    return false;
   }
 
   @override
@@ -124,18 +153,6 @@ class _SupTechConceptSheetState extends State<SupTechConceptSheet> {
     );
   }
 
-  Widget _sectionPanel({
-    required GlobalKey key,
-    required String title,
-    required Widget child,
-    EdgeInsetsGeometry? padding,
-  }) {
-    return KeyedSubtree(
-      key: key,
-      child: _labeledPanel(title, child, padding: padding),
-    );
-  }
-
   Widget _labeledPanel(String title, Widget child, {EdgeInsetsGeometry? padding}) {
     return _referencePanel(
       padding: padding,
@@ -153,70 +170,59 @@ class _SupTechConceptSheetState extends State<SupTechConceptSheet> {
   Widget _buildWideLayout(BuildContext context) {
     return Column(
       children: [
-        _buildSectionNav(),
-        const SizedBox(height: 22),
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
-              child: _sectionPanel(
-                key: _traitsKey,
-                title: 'Traits',
-                child: _buildTraitsSection(),
+              child: _labeledPanel(
+                'Traits',
+                _buildTraitsSection(),
               ),
             ),
             const SizedBox(width: 24),
             Expanded(
-              child: _sectionPanel(
-                key: _characterKey,
-                title: 'Character',
-                child: _buildMainCharacter(context),
+              child: _labeledPanel(
+                'Character',
+                _buildMainCharacter(context),
               ),
             ),
             const SizedBox(width: 24),
             Expanded(
-              child: _sectionPanel(
-                key: _aboutKey,
-                title: 'About',
-                child: _buildAboutSection(),
+              child: _labeledPanel(
+                'About',
+                _buildAboutSection(),
               ),
             ),
           ],
         ),
         const SizedBox(height: 24),
-        _sectionPanel(
-          key: _expressionsKey,
-          title: 'Expressions',
-          child: _buildExpressionsRow(context),
+        _labeledPanel(
+          'Expressions',
+          _buildExpressionsRow(context),
           padding: const EdgeInsets.fromLTRB(22, 16, 22, 18),
+        ),
+        const SizedBox(height: 24),
+        _labeledPanel(
+          'Color Palette',
+          _buildColorPalette(),
+          padding: const EdgeInsets.fromLTRB(18, 16, 18, 18),
         ),
         const SizedBox(height: 24),
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
-              child: _sectionPanel(
-                key: _paletteKey,
-                title: 'Color Palette',
-                child: _buildColorPalette(),
+              child: _labeledPanel(
+                'Accessories',
+                _buildAccessoriesSection(context),
                 padding: const EdgeInsets.fromLTRB(18, 16, 18, 18),
               ),
             ),
             const SizedBox(width: 24),
             Expanded(
-              child: _sectionPanel(
-                key: _accessoriesKey,
-                title: 'Accessories',
-                child: _buildAccessoriesSection(context),
-                padding: const EdgeInsets.fromLTRB(18, 16, 18, 18),
-              ),
-            ),
-            const SizedBox(width: 24),
-            Expanded(
-              child: _sectionPanel(
-                key: _posesKey,
-                title: 'Poses',
-                child: _buildPosesSection(context),
+              child: _labeledPanel(
+                'Poses',
+                _buildPosesSection(context),
                 padding: const EdgeInsets.fromLTRB(18, 16, 18, 18),
               ),
             ),
@@ -229,115 +235,36 @@ class _SupTechConceptSheetState extends State<SupTechConceptSheet> {
   Widget _buildNarrowLayout(BuildContext context) {
     return Column(
       children: [
-        _buildSectionNav(),
-        const SizedBox(height: 18),
-        _sectionPanel(
-          key: _traitsKey,
-          title: 'Traits',
-          child: _buildTraitsSection(),
-        ),
+        _labeledPanel('Traits', _buildTraitsSection()),
         const SizedBox(height: 20),
-        _sectionPanel(
-          key: _characterKey,
-          title: 'Character',
-          child: _buildMainCharacter(context),
-        ),
+        _labeledPanel('Character', _buildMainCharacter(context)),
         const SizedBox(height: 20),
-        _sectionPanel(
-          key: _aboutKey,
-          title: 'About',
-          child: _buildAboutSection(),
-        ),
+        _labeledPanel('About', _buildAboutSection()),
         const SizedBox(height: 20),
-        _sectionPanel(
-          key: _expressionsKey,
-          title: 'Expressions',
-          child: _buildExpressionsRow(context),
+        _labeledPanel(
+          'Expressions',
+          _buildExpressionsRow(context),
           padding: const EdgeInsets.fromLTRB(18, 16, 18, 18),
         ),
         const SizedBox(height: 20),
-        _sectionPanel(
-          key: _paletteKey,
-          title: 'Color Palette',
-          child: _buildColorPalette(),
+        _labeledPanel(
+          'Color Palette',
+          _buildColorPalette(),
           padding: const EdgeInsets.fromLTRB(18, 16, 18, 18),
         ),
         const SizedBox(height: 20),
-        _sectionPanel(
-          key: _accessoriesKey,
-          title: 'Accessories',
-          child: _buildAccessoriesSection(context),
+        _labeledPanel(
+          'Accessories',
+          _buildAccessoriesSection(context),
           padding: const EdgeInsets.fromLTRB(18, 16, 18, 18),
         ),
         const SizedBox(height: 20),
-        _sectionPanel(
-          key: _posesKey,
-          title: 'Poses',
-          child: _buildPosesSection(context),
+        _labeledPanel(
+          'Poses',
+          _buildPosesSection(context),
           padding: const EdgeInsets.fromLTRB(18, 16, 18, 18),
         ),
       ],
-    );
-  }
-
-  Widget _buildSectionNav() {
-    final navItems = [
-      ('Traits', _traitsKey),
-      ('Character', _characterKey),
-      ('About', _aboutKey),
-      ('Expressions', _expressionsKey),
-      ('Color Palette', _paletteKey),
-      ('Accessories', _accessoriesKey),
-      ('Poses', _posesKey),
-    ];
-
-    return _referencePanel(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Row(
-          children: [
-            for (final navItem in navItems) ...[
-              _sectionNavButton(navItem.$1, navItem.$2),
-              if (navItem != navItems.last) const SizedBox(width: 8),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _sectionNavButton(String label, GlobalKey targetKey) {
-    return InkWell(
-      borderRadius: BorderRadius.circular(999),
-      onTap: () => _scrollToSection(targetKey),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
-        decoration: BoxDecoration(
-          color: const Color(0xFFF5F8FF),
-          borderRadius: BorderRadius.circular(999),
-          border: Border.all(color: const Color(0xFFDDE7FF)),
-        ),
-        child: Text(
-          label,
-          style: const TextStyle(
-            color: Color(0xFF426AE3),
-            fontSize: 13,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-      ),
-    );
-  }
-
-  void _scrollToSection(GlobalKey targetKey) {
-    final targetContext = targetKey.currentContext;
-    if (targetContext == null) return;
-    Scrollable.ensureVisible(
-      targetContext,
-      duration: const Duration(milliseconds: 360),
-      curve: Curves.easeOutCubic,
-      alignment: 0.06,
     );
   }
 
@@ -468,26 +395,14 @@ class _SupTechConceptSheetState extends State<SupTechConceptSheet> {
     );
   }
 
-  Widget _buildMainCharacter(BuildContext context) => Column(
-    children: [
-      Container(
-        width: 386,
-        height: 516,
-        constraints: BoxConstraints(
-          maxWidth: MediaQuery.sizeOf(context).width - 36,
-        ),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: const Color(0xFFEFF2F7)),
-          boxShadow: [
-            BoxShadow(
-              color: const Color(0xFF253247).withValues(alpha: 0.07),
-              blurRadius: 28,
-              offset: const Offset(0, 10),
-            ),
-          ],
-        ),
+  Widget _buildMainCharacter(BuildContext context) {
+    final maxWidth = min(280.0, MediaQuery.sizeOf(context).width - 36);
+    final height = maxWidth * (516 / 386);
+    return Align(
+      alignment: Alignment.center,
+      child: SizedBox(
+        width: maxWidth,
+        height: height,
         child: CustomPaint(
           painter: _InteractiveConceptPainter(
             skin: skin,
@@ -497,74 +412,85 @@ class _SupTechConceptSheetState extends State<SupTechConceptSheet> {
             chestAccessory: _selectedChestAccessory,
             pose: _selectedPose,
           ),
-          size: const Size(386, 516),
+          size: Size(maxWidth, height),
         ),
-      ),
-    ],
-  );
-
-  Widget _buildExpressionsRow(BuildContext context) {
-    final expressions = [
-      SupTechExpression.neutral, SupTechExpression.happy, SupTechExpression.angry,
-      SupTechExpression.surprised, SupTechExpression.determined, SupTechExpression.wink,
-    ];
-    return SizedBox(
-      height: 150,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        itemCount: expressions.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 12),
-        itemBuilder: (context, index) {
-          final expr = expressions[index];
-          final isSelected = expr == _selectedExpression;
-          return GestureDetector(
-            onTap: () => _selectExpression(expr),
-            child: Container(
-              width: 188,
-              padding: const EdgeInsets.fromLTRB(10, 12, 10, 14),
-              decoration: BoxDecoration(
-                color: isSelected ? const Color(0xFFF5F8FF) : Colors.white,
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: isSelected ? const Color(0xFF4777EA) : const Color(0xFFE9EDF4)),
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xFF253247).withValues(alpha: 0.04),
-                    blurRadius: 14,
-                    offset: const Offset(0, 5),
-                  ),
-                ],
-              ),
-              child: Column(
-                children: [
-                  Expanded(
-                    child: CustomPaint(
-                      painter: _ExpressionPainter(skin: skin, expression: expr),
-                      size: const Size(142, 92),
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    _expressionName(expr),
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: isSelected ? const Color(0xFF4777EA) : const Color(0xFF45536A),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        },
       ),
     );
   }
 
-  Widget _buildAccessoriesSection(BuildContext context) => Wrap(
-    alignment: WrapAlignment.spaceAround,
-    runAlignment: WrapAlignment.center,
-    spacing: 18,
-    runSpacing: 14,
+  Widget _buildExpressionsRow(BuildContext context) {
+    final expressions = [
+      SupTechExpression.neutral,
+      SupTechExpression.happy,
+      SupTechExpression.angry,
+      SupTechExpression.surprised,
+      SupTechExpression.determined,
+      SupTechExpression.wink,
+    ];
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return Row(
+          children: [
+            for (var i = 0; i < expressions.length; i++) ...[
+              if (i > 0) const SizedBox(width: 10),
+              Expanded(
+                child: _expressionCard(expressions[i]),
+              ),
+            ],
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _expressionCard(SupTechExpression expr) {
+    final isSelected = expr == _selectedExpression;
+    return GestureDetector(
+      onTap: () => _selectExpression(expr),
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(8, 14, 8, 12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: isSelected ? const Color(0xFF4777EA) : const Color(0xFFE9EDF4),
+            width: isSelected ? 1.5 : 1,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF253247).withValues(alpha: 0.04),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            AspectRatio(
+              aspectRatio: 1.15,
+              child: CustomPaint(
+                painter: _ExpressionPainter(skin: skin, expression: expr),
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              _expressionName(expr),
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+                color: isSelected
+                    ? const Color(0xFF4777EA)
+                    : const Color(0xFF6B7A90),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAccessoriesSection(BuildContext context) => Row(
+    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
     children: [
       _accessoryItem('Antenna', 'antenna', SupTechHeadAccessory.antenna, SupTechEarAccessory.none, SupTechChestAccessory.none),
       _accessoryItem('Badge', 'badge', SupTechHeadAccessory.none, SupTechEarAccessory.none, SupTechChestAccessory.badge),
@@ -572,37 +498,58 @@ class _SupTechConceptSheetState extends State<SupTechConceptSheet> {
     ],
   );
 
-  Widget _accessoryItem(String label, String type, SupTechHeadAccessory head, SupTechEarAccessory ear, SupTechChestAccessory chest) => GestureDetector(
-    onTap: () {
-      if (head != SupTechHeadAccessory.none) _selectHeadAccessory(head);
-      if (ear != SupTechEarAccessory.none) _selectEarAccessory(ear);
-      if (chest != SupTechChestAccessory.none) _selectChestAccessory(chest);
-    },
-    child: Column(
-      children: [
-        SizedBox(
-          width: 88,
-          height: 76,
-          child: CustomPaint(painter: _AccessoryPainter(skin: skin, type: type), size: const Size(88, 76)),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-            color: Color(0xFF45536A),
+  Widget _accessoryItem(
+    String label,
+    String type,
+    SupTechHeadAccessory head,
+    SupTechEarAccessory ear,
+    SupTechChestAccessory chest,
+  ) {
+    final isSelected = _isAccessorySelected(head, ear, chest);
+    return GestureDetector(
+      onTap: () {
+        if (head != SupTechHeadAccessory.none) _selectHeadAccessory(head);
+        if (ear != SupTechEarAccessory.none) _selectEarAccessory(ear);
+        if (chest != SupTechChestAccessory.none) _selectChestAccessory(chest);
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+        decoration: BoxDecoration(
+          color: isSelected ? const Color(0xFFF5F8FF) : Colors.transparent,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isSelected ? const Color(0xFF4777EA) : Colors.transparent,
           ),
         ),
-      ],
-    ),
-  );
+        child: Column(
+          children: [
+            SizedBox(
+              width: 90,
+              height: 88,
+              child: CustomPaint(
+                painter: _AccessoryPainter(skin: skin, type: type),
+                size: const Size(90, 88),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: isSelected
+                    ? const Color(0xFF4777EA)
+                    : const Color(0xFF45536A),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
-  Widget _buildPosesSection(BuildContext context) => Wrap(
-    alignment: WrapAlignment.spaceAround,
-    runAlignment: WrapAlignment.center,
-    spacing: 18,
-    runSpacing: 14,
+  Widget _buildPosesSection(BuildContext context) => Row(
+    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
     children: [
       _poseItem('Wave'),
       _poseItem('Thinking'),
@@ -610,27 +557,45 @@ class _SupTechConceptSheetState extends State<SupTechConceptSheet> {
     ],
   );
 
-  Widget _poseItem(String label) => GestureDetector(
-    onTap: () => _selectPose(label),
-    child: Column(
-      children: [
-        SizedBox(
-          width: 98,
-          height: 76,
-          child: CustomPaint(painter: _PosePainter(label: label), size: const Size(98, 76)),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-            color: Color(0xFF45536A),
+  Widget _poseItem(String label) {
+    final isSelected = _selectedPose == label;
+    return GestureDetector(
+      onTap: () => _selectPose(label),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+        decoration: BoxDecoration(
+          color: isSelected ? const Color(0xFFF5F8FF) : Colors.transparent,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isSelected ? const Color(0xFF4777EA) : Colors.transparent,
           ),
         ),
-      ],
-    ),
-  );
+        child: Column(
+          children: [
+            SizedBox(
+              width: 90,
+              height: 88,
+              child: CustomPaint(
+                painter: _PosePainter(skin: skin, label: label),
+                size: const Size(90, 88),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: isSelected
+                    ? const Color(0xFF4777EA)
+                    : const Color(0xFF45536A),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   static String _expressionName(SupTechExpression e) => switch (e) {
     SupTechExpression.neutral => 'Neutral', SupTechExpression.happy => 'Happy',
@@ -667,6 +632,17 @@ class _InteractiveConceptPainter extends CustomPainter {
     canvas.save();
     final s = size.width / 50;
     canvas.translate(size.width / 2, size.height / 2 + 9 * s);
+
+    // Ambient glow behind character
+    canvas.drawCircle(
+      Offset.zero,
+      42 * s,
+      Paint()
+        ..shader = RadialGradient(colors: [
+          skin.accentColor.withValues(alpha: 0.14),
+          skin.accentColor.withValues(alpha: 0.0),
+        ]).createShader(Rect.fromCircle(center: Offset.zero, radius: 42 * s)),
+    );
 
     final bodyPaint = Paint()..color = skin.bodyColor..style = PaintingStyle.fill;
     final outlinePaint = Paint()
@@ -709,16 +685,26 @@ class _InteractiveConceptPainter extends CustomPainter {
       foldPaint,
     );
 
-    // BLUE GLOW AT ROBE BOTTOM
+    // Glow at robe bottom and cuff accents
     canvas.drawOval(
       Rect.fromCenter(center: Offset(0, 13.5 * s), width: 20 * s, height: 4 * s),
       Paint()
-        ..shader = const LinearGradient(
-          begin: Alignment.topCenter, end: Alignment.bottomCenter,
-          colors: [Color(0x006366F1), Color(0xFF6366F1)],
+        ..shader = LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            skin.accentColor.withValues(alpha: 0.0),
+            skin.accentColor,
+          ],
         ).createShader(Rect.fromCenter(center: Offset(0, 13.5 * s), width: 20 * s, height: 4 * s))
         ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3),
     );
+    final cuffPaint = Paint()
+      ..color = skin.accentColor.withValues(alpha: 0.85)
+      ..strokeWidth = 1.2 * s
+      ..strokeCap = StrokeCap.round;
+    canvas.drawLine(Offset(-8 * s, 0), Offset(-10.5 * s, 4 * s), cuffPaint);
+    canvas.drawLine(Offset(8 * s, 0), Offset(10.5 * s, 4 * s), cuffPaint);
 
     // HOOD
     final hoodPath = Path()
@@ -793,158 +779,441 @@ class _InteractiveConceptPainter extends CustomPainter {
         ).createShader(faceRect),
     );
 
-    // EYES based on expression
+    // EYES based on expression (Working pose uses focused eyes)
     final eyeY = -8.5 * s;
     final eyeSpacing = 5.2 * s;
-    final eyeRx = 1.8 * s;
-    final eyeRy = 3.1 * s;
-
-    void drawEyeGlow(Offset center) {
-      canvas.drawOval(
-        Rect.fromCenter(center: center, width: (eyeRx + 3.5 * s) * 2, height: (eyeRy + 3.5 * s) * 2),
-        Paint()
-          ..shader = RadialGradient(colors: [
-            skin.accentColor.withValues(alpha: 0.5),
-            skin.accentColor.withValues(alpha: 0.0),
-          ]).createShader(Rect.fromCenter(center: center, width: (eyeRx + 5 * s) * 2, height: (eyeRy + 5 * s) * 2)),
-      );
-      canvas.drawOval(
-        Rect.fromCenter(center: center, width: (eyeRx + 1.2 * s) * 2, height: (eyeRy + 1.2 * s) * 2),
-        Paint()
-          ..shader = RadialGradient(colors: [
-            Colors.white.withValues(alpha: 0.3),
-            skin.accentColor.withValues(alpha: 0.6),
-            skin.accentColor.withValues(alpha: 0.0),
-          ]).createShader(Rect.fromCenter(center: center, width: (eyeRx + 2.5 * s) * 2, height: (eyeRy + 2.5 * s) * 2)),
-      );
-      canvas.drawOval(
-        Rect.fromCenter(center: center, width: eyeRx * 2, height: eyeRy * 2),
-        Paint()..color = Colors.white,
-      );
-      canvas.drawCircle(
-        Offset(center.dx + eyeRx * 0.3, center.dy - eyeRy * 0.3),
-        eyeRx * 0.2,
-        Paint()..color = Colors.white.withValues(alpha: 0.4),
+    if (pose == 'Working') {
+      _drawFocusedEyes(canvas, s, eyeY, eyeSpacing);
+    } else {
+      _drawReferenceEyes(
+        canvas,
+        s,
+        expression,
+        eyeY,
+        eyeSpacing,
+        skin.accentColor,
+        large: true,
       );
     }
 
-    switch (expression) {
-      case SupTechExpression.neutral:
-        for (final dx in [-eyeSpacing, eyeSpacing]) {
-          drawEyeGlow(Offset(dx, eyeY));
-        }
-        break;
-      case SupTechExpression.happy:
-        for (final dx in [-eyeSpacing, eyeSpacing]) {
-          final arcPaint = Paint()
-            ..color = skin.accentColor
-            ..style = PaintingStyle.stroke
-            ..strokeWidth = 2.0 * s
-            ..strokeCap = StrokeCap.round;
-          canvas.drawPath(
-            Path()
-              ..moveTo(dx - 2.5 * s, eyeY + 0.5 * s)
-              ..quadraticBezierTo(dx, eyeY - 2.0 * s, dx + 2.5 * s, eyeY + 0.5 * s),
-            arcPaint,
-          );
-        }
-        break;
-      case SupTechExpression.angry:
-        for (final dx in [-eyeSpacing, eyeSpacing]) {
-          drawEyeGlow(Offset(dx, eyeY));
-          final browPaint = Paint()
-            ..color = Colors.black87
-            ..style = PaintingStyle.stroke
-            ..strokeWidth = 1.8 * s
-            ..strokeCap = StrokeCap.round;
-          if (dx < 0) {
-            canvas.drawLine(Offset(dx - 2.5 * s, eyeY - 2.8 * s), Offset(dx + 2.5 * s, eyeY - 1.8 * s), browPaint);
-          } else {
-            canvas.drawLine(Offset(dx - 2.5 * s, eyeY - 1.8 * s), Offset(dx + 2.5 * s, eyeY - 2.8 * s), browPaint);
-          }
-        }
-        break;
-      case SupTechExpression.surprised:
-        for (final dx in [-eyeSpacing, eyeSpacing]) {
-          final center = Offset(dx, eyeY);
-          canvas.drawOval(
-            Rect.fromCenter(center: center, width: 5 * s, height: 6.5 * s),
-            Paint()..shader = RadialGradient(colors: [skin.accentColor.withValues(alpha: 0.4), skin.accentColor.withValues(alpha: 0.0)]).createShader(Rect.fromCenter(center: center, width: 6 * s, height: 7 * s)),
-          );
-          canvas.drawOval(Rect.fromCenter(center: center, width: 2.4 * s, height: 3.4 * s), Paint()..color = Colors.white);
-        }
-        break;
-      case SupTechExpression.determined:
-        for (final dx in [-eyeSpacing, eyeSpacing]) {
-          drawEyeGlow(Offset(dx, eyeY));
-          canvas.drawLine(
-            Offset(dx - 2.5 * s, eyeY - 1.8 * s),
-            Offset(dx + 2.5 * s, eyeY - 1.8 * s),
-            Paint()..color = Colors.black87..style = PaintingStyle.stroke..strokeWidth = 2.0 * s..strokeCap = StrokeCap.round,
-          );
-        }
-        break;
-      case SupTechExpression.wink:
+    _drawConceptHeadAccessory(canvas, s, skin, headAccessory, outlinePaint);
+    _drawConceptEarAccessory(canvas, s, skin, earAccessory);
+    _drawConceptChestAccessory(canvas, s, skin, chestAccessory);
+
+    // POSE overlays
+    if (pose == 'Wave') {
+      canvas.drawPath(
+        Path()
+          ..moveTo(-8 * s, -15 * s)
+          ..quadraticBezierTo(-12 * s, -20 * s, -14 * s, -25 * s),
+        Paint()
+          ..color = skin.bodyColor
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 2.5 * s
+          ..strokeCap = StrokeCap.round,
+      );
+      canvas.drawCircle(Offset(-14 * s, -27 * s), 1.2 * s, Paint()..color = skin.bodyColor);
+      canvas.drawCircle(Offset(-14 * s, -27 * s), 1.2 * s, outlinePaint);
+      final wavePaint = Paint()
+        ..color = skin.accentColor.withValues(alpha: 0.6)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 0.8 * s
+        ..strokeCap = StrokeCap.round;
+      for (final i in [0, 1, 2]) {
+        final radius = (3 + i * 1.5) * s;
+        canvas.drawArc(
+          Rect.fromCenter(
+            center: Offset(-14 * s, -27 * s),
+            width: radius * 2,
+            height: radius * 2,
+          ),
+          -pi * 0.2,
+          pi * 0.6,
+          false,
+          wavePaint,
+        );
+      }
+    } else if (pose == 'Thinking') {
+      _drawClaspedHands(canvas, s, skin.bodyColor, outlinePaint, y: -11 * s);
+    } else if (pose == 'Working') {
+      _drawHolographicScreen(canvas, s, skin.accentColor, outlinePaint, y: -14 * s);
+    }
+
+    canvas.restore();
+  }
+
+  @override
+  bool shouldRepaint(covariant _InteractiveConceptPainter old) =>
+      old.skin.id != skin.id ||
+      old.expression != expression ||
+      old.headAccessory != headAccessory ||
+      old.earAccessory != earAccessory ||
+      old.chestAccessory != chestAccessory ||
+      old.pose != pose;
+}
+
+void _drawGlowingOvalEye(
+  Canvas canvas,
+  Offset center,
+  double s, {
+  required double rx,
+  required double ry,
+  required Color glowColor,
+}) {
+  canvas.drawOval(
+    Rect.fromCenter(
+      center: center,
+      width: (rx + 2.5 * s) * 2,
+      height: (ry + 2.5 * s) * 2,
+    ),
+    Paint()
+      ..shader = RadialGradient(colors: [
+        glowColor.withValues(alpha: 0.35),
+        glowColor.withValues(alpha: 0.0),
+      ]).createShader(Rect.fromCircle(center: center, radius: (rx + 2.5 * s))),
+  );
+  canvas.drawOval(
+    Rect.fromCenter(center: center, width: rx * 2, height: ry * 2),
+    Paint()..color = Colors.white,
+  );
+}
+
+void _drawReferenceEyes(
+  Canvas canvas,
+  double s,
+  SupTechExpression expression,
+  double eyeY,
+  double eyeSpacing,
+  Color glowColor, {
+  bool large = false,
+}) {
+  final rx = large ? 1.8 * s : 1.0 * s;
+  final ry = large ? 3.1 * s : 1.4 * s;
+  final stroke = large ? 2.0 * s : 1.4 * s;
+
+  switch (expression) {
+    case SupTechExpression.neutral:
+      for (final dx in [-eyeSpacing, eyeSpacing]) {
+        _drawGlowingOvalEye(canvas, Offset(dx, eyeY), s, rx: rx, ry: ry, glowColor: glowColor);
+      }
+    case SupTechExpression.happy:
+      final arcPaint = Paint()
+        ..color = Colors.white
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = stroke
+        ..strokeCap = StrokeCap.round;
+      for (final dx in [-eyeSpacing, eyeSpacing]) {
         canvas.drawPath(
           Path()
-            ..moveTo(-eyeSpacing - 2.5 * s, eyeY)
-            ..quadraticBezierTo(-eyeSpacing, eyeY - 1.2 * s, -eyeSpacing + 2.5 * s, eyeY),
-          Paint()..color = skin.accentColor..style = PaintingStyle.stroke..strokeWidth = 2.0 * s..strokeCap = StrokeCap.round,
+            ..moveTo(dx - 2.5 * s, eyeY + 0.5 * s)
+            ..quadraticBezierTo(dx, eyeY - 2.0 * s, dx + 2.5 * s, eyeY + 0.5 * s),
+          arcPaint,
         );
-        drawEyeGlow(Offset(eyeSpacing, eyeY));
-        break;
-      case SupTechExpression.sleep:
-        final linePaint = Paint()
-          ..color = skin.accentColor
+      }
+    case SupTechExpression.angry:
+      for (final dx in [-eyeSpacing, eyeSpacing]) {
+        canvas.save();
+        canvas.translate(dx, eyeY);
+        canvas.rotate(dx < 0 ? 0.35 : -0.35);
+        _drawGlowingOvalEye(canvas, Offset.zero, s, rx: rx * 0.9, ry: ry * 0.85, glowColor: glowColor);
+        canvas.restore();
+      }
+    case SupTechExpression.surprised:
+      for (final dx in [-eyeSpacing, eyeSpacing]) {
+        canvas.drawCircle(Offset(dx, eyeY), large ? 1.6 * s : 0.9 * s, Paint()..color = Colors.white);
+        canvas.drawLine(
+          Offset(dx - 1.5 * s, eyeY - 2.8 * s),
+          Offset(dx + 1.5 * s, eyeY - 2.8 * s),
+          Paint()
+            ..color = Colors.white
+            ..strokeWidth = large ? 1.0 * s : 0.6 * s
+            ..strokeCap = StrokeCap.round,
+        );
+      }
+    case SupTechExpression.determined:
+      for (final dx in [-eyeSpacing, eyeSpacing]) {
+        canvas.drawRRect(
+          RRect.fromRectAndRadius(
+            Rect.fromCenter(
+              center: Offset(dx, eyeY),
+              width: large ? 5 * s : 3 * s,
+              height: large ? 1.4 * s : 0.8 * s,
+            ),
+            Radius.circular(0.6 * s),
+          ),
+          Paint()..color = Colors.white,
+        );
+      }
+    case SupTechExpression.wink:
+      canvas.drawPath(
+        Path()
+          ..moveTo(-eyeSpacing - 2.5 * s, eyeY)
+          ..quadraticBezierTo(-eyeSpacing, eyeY - 1.2 * s, -eyeSpacing + 2.5 * s, eyeY),
+        Paint()
+          ..color = Colors.white
           ..style = PaintingStyle.stroke
-          ..strokeWidth = 2.0 * s
-          ..strokeCap = StrokeCap.round;
-        for (final dx in [-eyeSpacing, eyeSpacing]) {
-          canvas.drawLine(Offset(dx - 2.5 * s, eyeY), Offset(dx + 2.5 * s, eyeY), linePaint);
-        }
-        break;
-      case SupTechExpression.error:
-        final xPaint = Paint()
-          ..color = skin.accentColor
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 2.0 * s
-          ..strokeCap = StrokeCap.round;
-        for (final dx in [-eyeSpacing, eyeSpacing]) {
-          canvas.drawLine(Offset(dx - 1.5 * s, eyeY - 1.5 * s), Offset(dx + 1.5 * s, eyeY + 1.5 * s), xPaint);
-          canvas.drawLine(Offset(dx + 1.5 * s, eyeY - 1.5 * s), Offset(dx - 1.5 * s, eyeY + 1.5 * s), xPaint);
-        }
-        break;
-    }
-
-    // Accessory drawing
-    if (headAccessory == SupTechHeadAccessory.antenna) {
-      canvas.drawLine(
-        Offset(0, -27 * s), Offset(0, -31 * s),
-        Paint()..color = skin.accentColor..strokeWidth = 1.2 * s..strokeCap = StrokeCap.round,
+          ..strokeWidth = stroke
+          ..strokeCap = StrokeCap.round,
       );
-      canvas.drawCircle(Offset(0, -32 * s), 1.0 * s, Paint()..color = skin.accentColor);
-    }
-    if (earAccessory == SupTechEarAccessory.headset) {
+      canvas.drawCircle(
+        Offset(eyeSpacing, eyeY),
+        large ? 1.6 * s : 0.9 * s,
+        Paint()..color = Colors.white,
+      );
+    case SupTechExpression.sleep:
+      final linePaint = Paint()
+        ..color = Colors.white
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = stroke
+        ..strokeCap = StrokeCap.round;
+      for (final dx in [-eyeSpacing, eyeSpacing]) {
+        canvas.drawLine(Offset(dx - 2.5 * s, eyeY), Offset(dx + 2.5 * s, eyeY), linePaint);
+      }
+    case SupTechExpression.error:
+      final xPaint = Paint()
+        ..color = Colors.white
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = stroke
+        ..strokeCap = StrokeCap.round;
+      for (final dx in [-eyeSpacing, eyeSpacing]) {
+        canvas.drawLine(Offset(dx - 1.5 * s, eyeY - 1.5 * s), Offset(dx + 1.5 * s, eyeY + 1.5 * s), xPaint);
+        canvas.drawLine(Offset(dx + 1.5 * s, eyeY - 1.5 * s), Offset(dx - 1.5 * s, eyeY + 1.5 * s), xPaint);
+      }
+  }
+}
+
+void _drawFocusedEyes(Canvas canvas, double s, double eyeY, double eyeSpacing) {
+  final eyePaint = Paint()
+    ..color = Colors.white
+    ..style = PaintingStyle.stroke
+    ..strokeWidth = 1.8 * s
+    ..strokeCap = StrokeCap.round;
+  canvas.drawLine(
+    Offset(-eyeSpacing - 2 * s, eyeY - 0.5 * s),
+    Offset(-eyeSpacing + 2 * s, eyeY + 0.5 * s),
+    eyePaint,
+  );
+  canvas.drawLine(
+    Offset(eyeSpacing - 2 * s, eyeY - 0.5 * s),
+    Offset(eyeSpacing + 2 * s, eyeY + 0.5 * s),
+    eyePaint,
+  );
+}
+
+void _drawClaspedHands(
+  Canvas canvas,
+  double s,
+  Color bodyColor,
+  Paint outlinePaint, {
+  required double y,
+}) {
+  final handPaint = Paint()..color = bodyColor;
+  canvas.drawOval(
+    Rect.fromCenter(center: Offset(-2 * s, y), width: 3 * s, height: 2.5 * s),
+    handPaint,
+  );
+  canvas.drawOval(
+    Rect.fromCenter(center: Offset(2 * s, y), width: 3 * s, height: 2.5 * s),
+    handPaint,
+  );
+  canvas.drawOval(
+    Rect.fromCenter(center: Offset(0, y + 1.5 * s), width: 4 * s, height: 3 * s),
+    handPaint,
+  );
+  canvas.drawOval(
+    Rect.fromCenter(center: Offset(0, y + 1.5 * s), width: 4 * s, height: 3 * s),
+    outlinePaint,
+  );
+}
+
+void _drawHolographicScreen(
+  Canvas canvas,
+  double s,
+  Color accentColor,
+  Paint outlinePaint, {
+  required double y,
+}) {
+  final screenRect = RRect.fromRectAndRadius(
+    Rect.fromCenter(center: Offset(0, y), width: 16 * s, height: 11 * s),
+    Radius.circular(1.2 * s),
+  );
+  canvas.drawRRect(
+    screenRect,
+    Paint()..color = accentColor.withValues(alpha: 0.18),
+  );
+  canvas.drawRRect(
+    screenRect,
+    Paint()
+      ..color = outlinePaint.color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.2 * s,
+  );
+  for (final lineY in [y - 3 * s, y, y + 3 * s]) {
+    canvas.drawLine(
+      Offset(-5 * s, lineY),
+      Offset(5 * s, lineY),
+      Paint()
+        ..color = accentColor.withValues(alpha: 0.45)
+        ..strokeWidth = 0.7 * s,
+    );
+  }
+}
+
+void _drawConceptHeadAccessory(
+  Canvas canvas,
+  double s,
+  SkinDefinition skin,
+  SupTechHeadAccessory accessory,
+  Paint outlinePaint,
+) {
+  switch (accessory) {
+    case SupTechHeadAccessory.none:
+      break;
+    case SupTechHeadAccessory.antenna:
+      canvas.drawLine(
+        Offset(0, -27 * s),
+        Offset(0, -31 * s),
+        Paint()
+          ..color = skin.accentColor
+          ..strokeWidth = 1.2 * s
+          ..strokeCap = StrokeCap.round,
+      );
+      canvas.drawCircle(
+        Offset(0, -32 * s),
+        1.0 * s,
+        Paint()..color = skin.accentColor,
+      );
+    case SupTechHeadAccessory.crown:
+      final crown = Path()
+        ..moveTo(-5 * s, -26 * s)
+        ..lineTo(-4 * s, -31 * s)
+        ..lineTo(-2 * s, -28 * s)
+        ..lineTo(0, -33 * s)
+        ..lineTo(2 * s, -28 * s)
+        ..lineTo(4 * s, -31 * s)
+        ..lineTo(5 * s, -26 * s);
+      canvas.drawPath(crown, Paint()..color = skin.accentColor);
+      canvas.drawPath(crown, outlinePaint);
+    case SupTechHeadAccessory.wizardHat:
+      final cone = Path()
+        ..moveTo(-5 * s, -26 * s)
+        ..lineTo(5 * s, -26 * s)
+        ..lineTo(0, -36 * s);
+      canvas.drawPath(cone, Paint()..color = const Color(0xFF1E293B));
+      canvas.drawPath(cone, outlinePaint);
+      canvas.drawRect(
+        Rect.fromLTWH(-5 * s, -27 * s, 10 * s, 2 * s),
+        Paint()..color = skin.accentColor,
+      );
+    case SupTechHeadAccessory.ninjaHeadband:
+      canvas.drawRect(
+        Rect.fromLTWH(-12 * s, -12 * s, 24 * s, 2.5 * s),
+        Paint()..color = skin.accentColor,
+      );
+    case SupTechHeadAccessory.visor:
+      canvas.drawRRect(
+        RRect.fromRectAndRadius(
+          Rect.fromCenter(center: Offset(0, -7 * s), width: 18 * s, height: 5 * s),
+          Radius.circular(2 * s),
+        ),
+        Paint()..color = skin.accentColor.withValues(alpha: 0.75),
+      );
+    case SupTechHeadAccessory.horns:
+      for (final dir in [-1, 1]) {
+        final horn = Path()
+          ..moveTo(dir * 4 * s, -24 * s)
+          ..quadraticBezierTo(dir * 7 * s, -30 * s, dir * 5 * s, -34 * s);
+        canvas.drawPath(horn, Paint()..color = skin.accentColor..style = PaintingStyle.stroke..strokeWidth = 2 * s..strokeCap = StrokeCap.round);
+      }
+    case SupTechHeadAccessory.crest:
+      final crest = Path()
+        ..moveTo(0, -34 * s)
+        ..lineTo(-2.5 * s, -26 * s)
+        ..lineTo(0, -28 * s)
+        ..lineTo(2.5 * s, -26 * s);
+      canvas.drawPath(crest, Paint()..color = skin.accentColor);
+      canvas.drawPath(crest, outlinePaint);
+  }
+}
+
+void _drawConceptEarAccessory(
+  Canvas canvas,
+  double s,
+  SkinDefinition skin,
+  SupTechEarAccessory accessory,
+) {
+  switch (accessory) {
+    case SupTechEarAccessory.none:
+      break;
+    case SupTechEarAccessory.headset:
       for (final dx in [-7 * s, 7 * s]) {
         canvas.drawOval(
           Rect.fromCenter(center: Offset(dx, -3 * s), width: 2.5 * s, height: 3.5 * s),
-          Paint()..color = const Color(0xFF334155),
+          Paint()..color = skin.accentColor.withValues(alpha: 0.85),
         );
         canvas.drawOval(
           Rect.fromCenter(center: Offset(dx, -3 * s), width: 2.5 * s, height: 3.5 * s),
-          Paint()..color = Colors.black87..style = PaintingStyle.stroke..strokeWidth = 0.8 * s,
+          Paint()
+            ..color = Colors.black87
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = 0.8 * s,
         );
       }
       canvas.drawArc(
         Rect.fromCenter(center: Offset(0, -8 * s), width: 14 * s, height: 6 * s),
-        pi, pi, false,
-        Paint()..color = const Color(0xFF334155)..style = PaintingStyle.stroke..strokeWidth = 1.2 * s..strokeCap = StrokeCap.round,
+        pi,
+        pi,
+        false,
+        Paint()
+          ..color = skin.accentColor
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 1.2 * s
+          ..strokeCap = StrokeCap.round,
       );
-    }
+    case SupTechEarAccessory.scarf:
+      canvas.drawRRect(
+        RRect.fromRectAndRadius(
+          Rect.fromLTWH(-8 * s, -1 * s, 16 * s, 4 * s),
+          Radius.circular(2 * s),
+        ),
+        Paint()..color = skin.accentColor,
+      );
+      canvas.drawPath(
+        Path()
+          ..moveTo(-8 * s, 2 * s)
+          ..quadraticBezierTo(-11 * s, 8 * s, -9 * s, 12 * s),
+        Paint()
+          ..color = skin.accentColor
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 2.5 * s
+          ..strokeCap = StrokeCap.round,
+      );
+    case SupTechEarAccessory.earGlow:
+      for (final dx in [-5.5 * s, 5.5 * s]) {
+        canvas.drawCircle(
+          Offset(dx, -8.5 * s),
+          2 * s,
+          Paint()
+            ..shader = RadialGradient(colors: [
+              skin.accentColor,
+              skin.accentColor.withValues(alpha: 0.0),
+            ]).createShader(Rect.fromCircle(center: Offset(dx, -8.5 * s), radius: 2 * s)),
+        );
+      }
+  }
+}
 
-    // CHEST ACCESSORY
-    final badgeCY = 5.0 * s;
-    if (chestAccessory == SupTechChestAccessory.badge) {
+void _drawConceptChestAccessory(
+  Canvas canvas,
+  double s,
+  SkinDefinition skin,
+  SupTechChestAccessory accessory,
+) {
+  final badgeCY = 5.0 * s;
+  switch (accessory) {
+    case SupTechChestAccessory.none:
+      break;
+    case SupTechChestAccessory.badge:
       canvas.drawOval(
         Rect.fromCenter(center: Offset(0, badgeCY), width: 14 * s, height: 10 * s),
         Paint()
@@ -967,61 +1236,66 @@ class _InteractiveConceptPainter extends CustomPainter {
       );
       final stPainter = TextPainter(text: stSpan, textDirection: TextDirection.ltr)..layout();
       stPainter.paint(canvas, Offset(-stPainter.width / 2, badgeCY - stPainter.height / 2));
-    }
-
-    // POSE ARM
-    if (pose == 'Wave') {
-      canvas.drawPath(
-        Path()..moveTo(8 * s, -15 * s)..quadraticBezierTo(12 * s, -20 * s, 14 * s, -25 * s),
-        Paint()..color = skin.bodyColor..style = PaintingStyle.stroke..strokeWidth = 2.5 * s..strokeCap = StrokeCap.round,
+    case SupTechChestAccessory.cape:
+      final cape = Path()
+        ..moveTo(-6 * s, 0)
+        ..lineTo(-9 * s, 12 * s)
+        ..lineTo(9 * s, 12 * s)
+        ..lineTo(6 * s, 0);
+      canvas.drawPath(cape, Paint()..color = skin.bodyColor.withValues(alpha: 0.75));
+    case SupTechChestAccessory.codeScroll:
+      canvas.drawRRect(
+        RRect.fromRectAndRadius(
+          Rect.fromCenter(center: Offset(0, badgeCY), width: 8 * s, height: 10 * s),
+          Radius.circular(1 * s),
+        ),
+        Paint()..color = const Color(0xFFF8FAFC),
       );
-      canvas.drawCircle(Offset(14 * s, -27 * s), 1.2 * s, Paint()..color = skin.bodyColor);
-      canvas.drawCircle(Offset(14 * s, -27 * s), 1.2 * s, outlinePaint);
-      final wavePaint = Paint()..color = skin.accentColor.withValues(alpha: 0.6)..style = PaintingStyle.stroke..strokeWidth = 0.8 * s..strokeCap = StrokeCap.round;
-      for (final i in [0, 1, 2]) {
-        final radius = (3 + i * 1.5) * s;
-        canvas.drawArc(
-          Rect.fromCenter(center: Offset(14 * s, -27 * s), width: radius * 2, height: radius * 2),
-          -pi * 0.8, pi * 0.6, false, wavePaint,
+      canvas.drawLine(
+        Offset(-2 * s, badgeCY - 3 * s),
+        Offset(2 * s, badgeCY - 3 * s),
+        Paint()..color = skin.accentColor..strokeWidth = 0.8 * s,
+      );
+      canvas.drawLine(
+        Offset(-2 * s, badgeCY),
+        Offset(2 * s, badgeCY),
+        Paint()..color = skin.accentColor..strokeWidth = 0.8 * s,
+      );
+    case SupTechChestAccessory.gear:
+      canvas.drawCircle(
+        Offset(0, badgeCY),
+        3 * s,
+        Paint()..color = skin.accentColor.withValues(alpha: 0.25),
+      );
+      for (var i = 0; i < 6; i++) {
+        final angle = i * pi / 3;
+        canvas.drawLine(
+          Offset(0, badgeCY),
+          Offset(cos(angle) * 4 * s, badgeCY + sin(angle) * 4 * s),
+          Paint()..color = skin.accentColor..strokeWidth = 1.2 * s,
         );
       }
-    } else if (pose == 'Working') {
-      final laptopPaint = Paint()..color = skin.accentColor;
-      canvas.drawRRect(
-        RRect.fromRectAndRadius(Rect.fromCenter(center: Offset(0, -15 * s), width: 10 * s, height: 7 * s), Radius.circular(0.5 * s)),
-        laptopPaint,
+    case SupTechChestAccessory.flameEmblem:
+      final flame = Path()
+        ..moveTo(0, badgeCY - 4 * s)
+        ..quadraticBezierTo(-3 * s, badgeCY, 0, badgeCY + 4 * s)
+        ..quadraticBezierTo(3 * s, badgeCY, 0, badgeCY - 4 * s);
+      canvas.drawPath(flame, Paint()..color = const Color(0xFFF97316));
+    case SupTechChestAccessory.staff:
+      canvas.drawLine(
+        Offset(10 * s, -10 * s),
+        Offset(10 * s, 8 * s),
+        Paint()
+          ..color = const Color(0xFF92400E)
+          ..strokeWidth = 1.5 * s
+          ..strokeCap = StrokeCap.round,
       );
-      canvas.drawRRect(
-        RRect.fromRectAndRadius(Rect.fromCenter(center: Offset(0, -15 * s), width: 10 * s, height: 7 * s), Radius.circular(0.5 * s)),
-        outlinePaint,
+      canvas.drawCircle(
+        Offset(10 * s, -11 * s),
+        2 * s,
+        Paint()..color = skin.accentColor,
       );
-      canvas.drawRRect(
-        RRect.fromRectAndRadius(Rect.fromCenter(center: Offset(0, -15 * s), width: 8 * s, height: 5 * s), Radius.circular(0.3 * s)),
-        Paint()..color = skin.accentColor.withValues(alpha: 0.7),
-      );
-    }
-
-    // AMBIENT GLOW
-    canvas.drawRect(
-      Rect.fromCenter(center: Offset.zero, width: 84 * s, height: 84 * s),
-      Paint()
-        ..shader = RadialGradient(colors: [
-          skin.accentColor.withValues(alpha: 0.10),
-          skin.accentColor.withValues(alpha: 0.0),
-        ]).createShader(Rect.fromCircle(center: Offset.zero, radius: 42 * s)),
-    );
-
-    canvas.restore();
   }
-
-  @override
-  bool shouldRepaint(covariant _InteractiveConceptPainter old) =>
-      old.skin.id != skin.id ||
-      old.expression != expression ||
-      old.headAccessory != headAccessory ||
-      old.earAccessory != earAccessory ||
-      old.chestAccessory != chestAccessory ||
-      old.pose != pose;
 }
 
 // ═══════════════════════════════════════════════════════
@@ -1155,113 +1429,16 @@ class _ExpressionPainter extends CustomPainter {
     final eyeSpacing = 3.3 * s;
     final eyeY = -1.4 * s;
 
-    switch (expression) {
-      case SupTechExpression.neutral:
-        for (final dx in [-eyeSpacing, eyeSpacing]) {
-          _drawExprEye(canvas, dx, eyeY, s, skin.accentColor);
-        }
-        break;
-
-      case SupTechExpression.happy:
-        final arcPaint = Paint()
-          ..color = skin.accentColor
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 2.0 * s
-          ..strokeCap = StrokeCap.round;
-        for (final dx in [-eyeSpacing, eyeSpacing]) {
-          canvas.drawPath(
-            Path()
-              ..moveTo(dx - 2.5 * s, eyeY + 0.5 * s)
-              ..quadraticBezierTo(dx, eyeY - 2.0 * s, dx + 2.5 * s, eyeY + 0.5 * s),
-            arcPaint,
-          );
-        }
-        break;
-
-      case SupTechExpression.angry:
-        for (final dx in [-eyeSpacing, eyeSpacing]) {
-          _drawExprEye(canvas, dx, eyeY, s, skin.accentColor);
-          final browPaint = Paint()
-            ..color = Colors.black87
-            ..style = PaintingStyle.stroke
-            ..strokeWidth = 1.8 * s
-            ..strokeCap = StrokeCap.round;
-          if (dx < 0) {
-            canvas.drawLine(Offset(dx - 2.5 * s, eyeY - 2.8 * s), Offset(dx + 2.5 * s, eyeY - 1.8 * s), browPaint);
-          } else {
-            canvas.drawLine(Offset(dx - 2.5 * s, eyeY - 1.8 * s), Offset(dx + 2.5 * s, eyeY - 2.8 * s), browPaint);
-          }
-        }
-        break;
-
-      case SupTechExpression.surprised:
-        for (final dx in [-eyeSpacing, eyeSpacing]) {
-          final center = Offset(dx, eyeY);
-          canvas.drawOval(
-            Rect.fromCenter(center: center, width: 5 * s, height: 6.5 * s),
-            Paint()..shader = RadialGradient(colors: [skin.accentColor.withValues(alpha: 0.4), skin.accentColor.withValues(alpha: 0.0)]).createShader(Rect.fromCenter(center: center, width: 6 * s, height: 7 * s)),
-          );
-          canvas.drawOval(Rect.fromCenter(center: center, width: 2.4 * s, height: 3.4 * s), Paint()..color = Colors.white);
-        }
-        break;
-
-      case SupTechExpression.determined:
-        for (final dx in [-eyeSpacing, eyeSpacing]) {
-          _drawExprEye(canvas, dx, eyeY, s, skin.accentColor);
-          canvas.drawLine(
-            Offset(dx - 2.5 * s, eyeY - 1.8 * s),
-            Offset(dx + 2.5 * s, eyeY - 1.8 * s),
-            Paint()..color = Colors.black87..style = PaintingStyle.stroke..strokeWidth = 2.0 * s..strokeCap = StrokeCap.round,
-          );
-        }
-        break;
-
-      case SupTechExpression.wink:
-        // Left eye: wink
-        canvas.drawPath(
-          Path()
-            ..moveTo(-eyeSpacing - 2.5 * s, eyeY)
-            ..quadraticBezierTo(-eyeSpacing, eyeY - 1.2 * s, -eyeSpacing + 2.5 * s, eyeY),
-          Paint()..color = skin.accentColor..style = PaintingStyle.stroke..strokeWidth = 2.0 * s..strokeCap = StrokeCap.round,
-        );
-        // Right eye: normal
-        _drawExprEye(canvas, eyeSpacing, eyeY, s, skin.accentColor);
-        break;
-
-      case SupTechExpression.sleep:
-        final linePaint = Paint()
-          ..color = skin.accentColor
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 2.0 * s
-          ..strokeCap = StrokeCap.round;
-        for (final dx in [-eyeSpacing, eyeSpacing]) {
-          canvas.drawLine(Offset(dx - 2.5 * s, eyeY), Offset(dx + 2.5 * s, eyeY), linePaint);
-        }
-        break;
-
-      case SupTechExpression.error:
-        final xPaint = Paint()
-          ..color = skin.accentColor
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 2.0 * s
-          ..strokeCap = StrokeCap.round;
-        for (final dx in [-eyeSpacing, eyeSpacing]) {
-          canvas.drawLine(Offset(dx - 1.5 * s, eyeY - 1.5 * s), Offset(dx + 1.5 * s, eyeY + 1.5 * s), xPaint);
-          canvas.drawLine(Offset(dx + 1.5 * s, eyeY - 1.5 * s), Offset(dx - 1.5 * s, eyeY + 1.5 * s), xPaint);
-        }
-        break;
-    }
+    _drawReferenceEyes(
+      canvas,
+      s,
+      expression,
+      eyeY,
+      eyeSpacing,
+      skin.accentColor,
+    );
 
     canvas.restore();
-  }
-
-  void _drawExprEye(Canvas canvas, double cx, double cy, double s, Color glowColor) {
-    final center = Offset(cx, cy);
-    canvas.drawOval(
-      Rect.fromCenter(center: center, width: 4 * s, height: 5 * s),
-      Paint()..shader = RadialGradient(colors: [glowColor.withValues(alpha: 0.4), glowColor.withValues(alpha: 0.0)]).createShader(Rect.fromCenter(center: center, width: 5 * s, height: 6 * s)),
-    );
-    canvas.drawOval(Rect.fromCenter(center: center, width: 2 * s, height: 2.8 * s), Paint()..color = Colors.white);
   }
 
   @override
@@ -1355,8 +1532,9 @@ class _AccessoryPainter extends CustomPainter {
 // ═══════════════════════════════════════════════════════
 
 class _PosePainter extends CustomPainter {
+  final SkinDefinition skin;
   final String label;
-  _PosePainter({required this.label});
+  _PosePainter({required this.skin, required this.label});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -1365,11 +1543,26 @@ class _PosePainter extends CustomPainter {
     final s = size.width / 20;
     canvas.translate(size.width / 2, size.height / 2 + 2 * s);
 
-    _drawMiniHood(canvas, s, const Color(0xFF667280));
-    _drawMiniFace(canvas, s, eyeColor: const Color(0xFF7DB8FF));
+    _drawMiniHood(canvas, s, skin.bodyColor);
+
+    final faceRect = Rect.fromCenter(
+      center: Offset(0, -1.4 * s),
+      width: 13.8 * s,
+      height: 8.8 * s,
+    );
+    canvas.drawOval(
+      faceRect,
+      Paint()
+        ..shader = const RadialGradient(
+          center: Alignment(0, -0.15),
+          radius: 0.95,
+          colors: [Color(0xFF1B2633), Color(0xFF05070B), Color(0xFF020306)],
+          stops: [0.0, 0.5, 1.0],
+        ).createShader(faceRect),
+    );
 
     // Small robe
-    final robePaint = Paint()..color = const Color(0xFF667280)..style = PaintingStyle.fill;
+    final robePaint = Paint()..color = skin.bodyColor..style = PaintingStyle.fill;
     final robeOutline = Paint()
       ..color = Colors.black87
       ..style = PaintingStyle.stroke
@@ -1384,55 +1577,64 @@ class _PosePainter extends CustomPainter {
     canvas.drawPath(robePath, robePaint);
     canvas.drawPath(robePath, robeOutline);
 
-    if (label == 'Wave') {
-      // Arm raised
-      canvas.drawPath(
-        Path()..moveTo(4 * s, 2 * s)..quadraticBezierTo(7 * s, 0, 8 * s, -3 * s),
-        Paint()..color = const Color(0xFF667280)..style = PaintingStyle.stroke..strokeWidth = 2.5 * s..strokeCap = StrokeCap.round,
+    final eyeSpacing = 3.3 * s;
+    final eyeY = -1.4 * s;
+
+    if (label == 'Working') {
+      _drawFocusedEyes(canvas, s, eyeY, eyeSpacing);
+    } else {
+      _drawReferenceEyes(
+        canvas,
+        s,
+        SupTechExpression.neutral,
+        eyeY,
+        eyeSpacing,
+        skin.accentColor,
       );
-      canvas.drawCircle(Offset(8 * s, -3.5 * s), 1.2 * s, Paint()..color = const Color(0xFF667280));
-      canvas.drawCircle(Offset(8 * s, -3.5 * s), 1.2 * s, robeOutline);
-      // Wave lines
-      final wavePaint = Paint()..color = const Color(0xFF6366F1).withValues(alpha: 0.6)..style = PaintingStyle.stroke..strokeWidth = 0.8 * s..strokeCap = StrokeCap.round;
+    }
+
+    if (label == 'Wave') {
+      canvas.drawPath(
+        Path()
+          ..moveTo(-4 * s, 2 * s)
+          ..quadraticBezierTo(-7 * s, 0, -8 * s, -3 * s),
+        Paint()
+          ..color = skin.bodyColor
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 2.5 * s
+          ..strokeCap = StrokeCap.round,
+      );
+      canvas.drawCircle(Offset(-8 * s, -3.5 * s), 1.2 * s, Paint()..color = skin.bodyColor);
+      canvas.drawCircle(Offset(-8 * s, -3.5 * s), 1.2 * s, robeOutline);
+      final wavePaint = Paint()
+        ..color = skin.accentColor.withValues(alpha: 0.6)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 0.8 * s
+        ..strokeCap = StrokeCap.round;
       for (final i in [0, 1, 2]) {
         final radius = (3 + i * 1.5) * s;
         canvas.drawArc(
-          Rect.fromCenter(center: Offset(8 * s, -3.5 * s), width: radius * 2, height: radius * 2),
-          -pi * 0.8, pi * 0.6, false, wavePaint,
+          Rect.fromCenter(
+            center: Offset(-8 * s, -3.5 * s),
+            width: radius * 2,
+            height: radius * 2,
+          ),
+          -pi * 0.2,
+          pi * 0.6,
+          false,
+          wavePaint,
         );
       }
     } else if (label == 'Thinking') {
-      final bubblePaint = Paint()..color = const Color(0xFF9CA3AF);
-      canvas.drawCircle(Offset(5 * s, -5 * s), 0.6 * s, bubblePaint);
-      canvas.drawCircle(Offset(6.5 * s, -6.5 * s), 0.9 * s, bubblePaint);
-      canvas.drawCircle(Offset(8 * s, -8 * s), 1.2 * s, bubblePaint);
+      _drawClaspedHands(canvas, s, skin.bodyColor, robeOutline, y: 1.5 * s);
     } else if (label == 'Working') {
-      final laptopPaint = Paint()..color = const Color(0xFF6366F1);
-      canvas.drawRRect(
-        RRect.fromRectAndRadius(Rect.fromCenter(center: Offset(0, -1 * s), width: 7 * s, height: 5 * s), Radius.circular(0.5 * s)),
-        laptopPaint,
-      );
-      canvas.drawRRect(
-        RRect.fromRectAndRadius(Rect.fromCenter(center: Offset(0, -1 * s), width: 7 * s, height: 5 * s), Radius.circular(0.5 * s)),
-        robeOutline,
-      );
-      canvas.drawRRect(
-        RRect.fromRectAndRadius(Rect.fromCenter(center: Offset(0, -1 * s), width: 5.5 * s, height: 3.5 * s), Radius.circular(0.3 * s)),
-        Paint()..color = const Color(0xFF818CF8),
-      );
-      canvas.drawRect(
-        Rect.fromCenter(center: Offset(0, 2 * s), width: 8 * s, height: 1.5 * s),
-        laptopPaint,
-      );
-      canvas.drawRect(
-        Rect.fromCenter(center: Offset(0, 2 * s), width: 8 * s, height: 1.5 * s),
-        robeOutline,
-      );
+      _drawHolographicScreen(canvas, s, skin.accentColor, robeOutline, y: -1 * s);
     }
 
     canvas.restore();
   }
 
   @override
-  bool shouldRepaint(covariant _PosePainter old) => old.label != label;
+  bool shouldRepaint(covariant _PosePainter old) =>
+      old.skin.id != skin.id || old.label != label;
 }
