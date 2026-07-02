@@ -168,20 +168,25 @@ class _SkinPainter extends CustomPainter {
         _drawHead(canvas, skin, s, headCY, headR, hoodBaseY, hoodTopR, hoodBottomR, hoodPeakY);
         break;
     }
-    _drawFace(canvas, skin, s, faceCY, faceW, faceH);
+    if (!skin.hideFace) {
+      _drawFace(canvas, skin, s, faceCY, faceW, faceH);
 
-    final resolvedState = AvatarState(
-      expression: resolvedExpression,
-      blinking: isBlinking,
-      lookDirection: state.lookDirection,
-    );
-    _drawEyesWithOverride(canvas, skin, s, eyeY, eyeSpacing, eyeR, faceCY,
-        resolvedState, resolvedPose);
-    _drawMouth(canvas, skin, s, faceCY, resolvedExpression);
+      final resolvedState = AvatarState(
+        expression: resolvedExpression,
+        blinking: isBlinking,
+        lookDirection: state.lookDirection,
+      );
+      _drawEyesWithOverride(canvas, skin, s, eyeY, eyeSpacing, eyeR, faceCY,
+          resolvedState, resolvedPose);
+      _drawMouth(canvas, skin, s, faceCY, resolvedExpression);
+      if (skin.variant == SkinVariant.ninja) {
+        drawNinjaFaceScarf(canvas, skin, s, faceCY, faceW, faceH);
+      }
+    }
     _drawHeadAccessoryValue(canvas, skin, s, headCY, headR, hoodPeakY,
         resolvedHeadAccessory);
     _drawEarAccessoryValue(canvas, skin, s, headCY, headR,
-        resolvedEarAccessory);
+        resolvedEarAccessory, hoodPeakY: hoodPeakY);
     _drawChestAccessoryValue(canvas, skin, s, bodyTopY, bodyBotY,
         resolvedChestAccessory);
     _drawUniqueDetail(canvas, skin, s);
@@ -899,8 +904,10 @@ class _SkinPainter extends CustomPainter {
 
   void _drawEarAccessoryValue(Canvas canvas, SkinDefinition skin, double s,
       double headCY, double headR,
-      SupTechEarAccessory accessory) {
-    drawSupTechEarAccessory(canvas, skin, s, headCY, headR, accessory);
+      SupTechEarAccessory accessory, {
+      double? hoodPeakY,
+  }) {
+    drawSupTechEarAccessory(canvas, skin, s, headCY, headR, accessory, hoodPeakY: hoodPeakY);
   }
 
   // ─────────────────────────────────────────────
@@ -1008,6 +1015,9 @@ class _SkinPainter extends CustomPainter {
   void _drawShadowDetail(Canvas canvas, SkinDefinition skin, double s) {
     final shadowPaint = Paint()..color = skin.accentColor.withValues(alpha: 0.15);
     canvas.drawOval(Rect.fromCenter(center: Offset(2 * s, -4 * s), width: 12 * s, height: 16 * s), shadowPaint);
+    final trailPaint = Paint()..color = skin.accentColor.withValues(alpha: 0.08)..style = PaintingStyle.stroke..strokeWidth = 0.5 * s..strokeCap = StrokeCap.round;
+    canvas.drawLine(Offset(-6 * s, 8 * s), Offset(-8 * s, 12 * s), trailPaint);
+    canvas.drawLine(Offset(6 * s, 8 * s), Offset(8 * s, 12 * s), trailPaint);
   }
 
   void _drawNeonDetail(Canvas canvas, SkinDefinition skin, double s) {
@@ -1032,15 +1042,26 @@ class _SkinPainter extends CustomPainter {
   }
 
   void _drawTitanDetail(Canvas canvas, SkinDefinition skin, double s) {
-    final boltPaint = Paint()..color = skin.accentColor..style = PaintingStyle.stroke..strokeWidth = 0.6 * s..strokeCap = StrokeCap.round;
-    canvas.drawLine(Offset(-2 * s, -15 * s), Offset(0, -13 * s), boltPaint);
-    canvas.drawLine(Offset(0, -13 * s), Offset(2 * s, -15 * s), boltPaint);
+    final armorPaint = Paint()..color = skin.accentColor.withValues(alpha: 0.3)..style = PaintingStyle.stroke..strokeWidth = 0.6 * s..strokeCap = StrokeCap.round;
+    canvas.drawLine(Offset(-7 * s, -2 * s), Offset(-5 * s, 0), armorPaint);
+    canvas.drawLine(Offset(7 * s, -2 * s), Offset(5 * s, 0), armorPaint);
+    canvas.drawLine(Offset(-6 * s, 0), Offset(-4 * s, 2 * s), armorPaint);
+    canvas.drawLine(Offset(6 * s, 0), Offset(4 * s, 2 * s), armorPaint);
+    final platePaint = Paint()..color = skin.accentColor.withValues(alpha: 0.12)..style = PaintingStyle.fill;
+    canvas.drawRRect(RRect.fromRectAndRadius(Rect.fromCenter(center: Offset(0, 4 * s), width: 6 * s, height: 4 * s), Radius.circular(1 * s)), platePaint);
   }
 
   void _drawVoidDetail(Canvas canvas, SkinDefinition skin, double s) {
-    final portalPaint = Paint()..color = skin.accentColor.withValues(alpha: 0.3)..style = PaintingStyle.stroke..strokeWidth = 0.5 * s;
-    canvas.drawCircle(Offset(0, 4 * s), 3 * s, portalPaint);
-    canvas.drawCircle(Offset(0, 4 * s), 1.5 * s, Paint()..color = skin.accentColor.withValues(alpha: 0.15));
+    final cosmicPaint = Paint()
+      ..shader = RadialGradient(colors: [
+        skin.accentColor.withValues(alpha: 0.5),
+        skin.accentColor.withValues(alpha: 0.0),
+      ]).createShader(Rect.fromCircle(center: Offset(0, 4 * s), radius: 6 * s));
+    canvas.drawCircle(Offset(0, 4 * s), 5 * s, cosmicPaint);
+    final starPaint = Paint()..color = Colors.white.withValues(alpha: 0.3);
+    for (final pos in [Offset(-2 * s, 2 * s), Offset(3 * s, 5 * s), Offset(-1 * s, 7 * s), Offset(2 * s, 3 * s)]) {
+      canvas.drawCircle(pos, 0.4 * s, starPaint);
+    }
   }
 
   void _drawGlitchDetail(Canvas canvas, SkinDefinition skin, double s) {
@@ -1048,6 +1069,9 @@ class _SkinPainter extends CustomPainter {
     canvas.drawLine(Offset(-6 * s, -2 * s), Offset(6 * s, -2 * s), glitchPaint);
     canvas.drawLine(Offset(-4 * s, 3 * s), Offset(4 * s, 3 * s), glitchPaint);
     canvas.drawLine(Offset(-2 * s, 8 * s), Offset(2 * s, 8 * s), glitchPaint);
+    final offsetGlitch = Paint()..color = skin.bodyColor.withValues(alpha: 0.25)..style = PaintingStyle.stroke..strokeWidth = 0.4 * s;
+    canvas.drawLine(Offset(-5 * s, -1 * s), Offset(5 * s, -1 * s), offsetGlitch);
+    canvas.drawLine(Offset(-3 * s, 5 * s), Offset(3 * s, 5 * s), offsetGlitch);
   }
 
   void _drawFrostDetail(Canvas canvas, SkinDefinition skin, double s) {
@@ -1060,7 +1084,14 @@ class _SkinPainter extends CustomPainter {
 
   void _drawChronoDetail(Canvas canvas, SkinDefinition skin, double s) {
     final clockPaint = Paint()..color = skin.accentColor..style = PaintingStyle.stroke..strokeWidth = 0.5 * s;
-    canvas.drawCircle(Offset(0, 4 * s), 3 * s, clockPaint);
+    canvas.drawCircle(Offset(0, 4 * s), 3.5 * s, clockPaint);
+    canvas.drawCircle(Offset(0, 4 * s), 0.8 * s, clockPaint);
+    for (var i = 0; i < 12; i++) {
+      final angle = i * pi / 6;
+      final outer = Offset(3.5 * s * cos(angle), 4 * s + 3.5 * s * sin(angle));
+      final inner = Offset(2.8 * s * cos(angle), 4 * s + 2.8 * s * sin(angle));
+      canvas.drawLine(outer, inner, clockPaint);
+    }
     canvas.drawLine(Offset(0, 4 * s), Offset(0, 2 * s), clockPaint);
     canvas.drawLine(Offset(0, 4 * s), Offset(2 * s, 4 * s), clockPaint);
   }
@@ -1079,6 +1110,10 @@ class _SkinPainter extends CustomPainter {
 
   void _drawSparkDetail(Canvas canvas, SkinDefinition skin, double s) {
     final sparkPaint = Paint()..color = skin.accentColor..style = PaintingStyle.stroke..strokeWidth = 0.5 * s..strokeCap = StrokeCap.round;
+    canvas.drawPath(
+      Path()..moveTo(-2 * s, -16 * s)..lineTo(0, -12 * s)..lineTo(-1 * s, -10 * s)..lineTo(1 * s, -7 * s),
+      sparkPaint,
+    );
     for (final dx in [-5, 5]) {
       canvas.drawLine(Offset(dx * s, -2 * s), Offset((dx - 1) * s, 1 * s), sparkPaint);
       canvas.drawLine(Offset((dx - 1) * s, 1 * s), Offset((dx + 1) * s, 3 * s), sparkPaint);

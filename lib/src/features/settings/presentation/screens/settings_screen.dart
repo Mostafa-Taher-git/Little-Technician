@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
@@ -90,39 +89,6 @@ class SettingsScreen extends StatelessWidget {
             onTap: () => _showAboutDialog(context),
             scheme: scheme,
           ),
-          const Gap(8),
-          if (kDebugMode)
-            _SettingsTile(
-              icon: Icons.lock_open,
-              label: 'Unlock Everything',
-              subtitle: 'Max points, all skins, frames, rewards',
-              onTap: () async {
-                final confirm = await showDialog<bool>(
-                  context: context,
-                  builder: (_) => AlertDialog(
-                    title: const Text('Unlock Everything'),
-                    content: const Text('This will give you 99999 points, all skins, frames, and rewards. Continue?'),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                    actions: [
-                      TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
-                      TextButton(
-                        onPressed: () => Navigator.pop(context, true),
-                        child: const Text('Unlock', style: TextStyle(color: Colors.amber)),
-                      ),
-                    ],
-                  ),
-                );
-                if (confirm == true && context.mounted) {
-                  await context.read<GameCubit>().unlockEverything();
-                  if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Everything unlocked!')),
-                    );
-                  }
-                }
-              },
-              scheme: scheme,
-            ),
           const Gap(24),
 
           // Section: Danger zone

@@ -34,9 +34,16 @@ class _LittleTechAppState extends State<LittleTechApp> {
 
   Future<void> _loadUserId() async {
     final userId = await AuthService.getFreshUserId();
-    if (mounted) {
-      setState(() => _userId = userId);
+    if (!mounted) return;
+    if (userId != null) {
+      final user = await AuthService.getCurrentUser();
+      if (user == null) {
+        await AuthService.logout();
+        if (mounted) setState(() => _userId = null);
+        return;
+      }
     }
+    if (mounted) setState(() => _userId = userId);
   }
 
   void _onAuthChanged() {

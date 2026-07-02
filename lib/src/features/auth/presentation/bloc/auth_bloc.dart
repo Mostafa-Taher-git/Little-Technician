@@ -28,7 +28,16 @@ class AuthError extends AuthState {
 }
 
 class AuthCubit extends Cubit<AuthState> {
-  AuthCubit() : super(AuthInitial());
+  AuthCubit() : super(AuthInitial()) {
+    _restoreSession();
+  }
+
+  Future<void> _restoreSession() async {
+    final user = await AuthService.getCurrentUser();
+    if (user != null && !isClosed) {
+      emit(LoginSuccess(user));
+    }
+  }
 
   UserModel? get currentUser {
     final s = state;

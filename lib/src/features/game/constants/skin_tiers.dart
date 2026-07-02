@@ -11,7 +11,7 @@ enum SkinVariant { default_, ninja, wizard, tech, armored, phoenix, void_ }
 
 enum SupTechHeadAccessory { none, antenna, crown, wizardHat, ninjaHeadband, visor, horns, crest }
 
-enum SupTechEarAccessory { none, headset, scarf, earGlow }
+enum SupTechEarAccessory { none, headset, earGlow }
 
 enum SupTechChestAccessory { none, badge, cape, codeScroll, gear, flameEmblem, staff }
 
@@ -44,6 +44,7 @@ class SkinDefinition {
   final SupTechEarAccessory earAccessory;
   final SupTechChestAccessory chestAccessory;
   final bool showLogo;
+  final bool hideFace;
 
   const SkinDefinition({
     required this.id,
@@ -60,6 +61,7 @@ class SkinDefinition {
     this.earAccessory = SupTechEarAccessory.none,
     this.chestAccessory = SupTechChestAccessory.none,
     this.showLogo = true,
+    this.hideFace = false,
   });
 
   Color get color {
@@ -131,7 +133,6 @@ class SkinTierManager {
       previewIcon: Icons.auto_awesome,
       bodyColor: Color(0xFF667280),
       accentColor: Color(0xFF7DB8FF),
-      chestAccessory: SupTechChestAccessory.badge,
     ),
     SkinDefinition(
       id: 'rookie',
@@ -155,7 +156,6 @@ class SkinTierManager {
       bodyColor: Color(0xFF7C3AED),
       accentColor: Color(0xFFA78BFA),
       headAccessory: SupTechHeadAccessory.ninjaHeadband,
-      earAccessory: SupTechEarAccessory.scarf,
     ),
     SkinDefinition(
       id: 'wizard',
@@ -192,7 +192,7 @@ class SkinTierManager {
       levelsRequired: 0,
       previewIcon: Icons.terminal,
       isRewardSkin: true,
-      bodyColor: Color(0xFF059669),
+      bodyColor: Color(0xFF111827),
       accentColor: Color(0xFF34D399),
       headAccessory: SupTechHeadAccessory.visor,
       earAccessory: SupTechEarAccessory.headset,
@@ -251,7 +251,6 @@ class SkinTierManager {
       isRewardSkin: true,
       bodyColor: Color(0xFF581C87),
       accentColor: Color(0xFF7C3AED),
-      earAccessory: SupTechEarAccessory.scarf,
       showLogo: false,
     ),
     SkinDefinition(
@@ -307,7 +306,6 @@ class SkinTierManager {
       bodyColor: Color(0xFF4C1D95),
       accentColor: Color(0xFF7C3AED),
       headAccessory: SupTechHeadAccessory.horns,
-      earAccessory: SupTechEarAccessory.scarf,
       showLogo: false,
     ),
     SkinDefinition(
@@ -362,6 +360,7 @@ class SkinTierManager {
       accentColor: Color(0xFFF1F5F9),
       chestAccessory: SupTechChestAccessory.cape,
       showLogo: false,
+      hideFace: true,
     ),
     SkinDefinition(
       id: 'viper',
@@ -375,7 +374,7 @@ class SkinTierManager {
       bodyColor: Color(0xFF15803D),
       accentColor: Color(0xFF86EFAC),
       headAccessory: SupTechHeadAccessory.ninjaHeadband,
-      earAccessory: SupTechEarAccessory.scarf,
+      chestAccessory: SupTechChestAccessory.badge,
     ),
     SkinDefinition(
       id: 'spark',

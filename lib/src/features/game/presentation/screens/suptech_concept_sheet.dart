@@ -430,41 +430,46 @@ class _InteractiveConceptPainter extends CustomPainter {
     );
 
     // Face
-    final faceRect = Rect.fromCenter(
-      center: Offset(0, -8.8 * s),
-      width: 23.5 * s, height: 14.5 * s,
-    );
-    canvas.drawOval(
-      faceRect.inflate(1.4 * s),
-      Paint()
-        ..shader = RadialGradient(colors: [
-          skin.accentColor.withValues(alpha: 0.12),
-          skin.accentColor.withValues(alpha: 0.0),
-        ]).createShader(faceRect.inflate(5 * s)),
-    );
-    canvas.drawOval(
-      faceRect,
-      Paint()
-        ..shader = const RadialGradient(
-          center: Alignment(0.05, -0.1),
-          radius: 0.95,
-          colors: [Color(0xFF1B2633), Color(0xFF05070B), Color(0xFF020306)],
-          stops: [0.0, 0.52, 1.0],
-        ).createShader(faceRect),
-    );
-
-    // Eyes
-    final eyeY = -8.5 * s;
-    final eyeSpacing = 5.2 * s;
-    final eyeR = 3.1 * s;
     final headCY = -8.8 * s;
     final headR = 11.75 * s;
     final hoodPeakY = -28 * s;
     final bodyTopY = -1 * s;
     final bodyBotY = 13 * s;
-    drawSupTechEyes(canvas, skin, s, eyeY, eyeSpacing, eyeR, expression);
+    if (!skin.hideFace) {
+      final faceRect = Rect.fromCenter(
+        center: Offset(0, headCY),
+        width: 23.5 * s, height: 14.5 * s,
+      );
+      canvas.drawOval(
+        faceRect.inflate(1.4 * s),
+        Paint()
+          ..shader = RadialGradient(colors: [
+            skin.accentColor.withValues(alpha: 0.12),
+            skin.accentColor.withValues(alpha: 0.0),
+          ]).createShader(faceRect.inflate(5 * s)),
+      );
+      canvas.drawOval(
+        faceRect,
+        Paint()
+          ..shader = const RadialGradient(
+            center: Alignment(0.05, -0.1),
+            radius: 0.95,
+            colors: [Color(0xFF1B2633), Color(0xFF05070B), Color(0xFF020306)],
+            stops: [0.0, 0.52, 1.0],
+          ).createShader(faceRect),
+      );
+
+      // Eyes
+      final eyeY = -8.5 * s;
+      final eyeSpacing = 5.2 * s;
+      final eyeR = 3.1 * s;
+      drawSupTechEyes(canvas, skin, s, eyeY, eyeSpacing, eyeR, expression);
+      if (skin.variant == SkinVariant.ninja) {
+        drawNinjaFaceScarf(canvas, skin, s, headCY, 23.5 * s, 14.5 * s);
+      }
+    }
     drawSupTechHeadAccessory(canvas, skin, s, headCY, headR, hoodPeakY, skin.headAccessory);
-    drawSupTechEarAccessory(canvas, skin, s, headCY, headR, skin.earAccessory);
+    drawSupTechEarAccessory(canvas, skin, s, headCY, headR, skin.earAccessory, hoodPeakY: hoodPeakY);
     drawSupTechChestAccessory(canvas, skin, s, bodyTopY, bodyBotY, skin.chestAccessory);
 
     canvas.restore();
