@@ -75,6 +75,20 @@ class SettingsScreen extends StatelessWidget {
           // Section: Account
           Text('Account', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: scheme.onSurface.withValues(alpha: 0.6), letterSpacing: 0.5)),
           const Gap(10),
+          Builder(
+            builder: (context) {
+              final authState = context.watch<AuthCubit>().state;
+              final user = (authState is LoginSuccess) ? authState.user : (authState is RegisterSuccess) ? authState.user : null;
+              return _SettingsTile(
+                icon: Icons.face,
+                label: 'Change Avatar',
+                subtitle: user?.avatarIcon ?? '',
+                onTap: () => _showAvatarPicker(context),
+                scheme: scheme,
+              );
+            },
+          ),
+          const Gap(8),
           _SettingsTile(
             icon: Icons.swap_horiz,
             label: 'Switch Account',
@@ -186,6 +200,57 @@ class SettingsScreen extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  void _showAvatarPicker(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        String selected = AuthService.currentAvatars.first;
+        return StatefulBuilder(
+          builder: (ctx, setDialogState) => AlertDialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            title: const Text('Choose Your Avatar'),
+            content: Wrap(
+              spacing: 10,
+              runSpacing: 10,
+              children: AuthService.currentAvatars.map((ic) {
+                final sel = selected == ic;
+                return GestureDetector(
+                  onTap: () => setDialogState(() => selected = ic),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: sel ? scheme.primary.withValues(alpha: 0.2) : Colors.white.withValues(alpha: 0.06),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: sel ? scheme.primary : Colors.transparent, width: 1.5),
+                    ),
+                    child: Text(ic, style: const TextStyle(fontSize: 24)),
+                  ),
+                );
+              }).toList(),
+            ),
+            actions: [
+              TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+              TextButton(
+                onPressed: () async {
+                  final uid = await AuthService.getCurrentUserId();
+                  if (uid == null) return;
+                  await AuthService.updateAvatarIcon(uid, selected);
+                  if (ctx.mounted) Navigator.pop(ctx);
+                  if (context.mounted) {
+                    await context.read<AuthCubit>().refreshUser();
+                  }
+                },
+                child: Text('Save', style: TextStyle(color: scheme.primary)),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 

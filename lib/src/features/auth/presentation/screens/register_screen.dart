@@ -4,6 +4,7 @@ import 'package:gap/gap.dart';
 import 'package:littletech/src/core/constants/colors.dart';
 import 'package:littletech/src/core/navigation/nav.dart';
 import 'package:littletech/src/core/widgets/app_widgets.dart';
+import 'package:littletech/src/features/auth/data/services/auth_service.dart';
 import 'package:littletech/src/features/auth/presentation/bloc/auth_bloc.dart';
 import 'login_screen.dart';
 
@@ -20,9 +21,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _passwordCtrl = TextEditingController();
   final _confirmCtrl = TextEditingController();
   bool _obscure = true;
-  String _icon = '🔧';
-
-  final _icons = ['🔮', '🌌', '☄️', '⭐', '🌙', '🧪', '🌍', '🐋', '🌊'];
+  String _icon = AuthService.currentAvatars.first;
 
   @override
   void dispose() {
@@ -73,7 +72,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       Wrap(
                         spacing: 10,
                         runSpacing: 10,
-                        children: _icons.map((ic) {
+                        children: AuthService.currentAvatars.map((ic) {
                           final sel = _icon == ic;
                           return GestureDetector(
                             onTap: () => setState(() => _icon = ic),

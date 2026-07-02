@@ -9,6 +9,11 @@ class AuthService {
   static const _sessionKey = 'lt_session';
   static SharedPreferences? _cachedPrefs;
 
+  static const _oldIcons = ['🔧', '⚙️', '💻', '🛠️', '📱', '🔋', '🖱️', '⌨️'];
+  static const _currentIcons = ['🔮', '🌌', '☄️', '⭐', '🌙', '🧪', '🌍', '🐋', '🌊'];
+
+  static List<String> get currentAvatars => _currentIcons;
+
   static Future<SharedPreferences> get _prefs async {
     _cachedPrefs ??= await SharedPreferences.getInstance();
     return _cachedPrefs!;
@@ -73,6 +78,16 @@ class AuthService {
     for (var i = 0; i < users.length; i++) {
       if (users[i].id == 0) {
         users[i].id = i + 1;
+        migrated = true;
+      }
+    }
+    // Migrate stale avatarIcons to the current set
+    for (final u in users) {
+      if (!_currentIcons.contains(u.avatarIcon)) {
+        final oldIdx = _oldIcons.indexOf(u.avatarIcon);
+        u.avatarIcon = oldIdx >= 0 && oldIdx < _currentIcons.length
+            ? _currentIcons[oldIdx]
+            : _currentIcons[0];
         migrated = true;
       }
     }
@@ -215,6 +230,15 @@ class AuthService {
   }
 
   /// Reset all users for testing - call this to start fresh
+  static Future<bool> updateAvatarIcon(int userId, String newIcon) async {
+    final users = await _loadUsers();
+    final idx = users.indexWhere((u) => u.id == userId);
+    if (idx < 0) return false;
+    users[idx].avatarIcon = newIcon;
+    await _saveUsers(users);
+    return true;
+  }
+
   static Future<void> resetAllUsers() async {
     final prefs = await _prefs;
     await prefs.remove(_usersKey);
