@@ -204,7 +204,7 @@ class _SkinPainter extends CustomPainter {
     final outlinePaint = Paint()
       ..color = isLightBody ? const Color(0xFF94A3B8) : Colors.black87
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.5 * s
+      ..strokeWidth = 1.25 * s
       ..strokeCap = StrokeCap.round
       ..strokeJoin = StrokeJoin.round;
 
@@ -233,7 +233,7 @@ class _SkinPainter extends CustomPainter {
     final foldPaint = Paint()
       ..color = Colors.black.withValues(alpha: 0.10)
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.0 * s
+      ..strokeWidth = 0.5 * s
       ..strokeCap = StrokeCap.round;
     final midY = bodyTopY + (bodyBotY - bodyTopY) * 0.5;
     canvas.drawPath(
@@ -276,7 +276,7 @@ class _SkinPainter extends CustomPainter {
     final outlinePaint = Paint()
       ..color = isLightBody ? const Color(0xFF94A3B8) : Colors.black87
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 3.0 * s
+      ..strokeWidth = 1.5 * s
       ..strokeCap = StrokeCap.round
       ..strokeJoin = StrokeJoin.round;
 
@@ -310,7 +310,7 @@ class _SkinPainter extends CustomPainter {
     final innerShadowPaint = Paint()
       ..color = Colors.black.withValues(alpha: 0.12)
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.0 * s
+      ..strokeWidth = 1 * s
       ..strokeCap = StrokeCap.round;
     final innerPath = Path()
       ..moveTo(-hoodBottomR + 2 * s, hoodBaseY - 1 * s)
@@ -327,7 +327,7 @@ class _SkinPainter extends CustomPainter {
     final highlightPaint = Paint()
       ..color = skin.accentColor.withValues(alpha: 0.15)
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.5 * s
+      ..strokeWidth = 0.75 * s
       ..strokeCap = StrokeCap.round;
     canvas.drawPath(
       Path()
@@ -351,7 +351,7 @@ class _SkinPainter extends CustomPainter {
     final isLightBody = ThemeData.estimateBrightnessForColor(skin.bodyColor) == Brightness.light;
     final outlinePaint = Paint()
       ..color = isLightBody ? const Color(0xFF94A3B8) : Colors.black87
-      ..style = PaintingStyle.stroke..strokeWidth = 2.5 * s..strokeCap = StrokeCap.round..strokeJoin = StrokeJoin.round;
+      ..style = PaintingStyle.stroke..strokeWidth = 1.25 * s..strokeCap = StrokeCap.round..strokeJoin = StrokeJoin.round;
 
     // Shadow
     canvas.drawOval(Rect.fromCenter(center: Offset(0, 14 * s), width: 18 * s, height: 2 * s),
@@ -381,7 +381,7 @@ class _SkinPainter extends CustomPainter {
     canvas.drawPath(hoodPath, outlinePaint);
 
     // Fold lines
-    final foldPaint = Paint()..color = Colors.black.withValues(alpha: 0.10)..style = PaintingStyle.stroke..strokeWidth = 1.0 * s..strokeCap = StrokeCap.round;
+    final foldPaint = Paint()..color = Colors.black.withValues(alpha: 0.10)..style = PaintingStyle.stroke..strokeWidth = 0.5 * s..strokeCap = StrokeCap.round;
     canvas.drawPath(Path()..moveTo(-2 * s, 0)..quadraticBezierTo(-3 * s, 6 * s, -5 * s, 12 * s), foldPaint);
     canvas.drawPath(Path()..moveTo(2 * s, 0)..quadraticBezierTo(3 * s, 6 * s, 5 * s, 12 * s), foldPaint);
 
@@ -402,7 +402,7 @@ class _SkinPainter extends CustomPainter {
     final isLightBody = ThemeData.estimateBrightnessForColor(skin.bodyColor) == Brightness.light;
     final outlinePaint = Paint()
       ..color = isLightBody ? const Color(0xFF94A3B8) : Colors.black87
-      ..style = PaintingStyle.stroke..strokeWidth = 2.5 * s..strokeCap = StrokeCap.round..strokeJoin = StrokeJoin.round;
+      ..style = PaintingStyle.stroke..strokeWidth = 1.25 * s..strokeCap = StrokeCap.round..strokeJoin = StrokeJoin.round;
 
     // Shadow
     canvas.drawOval(Rect.fromCenter(center: Offset(0, 15 * s), width: 26 * s, height: 2.5 * s),
@@ -438,7 +438,7 @@ class _SkinPainter extends CustomPainter {
     canvas.drawPath(hoodPath, outlinePaint);
 
     // Fold lines
-    final foldPaint = Paint()..color = Colors.black.withValues(alpha: 0.10)..style = PaintingStyle.stroke..strokeWidth = 1.0 * s..strokeCap = StrokeCap.round;
+    final foldPaint = Paint()..color = Colors.black.withValues(alpha: 0.10)..style = PaintingStyle.stroke..strokeWidth = 0.5 * s..strokeCap = StrokeCap.round;
     canvas.drawPath(Path()..moveTo(-3 * s, 0)..quadraticBezierTo(-5 * s, 6 * s, -7 * s, 13 * s), foldPaint);
     canvas.drawPath(Path()..moveTo(3 * s, 0)..quadraticBezierTo(5 * s, 6 * s, 7 * s, 13 * s), foldPaint);
 
@@ -477,7 +477,7 @@ class _SkinPainter extends CustomPainter {
     final isLightBody = ThemeData.estimateBrightnessForColor(skin.bodyColor) == Brightness.light;
     final outlinePaint = Paint()
       ..color = isLightBody ? const Color(0xFF94A3B8) : Colors.black87
-      ..style = PaintingStyle.stroke..strokeWidth = 2.5 * s..strokeCap = StrokeCap.round..strokeJoin = StrokeJoin.round;
+      ..style = PaintingStyle.stroke..strokeWidth = 1.25 * s..strokeCap = StrokeCap.round..strokeJoin = StrokeJoin.round;
 
     // Shadow
     canvas.drawOval(Rect.fromCenter(center: Offset(0, 14 * s), width: 22 * s, height: 2.5 * s),
@@ -496,7 +496,7 @@ class _SkinPainter extends CustomPainter {
     canvas.drawPath(robePath, outlinePaint);
 
     // Circuit lines on robe
-    final circuitPaint = Paint()..color = skin.accentColor.withValues(alpha: 0.25)..style = PaintingStyle.stroke..strokeWidth = 0.8 * s..strokeCap = StrokeCap.round;
+    final circuitPaint = Paint()..color = skin.accentColor.withValues(alpha: 0.25)..style = PaintingStyle.stroke..strokeWidth = 0.4 * s..strokeCap = StrokeCap.round;
     canvas.drawLine(Offset(-3 * s, 2 * s), Offset(-3 * s, 8 * s), circuitPaint);
     canvas.drawLine(Offset(-3 * s, 8 * s), Offset(0, 10 * s), circuitPaint);
     canvas.drawLine(Offset(3 * s, 3 * s), Offset(3 * s, 7 * s), circuitPaint);
@@ -523,7 +523,7 @@ class _SkinPainter extends CustomPainter {
         ..moveTo(-10 * s, -2 * s)
         ..quadraticBezierTo(-5 * s, 2 * s, 0, 1 * s)
         ..quadraticBezierTo(5 * s, 2 * s, 10 * s, -2 * s),
-      Paint()..color = skin.accentColor.withValues(alpha: 0.3)..style = PaintingStyle.stroke..strokeWidth = 1.5 * s..strokeCap = StrokeCap.round,
+      Paint()..color = skin.accentColor.withValues(alpha: 0.3)..style = PaintingStyle.stroke..strokeWidth = 0.75 * s..strokeCap = StrokeCap.round,
     );
 
     // Bottom glow
@@ -543,9 +543,9 @@ class _SkinPainter extends CustomPainter {
     final isLightBody = ThemeData.estimateBrightnessForColor(skin.bodyColor) == Brightness.light;
     final outlinePaint = Paint()
       ..color = isLightBody ? const Color(0xFF94A3B8) : Colors.black87
-      ..style = PaintingStyle.stroke..strokeWidth = 2.5 * s..strokeCap = StrokeCap.round..strokeJoin = StrokeJoin.round;
+      ..style = PaintingStyle.stroke..strokeWidth = 1.25 * s..strokeCap = StrokeCap.round..strokeJoin = StrokeJoin.round;
     final platePaint = Paint()..color = skin.accentColor.withValues(alpha: 0.3)..style = PaintingStyle.fill;
-    final plateOutline = Paint()..color = Colors.black87..style = PaintingStyle.stroke..strokeWidth = 0.8 * s;
+    final plateOutline = Paint()..color = Colors.black87..style = PaintingStyle.stroke..strokeWidth = 0.4 * s;
 
     // Shadow
     canvas.drawOval(Rect.fromCenter(center: Offset(0, 15 * s), width: 26 * s, height: 3 * s),
@@ -602,7 +602,7 @@ class _SkinPainter extends CustomPainter {
 
     // Helmet ridge
     canvas.drawLine(Offset(0, -29 * s), Offset(0, -10 * s),
-      Paint()..color = skin.accentColor..style = PaintingStyle.stroke..strokeWidth = 2 * s..strokeCap = StrokeCap.round);
+      Paint()..color = skin.accentColor..style = PaintingStyle.stroke..strokeWidth = 1 * s..strokeCap = StrokeCap.round);
 
     // Bottom glow
     canvas.drawOval(Rect.fromCenter(center: Offset(0, 14.5 * s), width: 22 * s, height: 4 * s),
@@ -621,7 +621,7 @@ class _SkinPainter extends CustomPainter {
     final isLightBody = ThemeData.estimateBrightnessForColor(skin.bodyColor) == Brightness.light;
     final outlinePaint = Paint()
       ..color = isLightBody ? const Color(0xFF94A3B8) : Colors.black87
-      ..style = PaintingStyle.stroke..strokeWidth = 2.5 * s..strokeCap = StrokeCap.round..strokeJoin = StrokeJoin.round;
+      ..style = PaintingStyle.stroke..strokeWidth = 1.25 * s..strokeCap = StrokeCap.round..strokeJoin = StrokeJoin.round;
 
     // Shadow
     canvas.drawOval(Rect.fromCenter(center: Offset(0, 14 * s), width: 24 * s, height: 2.5 * s),
@@ -636,7 +636,7 @@ class _SkinPainter extends CustomPainter {
       ..quadraticBezierTo(-16 * s, 10 * s, -10 * s, 12 * s)
       ..close();
     canvas.drawPath(leftWing, wingPaint);
-    canvas.drawPath(leftWing, Paint()..color = skin.accentColor..style = PaintingStyle.stroke..strokeWidth = 0.8 * s);
+    canvas.drawPath(leftWing, Paint()..color = skin.accentColor..style = PaintingStyle.stroke..strokeWidth = 0.4 * s);
     // Right wing
     final rightWing = Path()
       ..moveTo(7 * s, 0)
@@ -644,7 +644,7 @@ class _SkinPainter extends CustomPainter {
       ..quadraticBezierTo(16 * s, 10 * s, 10 * s, 12 * s)
       ..close();
     canvas.drawPath(rightWing, wingPaint);
-    canvas.drawPath(rightWing, Paint()..color = skin.accentColor..style = PaintingStyle.stroke..strokeWidth = 0.8 * s);
+    canvas.drawPath(rightWing, Paint()..color = skin.accentColor..style = PaintingStyle.stroke..strokeWidth = 0.4 * s);
 
     // Flame-like robe bottom
     final robePath = Path()
@@ -688,7 +688,7 @@ class _SkinPainter extends CustomPainter {
     final isLightBody = ThemeData.estimateBrightnessForColor(skin.bodyColor) == Brightness.light;
     final outlinePaint = Paint()
       ..color = isLightBody ? const Color(0xFF94A3B8) : Colors.black87
-      ..style = PaintingStyle.stroke..strokeWidth = 2.5 * s..strokeCap = StrokeCap.round..strokeJoin = StrokeJoin.round;
+      ..style = PaintingStyle.stroke..strokeWidth = 1.25 * s..strokeCap = StrokeCap.round..strokeJoin = StrokeJoin.round;
 
     // Shadow
     canvas.drawOval(Rect.fromCenter(center: Offset(0, 14 * s), width: 22 * s, height: 2.5 * s),
@@ -840,7 +840,7 @@ class _SkinPainter extends CustomPainter {
     final linePaint = Paint()
       ..color = skin.accentColor
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.0 * s
+      ..strokeWidth = 1 * s
       ..strokeCap = StrokeCap.round;
     for (final dx in [-eyeSpacing, eyeSpacing]) {
       canvas.drawLine(
@@ -862,7 +862,7 @@ class _SkinPainter extends CustomPainter {
         Paint()
           ..color = skin.accentColor.withValues(alpha: 0.5)
           ..style = PaintingStyle.stroke
-          ..strokeWidth = 6.0 * s
+          ..strokeWidth = 3 * s
           ..strokeCap = StrokeCap.round
           ..maskFilter = MaskFilter.blur(BlurStyle.normal, 1.5 * s),
       );
@@ -872,7 +872,7 @@ class _SkinPainter extends CustomPainter {
         Paint()
           ..color = Colors.white
           ..style = PaintingStyle.stroke
-          ..strokeWidth = 2.5 * s
+          ..strokeWidth = 1.25 * s
           ..strokeCap = StrokeCap.round,
       );
     }
@@ -975,7 +975,7 @@ class _SkinPainter extends CustomPainter {
       Paint()
         ..color = skin.accentColor.withValues(alpha: 0.5)
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 5 * s
+        ..strokeWidth = 2.5 * s
         ..strokeCap = StrokeCap.round
         ..maskFilter = MaskFilter.blur(BlurStyle.normal, 1.5 * s),
     );
@@ -985,7 +985,7 @@ class _SkinPainter extends CustomPainter {
       Paint()
         ..color = Colors.white
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 2.5 * s
+        ..strokeWidth = 1.25 * s
         ..strokeCap = StrokeCap.round,
     );
 
@@ -998,7 +998,7 @@ class _SkinPainter extends CustomPainter {
     final linePaint = Paint()
       ..color = skin.accentColor
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.0 * s
+      ..strokeWidth = 1 * s
       ..strokeCap = StrokeCap.round;
     for (final dx in [-eyeSpacing, eyeSpacing]) {
       canvas.drawLine(
@@ -1011,7 +1011,7 @@ class _SkinPainter extends CustomPainter {
     final zPaint = Paint()
       ..color = skin.accentColor.withValues(alpha: 0.5)
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.2 * s
+      ..strokeWidth = 0.6 * s
       ..strokeCap = StrokeCap.round;
     _drawZ(canvas, 6 * s, eyeY - 3 * s, 2.0 * s, zPaint);
     _drawZ(canvas, 8 * s, eyeY - 6 * s, 1.4 * s, zPaint);
@@ -1033,7 +1033,7 @@ class _SkinPainter extends CustomPainter {
     final xPaint = Paint()
       ..color = skin.accentColor
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.0 * s
+      ..strokeWidth = 1 * s
       ..strokeCap = StrokeCap.round;
     for (final dx in [-eyeSpacing, eyeSpacing]) {
       canvas.drawLine(
@@ -1107,7 +1107,7 @@ class _SkinPainter extends CustomPainter {
     final mouthY = faceCY + 8 * s;
     final mouthPaint = Paint()
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.2 * s
+      ..strokeWidth = 0.6 * s
       ..strokeCap = StrokeCap.round;
 
     switch (effectiveExpression) {
@@ -1188,7 +1188,7 @@ class _SkinPainter extends CustomPainter {
     canvas.drawLine(
       Offset(0, peakY),
       Offset(0, peakY - 7 * s),
-      Paint()..color = Colors.black87..strokeWidth = 2.0 * s..strokeCap = StrokeCap.round,
+      Paint()..color = Colors.black87..strokeWidth = 1 * s..strokeCap = StrokeCap.round,
     );
     final tipCenter = Offset(0, peakY - 7 * s);
     canvas.drawCircle(tipCenter, 2.5 * s,
@@ -1211,7 +1211,7 @@ class _SkinPainter extends CustomPainter {
       ..lineTo(5 * s, peakY - 6 * s)
       ..lineTo(6 * s, peakY);
     canvas.drawPath(path, crownPaint..style = PaintingStyle.fill);
-    canvas.drawPath(path, Paint()..color = Colors.black87..style = PaintingStyle.stroke..strokeWidth = 1 * s);
+    canvas.drawPath(path, Paint()..color = Colors.black87..style = PaintingStyle.stroke..strokeWidth = 0.5 * s);
     canvas.drawCircle(Offset(0, peakY - 8 * s), 1.2 * s, jewelPaint);
   }
 
@@ -1224,7 +1224,7 @@ class _SkinPainter extends CustomPainter {
       ..lineTo(6 * s, peakY)
       ..lineTo(0, peakY - 14 * s);
     canvas.drawPath(cone, hatPaint);
-    canvas.drawPath(cone, Paint()..color = Colors.black87..style = PaintingStyle.stroke..strokeWidth = 1 * s);
+    canvas.drawPath(cone, Paint()..color = Colors.black87..style = PaintingStyle.stroke..strokeWidth = 0.5 * s);
     canvas.drawRect(Rect.fromLTWH(-6 * s, peakY - 1.5 * s, 12 * s, 2.5 * s), bandPaint);
     // Star on tip
     canvas.drawCircle(Offset(0, peakY - 14 * s), 1.5 * s, Paint()..color = skin.accentColor);
@@ -1240,7 +1240,7 @@ class _SkinPainter extends CustomPainter {
       ..quadraticBezierTo(-headR - 6 * s, bandY + 8 * s, -headR - 3 * s, bandY + 12 * s)
       ..moveTo(headR + 2 * s, bandY + 1.5 * s)
       ..quadraticBezierTo(headR + 6 * s, bandY + 8 * s, headR + 3 * s, bandY + 12 * s);
-    canvas.drawPath(tailPath, Paint()..color = skin.accentColor..style = PaintingStyle.stroke..strokeWidth = 2 * s);
+    canvas.drawPath(tailPath, Paint()..color = skin.accentColor..style = PaintingStyle.stroke..strokeWidth = 1 * s);
   }
 
   void _drawVisor(Canvas canvas, SkinDefinition skin, double s, double headCY, double headR) {
@@ -1271,7 +1271,7 @@ class _SkinPainter extends CustomPainter {
         ..quadraticBezierTo(dir * headR * 0.9, hornBaseY - 6 * s, dir * headR * 0.6, hornBaseY - 10 * s)
         ..quadraticBezierTo(dir * headR * 0.4, hornBaseY - 7 * s, dir * headR * 0.25, hornBaseY - 1 * s);
       canvas.drawPath(hornPath, hornPaint);
-      canvas.drawPath(hornPath, Paint()..color = Colors.black87..style = PaintingStyle.stroke..strokeWidth = 0.8 * s);
+      canvas.drawPath(hornPath, Paint()..color = Colors.black87..style = PaintingStyle.stroke..strokeWidth = 0.4 * s);
     }
   }
 
@@ -1284,7 +1284,7 @@ class _SkinPainter extends CustomPainter {
       ..lineTo(0, peakY - 2 * s)
       ..lineTo(3 * s, peakY);
     canvas.drawPath(crestPath, crestPaint);
-    canvas.drawPath(crestPath, Paint()..color = Colors.black87..style = PaintingStyle.stroke..strokeWidth = 0.8 * s);
+    canvas.drawPath(crestPath, Paint()..color = Colors.black87..style = PaintingStyle.stroke..strokeWidth = 0.4 * s);
   }
 
   // ─────────────────────────────────────────────
@@ -1312,7 +1312,7 @@ class _SkinPainter extends CustomPainter {
     final isLightBody = ThemeData.estimateBrightnessForColor(skin.bodyColor) == Brightness.light;
     final outlinePaint = Paint()
       ..color = isLightBody ? const Color(0xFF94A3B8) : Colors.black87
-      ..style = PaintingStyle.stroke..strokeWidth = 1.5 * s..strokeCap = StrokeCap.round;
+      ..style = PaintingStyle.stroke..strokeWidth = 0.75 * s..strokeCap = StrokeCap.round;
     final bandPath = Path()
       ..addOval(Rect.fromCenter(center: Offset(0, headCY - 1 * s), width: headR * 2 + 6 * s, height: 3.5 * s))
       ..addOval(Rect.fromCenter(center: Offset(0, headCY - 1 * s), width: headR * 2 - 1 * s, height: 1.2 * s));
@@ -1346,8 +1346,8 @@ class _SkinPainter extends CustomPainter {
     final tailPath = Path()
       ..moveTo(-headR, neckY + 3 * s)
       ..quadraticBezierTo(-headR - 5 * s, neckY + 8 * s, -headR - 3 * s, neckY + 14 * s);
-    canvas.drawPath(tailPath, Paint()..color = skin.accentColor..style = PaintingStyle.stroke..strokeWidth = 3.5 * s..strokeCap = StrokeCap.round);
-    canvas.drawPath(tailPath, Paint()..color = Colors.black87..style = PaintingStyle.stroke..strokeWidth = 1 * s);
+    canvas.drawPath(tailPath, Paint()..color = skin.accentColor..style = PaintingStyle.stroke..strokeWidth = 1.75 * s..strokeCap = StrokeCap.round);
+    canvas.drawPath(tailPath, Paint()..color = Colors.black87..style = PaintingStyle.stroke..strokeWidth = 0.5 * s);
   }
 
   void _drawEarGlow(Canvas canvas, SkinDefinition skin, double s, double headCY, double headR) {
@@ -1423,7 +1423,7 @@ class _SkinPainter extends CustomPainter {
       ..lineTo(8 * s, bodyBotY)
       ..lineTo(6 * s, bodyTopY + 2 * s);
     canvas.drawPath(capePath, capePaint);
-    canvas.drawPath(capePath, Paint()..color = skin.accentColor..style = PaintingStyle.stroke..strokeWidth = 0.8 * s);
+    canvas.drawPath(capePath, Paint()..color = skin.accentColor..style = PaintingStyle.stroke..strokeWidth = 0.4 * s);
   }
 
   void _drawCodeScroll(Canvas canvas, SkinDefinition skin, double s, double bodyTopY, double bodyBotY) {
@@ -1434,13 +1434,13 @@ class _SkinPainter extends CustomPainter {
       Radius.circular(1 * s),
     );
     canvas.drawRRect(scrollRect, scrollPaint);
-    canvas.drawRRect(scrollRect, Paint()..color = Colors.brown..style = PaintingStyle.stroke..strokeWidth = 0.8 * s);
+    canvas.drawRRect(scrollRect, Paint()..color = Colors.brown..style = PaintingStyle.stroke..strokeWidth = 0.4 * s);
     // Code lines
     for (var i = 0; i < 3; i++) {
       canvas.drawLine(
         Offset(-2 * s, scrollY - 2 * s + i * 2.5 * s),
         Offset(-2 * s + 3 * s, scrollY - 2 * s + i * 2.5 * s),
-        Paint()..color = Colors.black54..strokeWidth = 0.8 * s..strokeCap = StrokeCap.round,
+        Paint()..color = Colors.black54..strokeWidth = 0.4 * s..strokeCap = StrokeCap.round,
       );
     }
   }
@@ -1450,7 +1450,7 @@ class _SkinPainter extends CustomPainter {
     final gearPaint = Paint()..color = skin.accentColor;
     // Center circle
     canvas.drawCircle(Offset(0, gearY), 4 * s, gearPaint..style = PaintingStyle.fill);
-    canvas.drawCircle(Offset(0, gearY), 4 * s, Paint()..color = Colors.black87..style = PaintingStyle.stroke..strokeWidth = 0.8 * s);
+    canvas.drawCircle(Offset(0, gearY), 4 * s, Paint()..color = Colors.black87..style = PaintingStyle.stroke..strokeWidth = 0.4 * s);
     // Teeth
     for (var i = 0; i < 6; i++) {
       final angle = i * 3.14159 / 3;
@@ -1472,7 +1472,7 @@ class _SkinPainter extends CustomPainter {
       ..quadraticBezierTo(-2 * s, flameY + 3 * s, -4 * s, flameY + 1 * s)
       ..quadraticBezierTo(-3 * s, flameY - 1 * s, 0, flameY - 5 * s);
     canvas.drawPath(flamePath, flamePaint);
-    canvas.drawPath(flamePath, Paint()..color = Colors.black87..style = PaintingStyle.stroke..strokeWidth = 0.8 * s);
+    canvas.drawPath(flamePath, Paint()..color = Colors.black87..style = PaintingStyle.stroke..strokeWidth = 0.4 * s);
     // Inner glow
     final innerFlame = Path()
       ..moveTo(0, flameY - 2 * s)
@@ -1489,7 +1489,7 @@ class _SkinPainter extends CustomPainter {
     canvas.drawLine(
       Offset(staffX, bodyTopY + 2 * s),
       Offset(staffX, bodyBotY - 2 * s),
-      Paint()..color = const Color(0xFF78350F)..strokeWidth = 1.5 * s..strokeCap = StrokeCap.round,
+      Paint()..color = const Color(0xFF78350F)..strokeWidth = 0.75 * s..strokeCap = StrokeCap.round,
     );
     // Top crystal
     final crystalCenter = Offset(staffX, bodyTopY + 1 * s);
@@ -1509,7 +1509,7 @@ class _SkinPainter extends CustomPainter {
     final eyePaint = Paint()
       ..color = Colors.white
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.8 * s
+      ..strokeWidth = 0.9 * s
       ..strokeCap = StrokeCap.round;
     canvas.drawLine(
       Offset(-eyeSpacing - 2 * s, eyeY - 0.5 * s),
@@ -1536,7 +1536,7 @@ class _SkinPainter extends CustomPainter {
     final outlinePaint = Paint()
       ..color = isLightBody ? const Color(0xFF94A3B8) : Colors.black87
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.5 * s
+      ..strokeWidth = 1.25 * s
       ..strokeCap = StrokeCap.round;
 
     switch (pose) {
@@ -1548,7 +1548,7 @@ class _SkinPainter extends CustomPainter {
           Paint()
             ..color = skin.bodyColor
             ..style = PaintingStyle.stroke
-            ..strokeWidth = 2.5 * s
+            ..strokeWidth = 1.25 * s
             ..strokeCap = StrokeCap.round,
         );
         canvas.drawCircle(Offset(-14 * s, -27 * s), 1.2 * s, Paint()..color = skin.bodyColor);
@@ -1556,7 +1556,7 @@ class _SkinPainter extends CustomPainter {
         final wavePaint = Paint()
           ..color = skin.accentColor.withValues(alpha: 0.6)
           ..style = PaintingStyle.stroke
-          ..strokeWidth = 0.8 * s
+          ..strokeWidth = 0.4 * s
           ..strokeCap = StrokeCap.round;
         for (final i in [0, 1, 2]) {
           final radius = (3 + i * 1.5) * s;
@@ -1606,7 +1606,7 @@ class _SkinPainter extends CustomPainter {
           Paint()
             ..color = outlinePaint.color
             ..style = PaintingStyle.stroke
-            ..strokeWidth = 1.2 * s,
+            ..strokeWidth = 0.6 * s,
         );
         for (final lineY in [screenY - 3 * s, screenY, screenY + 3 * s]) {
           canvas.drawLine(
@@ -1614,7 +1614,7 @@ class _SkinPainter extends CustomPainter {
             Offset(5 * s, lineY),
             Paint()
               ..color = skin.accentColor.withValues(alpha: 0.45)
-              ..strokeWidth = 0.7 * s,
+              ..strokeWidth = 0.35 * s,
           );
         }
       case SupTechPose.none:
@@ -1653,7 +1653,7 @@ class _SkinPainter extends CustomPainter {
   }
 
   void _drawHackerDetail(Canvas canvas, SkinDefinition skin, double s) {
-    final promptPaint = Paint()..color = skin.accentColor..style = PaintingStyle.stroke..strokeWidth = 0.8 * s..strokeCap = StrokeCap.round;
+    final promptPaint = Paint()..color = skin.accentColor..style = PaintingStyle.stroke..strokeWidth = 0.4 * s..strokeCap = StrokeCap.round;
     final py = -2 * s;
     canvas.drawLine(Offset(-3 * s, py), Offset(-1 * s, py), promptPaint);
     canvas.drawLine(Offset(-1 * s, py), Offset(-1 * s, py + 2 * s), promptPaint);
@@ -1679,9 +1679,9 @@ class _SkinPainter extends CustomPainter {
   }
 
   void _drawEngineerDetail(Canvas canvas, SkinDefinition skin, double s) {
-    final wrenchPaint = Paint()..color = skin.accentColor..style = PaintingStyle.stroke..strokeWidth = 1.2 * s..strokeCap = StrokeCap.round;
+    final wrenchPaint = Paint()..color = skin.accentColor..style = PaintingStyle.stroke..strokeWidth = 0.6 * s..strokeCap = StrokeCap.round;
     canvas.drawLine(Offset(5 * s, 3 * s), Offset(5 * s, 9 * s), wrenchPaint);
-    canvas.drawCircle(Offset(5 * s, 3 * s), 1.5 * s, Paint()..style = PaintingStyle.stroke..color = skin.accentColor..strokeWidth = 1 * s);
+    canvas.drawCircle(Offset(5 * s, 3 * s), 1.5 * s, Paint()..style = PaintingStyle.stroke..color = skin.accentColor..strokeWidth = 0.5 * s);
   }
 
   void _drawGrandmasterDetail(Canvas canvas, SkinDefinition skin, double s) {
@@ -1690,7 +1690,7 @@ class _SkinPainter extends CustomPainter {
   }
 
   void _drawCyberDetail(Canvas canvas, SkinDefinition skin, double s) {
-    final scanPaint = Paint()..color = skin.accentColor.withValues(alpha: 0.2)..style = PaintingStyle.stroke..strokeWidth = 0.6 * s;
+    final scanPaint = Paint()..color = skin.accentColor.withValues(alpha: 0.2)..style = PaintingStyle.stroke..strokeWidth = 0.3 * s;
     for (var i = 0; i < 3; i++) {
       final y = -4 * s + i * 3 * s;
       canvas.drawLine(Offset(-6 * s, y), Offset(6 * s, y), scanPaint);
@@ -1703,7 +1703,7 @@ class _SkinPainter extends CustomPainter {
   }
 
   void _drawNeonDetail(Canvas canvas, SkinDefinition skin, double s) {
-    final neonPaint = Paint()..color = skin.accentColor..style = PaintingStyle.stroke..strokeWidth = 1.5 * s..strokeCap = StrokeCap.round
+    final neonPaint = Paint()..color = skin.accentColor..style = PaintingStyle.stroke..strokeWidth = 0.75 * s..strokeCap = StrokeCap.round
       ..maskFilter = MaskFilter.blur(BlurStyle.normal, 1 * s);
     canvas.drawLine(Offset(-6 * s, 2 * s), Offset(-6 * s, 10 * s), neonPaint);
     canvas.drawLine(Offset(6 * s, 2 * s), Offset(6 * s, 10 * s), neonPaint);
@@ -1724,26 +1724,26 @@ class _SkinPainter extends CustomPainter {
   }
 
   void _drawTitanDetail(Canvas canvas, SkinDefinition skin, double s) {
-    final boltPaint = Paint()..color = skin.accentColor..style = PaintingStyle.stroke..strokeWidth = 1.2 * s..strokeCap = StrokeCap.round;
+    final boltPaint = Paint()..color = skin.accentColor..style = PaintingStyle.stroke..strokeWidth = 0.6 * s..strokeCap = StrokeCap.round;
     canvas.drawLine(Offset(-2 * s, -15 * s), Offset(0, -13 * s), boltPaint);
     canvas.drawLine(Offset(0, -13 * s), Offset(2 * s, -15 * s), boltPaint);
   }
 
   void _drawVoidDetail(Canvas canvas, SkinDefinition skin, double s) {
-    final portalPaint = Paint()..color = skin.accentColor.withValues(alpha: 0.3)..style = PaintingStyle.stroke..strokeWidth = 1 * s;
+    final portalPaint = Paint()..color = skin.accentColor.withValues(alpha: 0.3)..style = PaintingStyle.stroke..strokeWidth = 0.5 * s;
     canvas.drawCircle(Offset(0, 4 * s), 3 * s, portalPaint);
     canvas.drawCircle(Offset(0, 4 * s), 1.5 * s, Paint()..color = skin.accentColor.withValues(alpha: 0.15));
   }
 
   void _drawGlitchDetail(Canvas canvas, SkinDefinition skin, double s) {
-    final glitchPaint = Paint()..color = skin.accentColor.withValues(alpha: 0.35)..style = PaintingStyle.stroke..strokeWidth = 1 * s;
+    final glitchPaint = Paint()..color = skin.accentColor.withValues(alpha: 0.35)..style = PaintingStyle.stroke..strokeWidth = 0.5 * s;
     canvas.drawLine(Offset(-6 * s, -2 * s), Offset(6 * s, -2 * s), glitchPaint);
     canvas.drawLine(Offset(-4 * s, 3 * s), Offset(4 * s, 3 * s), glitchPaint);
     canvas.drawLine(Offset(-2 * s, 8 * s), Offset(2 * s, 8 * s), glitchPaint);
   }
 
   void _drawFrostDetail(Canvas canvas, SkinDefinition skin, double s) {
-    final icePaint = Paint()..color = skin.accentColor..style = PaintingStyle.stroke..strokeWidth = 1 * s..strokeCap = StrokeCap.round;
+    final icePaint = Paint()..color = skin.accentColor..style = PaintingStyle.stroke..strokeWidth = 0.5 * s..strokeCap = StrokeCap.round;
     for (final dx in [-4, 0, 4]) {
       final iy = 12 * s + (dx.abs() % 2) * 1.5 * s;
       canvas.drawLine(Offset(dx * s, iy), Offset(dx * s, iy + 2 * s), icePaint);
@@ -1751,7 +1751,7 @@ class _SkinPainter extends CustomPainter {
   }
 
   void _drawChronoDetail(Canvas canvas, SkinDefinition skin, double s) {
-    final clockPaint = Paint()..color = skin.accentColor..style = PaintingStyle.stroke..strokeWidth = 1 * s;
+    final clockPaint = Paint()..color = skin.accentColor..style = PaintingStyle.stroke..strokeWidth = 0.5 * s;
     canvas.drawCircle(Offset(0, 4 * s), 3 * s, clockPaint);
     canvas.drawLine(Offset(0, 4 * s), Offset(0, 2 * s), clockPaint);
     canvas.drawLine(Offset(0, 4 * s), Offset(2 * s, 4 * s), clockPaint);
@@ -1770,7 +1770,7 @@ class _SkinPainter extends CustomPainter {
   }
 
   void _drawSparkDetail(Canvas canvas, SkinDefinition skin, double s) {
-    final sparkPaint = Paint()..color = skin.accentColor..style = PaintingStyle.stroke..strokeWidth = 1 * s..strokeCap = StrokeCap.round;
+    final sparkPaint = Paint()..color = skin.accentColor..style = PaintingStyle.stroke..strokeWidth = 0.5 * s..strokeCap = StrokeCap.round;
     for (final dx in [-5, 5]) {
       canvas.drawLine(Offset(dx * s, -2 * s), Offset((dx - 1) * s, 1 * s), sparkPaint);
       canvas.drawLine(Offset((dx - 1) * s, 1 * s), Offset((dx + 1) * s, 3 * s), sparkPaint);

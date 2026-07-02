@@ -127,12 +127,6 @@ class SupTechConceptSheet extends StatelessWidget {
           padding: const EdgeInsets.fromLTRB(22, 16, 22, 18),
         ),
         const SizedBox(height: 24),
-        _labeledPanel(
-          'Color Palette',
-          _buildColorPalette(),
-          padding: const EdgeInsets.fromLTRB(18, 16, 18, 18),
-        ),
-        const SizedBox(height: 24),
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -179,12 +173,6 @@ class SupTechConceptSheet extends StatelessWidget {
         _labeledPanel(
           'Expressions',
           _buildExpressionsRow(context, cubit, c),
-          padding: const EdgeInsets.fromLTRB(18, 16, 18, 18),
-        ),
-        const SizedBox(height: 20),
-        _labeledPanel(
-          'Color Palette',
-          _buildColorPalette(),
           padding: const EdgeInsets.fromLTRB(18, 16, 18, 18),
         ),
         const SizedBox(height: 20),
@@ -267,40 +255,6 @@ class SupTechConceptSheet extends StatelessWidget {
               style: const TextStyle(color: Color(0xFF263348), fontSize: 13, fontWeight: FontWeight.w700),
             ),
           ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildColorPalette() {
-    final colors = [
-      ('Robe', skin.bodyColor),
-      ('Glow', skin.accentColor),
-      ('Face', const Color(0xFF05070B)),
-      ('Light', const Color(0xFFFFFFFF)),
-    ];
-    return Wrap(spacing: 14, runSpacing: 14,
-      children: [for (final pc in colors) _colorSwatch(pc.$1, pc.$2)],
-    );
-  }
-
-  Widget _colorSwatch(String label, Color color) {
-    final hex = '#${color.toARGB32().toRadixString(16).substring(2).toUpperCase()}';
-    return SizedBox(
-      width: 70,
-      child: Column(
-        children: [
-          Container(
-            width: 44, height: 44,
-            decoration: BoxDecoration(
-              color: color,
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: const Color(0xFFDDE3EE)),
-            ),
-          ),
-          const SizedBox(height: 7),
-          Text(label, style: const TextStyle(color: Color(0xFF45536A), fontSize: 11)),
-          Text(hex, style: const TextStyle(color: Color(0xFF8C98AA), fontSize: 9, fontFamily: 'monospace')),
         ],
       ),
     );
@@ -693,7 +647,7 @@ class _InteractiveConceptPainter extends CustomPainter {
     final outlinePaint = Paint()
       ..color = Colors.black87
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.5 * s
+      ..strokeWidth = 1.25 * s
       ..strokeCap = StrokeCap.round
       ..strokeJoin = StrokeJoin.round;
 
@@ -719,7 +673,7 @@ class _InteractiveConceptPainter extends CustomPainter {
     final foldPaint = Paint()
       ..color = Colors.black.withValues(alpha: 0.10)
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.0 * s
+      ..strokeWidth = 0.5 * s
       ..strokeCap = StrokeCap.round;
     canvas.drawPath(
       Path()..moveTo(-2.5 * s, 0)..quadraticBezierTo(-3.5 * s, 6 * s, -5.5 * s, 12 * s),
@@ -744,7 +698,7 @@ class _InteractiveConceptPainter extends CustomPainter {
     // Cuff accents
     final cuffPaint = Paint()
       ..color = skin.accentColor.withValues(alpha: 0.85)
-      ..strokeWidth = 1.2 * s
+      ..strokeWidth = 0.6 * s
       ..strokeCap = StrokeCap.round;
     canvas.drawLine(Offset(-8 * s, 0), Offset(-10.5 * s, 4 * s), cuffPaint);
     canvas.drawLine(Offset(8 * s, 0), Offset(10.5 * s, 4 * s), cuffPaint);
@@ -779,7 +733,7 @@ class _InteractiveConceptPainter extends CustomPainter {
       Paint()
         ..color = skin.accentColor.withValues(alpha: 0.10)
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 1.5 * s
+        ..strokeWidth = 0.75 * s
         ..strokeCap = StrokeCap.round,
     );
 
@@ -829,7 +783,7 @@ class _InteractiveConceptPainter extends CustomPainter {
         Paint()
           ..color = skin.bodyColor
           ..style = PaintingStyle.stroke
-          ..strokeWidth = 2.5 * s
+          ..strokeWidth = 1.25 * s
           ..strokeCap = StrokeCap.round,
       );
       canvas.drawCircle(Offset(-14 * s, -27 * s), 1.2 * s, Paint()..color = skin.bodyColor);
@@ -837,7 +791,7 @@ class _InteractiveConceptPainter extends CustomPainter {
       final wavePaint = Paint()
         ..color = skin.accentColor.withValues(alpha: 0.6)
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 0.8 * s
+        ..strokeWidth = 0.4 * s
         ..strokeCap = StrokeCap.round;
       for (final i in [0, 1, 2]) {
         final radius = (3 + i * 1.5) * s;
@@ -945,7 +899,7 @@ void _drawReferenceEyes(
           Offset(dx + 1.5 * s, eyeY - 2.8 * s),
           Paint()
             ..color = Colors.white
-            ..strokeWidth = large ? 1.0 * s : 0.6 * s
+            ..strokeWidth = large ? 0.5 * s : 0.3 * s
             ..strokeCap = StrokeCap.round,
         );
       }
@@ -1001,7 +955,7 @@ void _drawFocusedEyes(Canvas canvas, double s, double eyeY, double eyeSpacing) {
   final eyePaint = Paint()
     ..color = Colors.white
     ..style = PaintingStyle.stroke
-    ..strokeWidth = 1.8 * s
+    ..strokeWidth = 0.9 * s
     ..strokeCap = StrokeCap.round;
   canvas.drawLine(
     Offset(-eyeSpacing - 2 * s, eyeY - 0.5 * s),
@@ -1044,12 +998,12 @@ void _drawHolographicScreen(
     Paint()
       ..color = outlinePaint.color
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.2 * s,
+      ..strokeWidth = 0.6 * s,
   );
   for (final lineY in [y - 3 * s, y, y + 3 * s]) {
     canvas.drawLine(
       Offset(-5 * s, lineY), Offset(5 * s, lineY),
-      Paint()..color = accentColor.withValues(alpha: 0.45)..strokeWidth = 0.7 * s,
+      Paint()..color = accentColor.withValues(alpha: 0.45)..strokeWidth = 0.35 * s,
     );
   }
 }
@@ -1062,7 +1016,7 @@ void _drawConceptHeadAccessory(
     case SupTechHeadAccessory.none: break;
     case SupTechHeadAccessory.antenna:
       canvas.drawLine(Offset(0, -27 * s), Offset(0, -31 * s),
-        Paint()..color = skin.accentColor..strokeWidth = 1.2 * s..strokeCap = StrokeCap.round);
+        Paint()..color = skin.accentColor..strokeWidth = 0.6 * s..strokeCap = StrokeCap.round);
       canvas.drawCircle(Offset(0, -32 * s), 1.0 * s, Paint()..color = skin.accentColor);
     case SupTechHeadAccessory.crown:
       final crown = Path()
@@ -1084,7 +1038,7 @@ void _drawConceptHeadAccessory(
       for (final dir in [-1, 1]) {
         canvas.drawPath(
           Path()..moveTo(dir * 4 * s, -24 * s)..quadraticBezierTo(dir * 7 * s, -30 * s, dir * 5 * s, -34 * s),
-          Paint()..color = skin.accentColor..style = PaintingStyle.stroke..strokeWidth = 2 * s..strokeCap = StrokeCap.round,
+          Paint()..color = skin.accentColor..style = PaintingStyle.stroke..strokeWidth = 1 * s..strokeCap = StrokeCap.round,
         );
       }
     case SupTechHeadAccessory.crest:
@@ -1103,12 +1057,12 @@ void _drawConceptEarAccessory(
         canvas.drawOval(Rect.fromCenter(center: Offset(dx, -3 * s), width: 2.5 * s, height: 3.5 * s),
           Paint()..color = skin.accentColor.withValues(alpha: 0.85));
         canvas.drawOval(Rect.fromCenter(center: Offset(dx, -3 * s), width: 2.5 * s, height: 3.5 * s),
-          Paint()..color = Colors.black87..style = PaintingStyle.stroke..strokeWidth = 0.8 * s);
+          Paint()..color = Colors.black87..style = PaintingStyle.stroke..strokeWidth = 0.4 * s);
       }
       canvas.drawArc(
         Rect.fromCenter(center: Offset(0, -8 * s), width: 14 * s, height: 6 * s),
         pi, pi, false,
-        Paint()..color = skin.accentColor..style = PaintingStyle.stroke..strokeWidth = 1.2 * s..strokeCap = StrokeCap.round,
+        Paint()..color = skin.accentColor..style = PaintingStyle.stroke..strokeWidth = 0.6 * s..strokeCap = StrokeCap.round,
       );
     case SupTechEarAccessory.scarf:
       canvas.drawRRect(
@@ -1117,7 +1071,7 @@ void _drawConceptEarAccessory(
       );
       canvas.drawPath(
         Path()..moveTo(-8 * s, 2 * s)..quadraticBezierTo(-11 * s, 8 * s, -9 * s, 12 * s),
-        Paint()..color = skin.accentColor..style = PaintingStyle.stroke..strokeWidth = 2.5 * s..strokeCap = StrokeCap.round,
+        Paint()..color = skin.accentColor..style = PaintingStyle.stroke..strokeWidth = 1.25 * s..strokeCap = StrokeCap.round,
       );
     case SupTechEarAccessory.earGlow:
       for (final dx in [-5.5 * s, 5.5 * s]) {
@@ -1160,15 +1114,15 @@ void _drawConceptChestAccessory(
       canvas.drawRRect(RRect.fromRectAndRadius(Rect.fromCenter(center: Offset(0, badgeCY), width: 8 * s, height: 10 * s), Radius.circular(1 * s)),
         Paint()..color = const Color(0xFFF8FAFC));
       canvas.drawLine(Offset(-2 * s, badgeCY - 3 * s), Offset(2 * s, badgeCY - 3 * s),
-        Paint()..color = skin.accentColor..strokeWidth = 0.8 * s);
+        Paint()..color = skin.accentColor..strokeWidth = 0.4 * s);
       canvas.drawLine(Offset(-2 * s, badgeCY), Offset(2 * s, badgeCY),
-        Paint()..color = skin.accentColor..strokeWidth = 0.8 * s);
+        Paint()..color = skin.accentColor..strokeWidth = 0.4 * s);
     case SupTechChestAccessory.gear:
       canvas.drawCircle(Offset(0, badgeCY), 3 * s, Paint()..color = skin.accentColor.withValues(alpha: 0.25));
       for (var i = 0; i < 6; i++) {
         final angle = i * pi / 3;
         canvas.drawLine(Offset(0, badgeCY), Offset(cos(angle) * 4 * s, badgeCY + sin(angle) * 4 * s),
-          Paint()..color = skin.accentColor..strokeWidth = 1.2 * s);
+          Paint()..color = skin.accentColor..strokeWidth = 0.6 * s);
       }
     case SupTechChestAccessory.flameEmblem:
       final flame = Path()
@@ -1178,7 +1132,7 @@ void _drawConceptChestAccessory(
       canvas.drawPath(flame, Paint()..color = const Color(0xFFF97316));
     case SupTechChestAccessory.staff:
       canvas.drawLine(Offset(10 * s, -10 * s), Offset(10 * s, 8 * s),
-        Paint()..color = const Color(0xFF92400E)..strokeWidth = 1.5 * s..strokeCap = StrokeCap.round);
+        Paint()..color = const Color(0xFF92400E)..strokeWidth = 0.75 * s..strokeCap = StrokeCap.round);
       canvas.drawCircle(Offset(10 * s, -11 * s), 2 * s, Paint()..color = skin.accentColor);
   }
 }
@@ -1192,7 +1146,7 @@ void _drawMiniHood(Canvas canvas, double s, Color bodyColor) {
   final outlinePaint = Paint()
     ..color = Colors.black87
     ..style = PaintingStyle.stroke
-    ..strokeWidth = 1.2 * s
+    ..strokeWidth = 0.6 * s
     ..strokeCap = StrokeCap.round
     ..strokeJoin = StrokeJoin.round;
 
@@ -1225,7 +1179,7 @@ void _drawMiniHood(Canvas canvas, double s, Color bodyColor) {
     Paint()
       ..color = Colors.white.withValues(alpha: 0.12)
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.0 * s
+      ..strokeWidth = 0.5 * s
       ..strokeCap = StrokeCap.round,
   );
 }
@@ -1346,7 +1300,7 @@ class _MiniAccessoryPainter extends CustomPainter {
     final robeOutline = Paint()
       ..color = Colors.black87
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.0 * s
+      ..strokeWidth = 0.5 * s
       ..strokeCap = StrokeCap.round;
     final robePath = Path()
       ..moveTo(-4 * s, 2 * s)
@@ -1372,9 +1326,9 @@ class _MiniAccessoryPainter extends CustomPainter {
     switch (acc) {
       case SupTechHeadAccessory.antenna:
         canvas.drawLine(Offset(0, -8.5 * s), Offset(0, -11.5 * s),
-          Paint()..color = accent..strokeWidth = 1.2 * s..strokeCap = StrokeCap.round);
+          Paint()..color = accent..strokeWidth = 0.6 * s..strokeCap = StrokeCap.round);
         canvas.drawCircle(Offset(0, -12 * s), 1.0 * s, Paint()..color = accent);
-        canvas.drawCircle(Offset(0, -12 * s), 1.0 * s, Paint()..color = accent..style = PaintingStyle.stroke..strokeWidth = 0.8 * s);
+        canvas.drawCircle(Offset(0, -12 * s), 1.0 * s, Paint()..color = accent..style = PaintingStyle.stroke..strokeWidth = 0.4 * s);
       case SupTechHeadAccessory.crown:
         final crown = Path()
           ..moveTo(-3 * s, -9 * s)..lineTo(-2.5 * s, -12 * s)..lineTo(-1 * s, -10 * s)
@@ -1395,7 +1349,7 @@ class _MiniAccessoryPainter extends CustomPainter {
         for (final dir in [-1, 1]) {
           canvas.drawPath(
             Path()..moveTo(dir * 3 * s, -9 * s)..quadraticBezierTo(dir * 5 * s, -12 * s, dir * 3.5 * s, -14 * s),
-            Paint()..color = accent..style = PaintingStyle.stroke..strokeWidth = 1.5 * s..strokeCap = StrokeCap.round,
+            Paint()..color = accent..style = PaintingStyle.stroke..strokeWidth = 0.75 * s..strokeCap = StrokeCap.round,
           );
         }
       case SupTechHeadAccessory.crest:
@@ -1417,14 +1371,14 @@ class _MiniAccessoryPainter extends CustomPainter {
         canvas.drawArc(
           Rect.fromCenter(center: Offset(0, -4 * s), width: 12 * s, height: 5 * s),
           pi, pi, false,
-          Paint()..color = accent..style = PaintingStyle.stroke..strokeWidth = 1.0 * s..strokeCap = StrokeCap.round,
+          Paint()..color = accent..style = PaintingStyle.stroke..strokeWidth = 0.5 * s..strokeCap = StrokeCap.round,
         );
       case SupTechEarAccessory.scarf:
         canvas.drawRRect(RRect.fromRectAndRadius(Rect.fromLTWH(-6 * s, 0, 12 * s, 3 * s), Radius.circular(1.5 * s)),
           Paint()..color = accent);
         canvas.drawPath(
           Path()..moveTo(-6 * s, 2 * s)..quadraticBezierTo(-8 * s, 6 * s, -6 * s, 9 * s),
-          Paint()..color = accent..style = PaintingStyle.stroke..strokeWidth = 2 * s..strokeCap = StrokeCap.round,
+          Paint()..color = accent..style = PaintingStyle.stroke..strokeWidth = 1 * s..strokeCap = StrokeCap.round,
         );
       case SupTechEarAccessory.earGlow:
         for (final dx in [-4 * s, 4 * s]) {
@@ -1452,21 +1406,21 @@ class _MiniAccessoryPainter extends CustomPainter {
       case SupTechChestAccessory.codeScroll:
         canvas.drawRRect(RRect.fromRectAndRadius(Rect.fromCenter(center: Offset(0, 5.5 * s), width: 5 * s, height: 6 * s), Radius.circular(0.8 * s)),
           Paint()..color = const Color(0xFFF8FAFC));
-        canvas.drawLine(Offset(-1.5 * s, 4 * s), Offset(1.5 * s, 4 * s), Paint()..color = accent..strokeWidth = 0.6 * s);
-        canvas.drawLine(Offset(-1.5 * s, 6 * s), Offset(1.5 * s, 6 * s), Paint()..color = accent..strokeWidth = 0.6 * s);
+        canvas.drawLine(Offset(-1.5 * s, 4 * s), Offset(1.5 * s, 4 * s), Paint()..color = accent..strokeWidth = 0.3 * s);
+        canvas.drawLine(Offset(-1.5 * s, 6 * s), Offset(1.5 * s, 6 * s), Paint()..color = accent..strokeWidth = 0.3 * s);
       case SupTechChestAccessory.gear:
         canvas.drawCircle(Offset(0, 5.5 * s), 2.5 * s, Paint()..color = accent.withValues(alpha: 0.25));
         for (var i = 0; i < 6; i++) {
           final angle = i * pi / 3;
           canvas.drawLine(Offset(0, 5.5 * s), Offset(cos(angle) * 3 * s, 5.5 * s + sin(angle) * 3 * s),
-            Paint()..color = accent..strokeWidth = 1.0 * s);
+            Paint()..color = accent..strokeWidth = 0.5 * s);
         }
       case SupTechChestAccessory.flameEmblem:
         final flame = Path()..moveTo(0, 3 * s)..quadraticBezierTo(-2 * s, 5.5 * s, 0, 7.5 * s)..quadraticBezierTo(2 * s, 5.5 * s, 0, 3 * s);
         canvas.drawPath(flame, Paint()..color = const Color(0xFFF97316));
       case SupTechChestAccessory.staff:
         canvas.drawLine(Offset(5 * s, 2 * s), Offset(5 * s, 8 * s),
-          Paint()..color = const Color(0xFF92400E)..strokeWidth = 1.2 * s..strokeCap = StrokeCap.round);
+          Paint()..color = const Color(0xFF92400E)..strokeWidth = 0.6 * s..strokeCap = StrokeCap.round);
         canvas.drawCircle(Offset(5 * s, 1.5 * s), 1.2 * s, Paint()..color = accent);
     }
   }
@@ -1514,7 +1468,7 @@ class _PosePainter extends CustomPainter {
     final robeOutline = Paint()
       ..color = Colors.black87
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.0 * s
+      ..strokeWidth = 0.5 * s
       ..strokeCap = StrokeCap.round;
     final robePath = Path()
       ..moveTo(-4 * s, 2 * s)
@@ -1542,7 +1496,7 @@ class _PosePainter extends CustomPainter {
         Paint()
           ..color = skin.bodyColor
           ..style = PaintingStyle.stroke
-          ..strokeWidth = 2.5 * s
+          ..strokeWidth = 1.25 * s
           ..strokeCap = StrokeCap.round,
       );
       canvas.drawCircle(Offset(-8 * s, -3.5 * s), 1.2 * s, Paint()..color = skin.bodyColor);
@@ -1550,7 +1504,7 @@ class _PosePainter extends CustomPainter {
       final wavePaint = Paint()
         ..color = skin.accentColor.withValues(alpha: 0.6)
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 0.8 * s
+        ..strokeWidth = 0.4 * s
         ..strokeCap = StrokeCap.round;
       for (final i in [0, 1, 2]) {
         final radius = (3 + i * 1.5) * s;
