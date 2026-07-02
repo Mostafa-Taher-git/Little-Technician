@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:littletech/src/features/game/constants/skin_tiers.dart';
 import 'package:littletech/src/features/game/domain/cubit/suptech_customization_cubit.dart';
 import 'package:littletech/src/features/game/domain/models/suptech_customization.dart';
+import 'package:littletech/src/features/game/presentation/widgets/sup_tech_renderer.dart';
 
 class SupTechConceptSheet extends StatelessWidget {
   final SkinDefinition skin;
@@ -764,46 +765,24 @@ class _InteractiveConceptPainter extends CustomPainter {
     // Eyes
     final eyeY = -8.5 * s;
     final eyeSpacing = 5.2 * s;
+    final eyeR = 3.1 * s;
+    final headCY = -8.8 * s;
+    final headR = 11.75 * s;
+    final hoodPeakY = -28 * s;
+    final bodyTopY = -1 * s;
+    final bodyBotY = 13 * s;
     if (pose == SupTechPose.working) {
-      _drawFocusedEyes(canvas, s, eyeY, eyeSpacing);
+      drawSupTechFocusedEyes(canvas, s, eyeY, eyeSpacing);
     } else {
-      _drawReferenceEyes(canvas, s, expression, eyeY, eyeSpacing, skin.accentColor, large: true);
+      drawSupTechEyes(canvas, skin, s, eyeY, eyeSpacing, eyeR, expression);
     }
 
-    _drawConceptHeadAccessory(canvas, s, skin, headAccessory, outlinePaint);
-    _drawConceptEarAccessory(canvas, s, skin, earAccessory);
-    _drawConceptChestAccessory(canvas, s, skin, chestAccessory);
+    drawSupTechHeadAccessory(canvas, skin, s, headCY, headR, hoodPeakY, headAccessory);
+    drawSupTechEarAccessory(canvas, skin, s, headCY, headR, earAccessory);
+    drawSupTechChestAccessory(canvas, skin, s, bodyTopY, bodyBotY, chestAccessory);
 
-    // Pose overlays
-    if (pose == SupTechPose.wave) {
-      canvas.drawPath(
-        Path()
-          ..moveTo(-8 * s, -15 * s)
-          ..quadraticBezierTo(-12 * s, -20 * s, -14 * s, -25 * s),
-        Paint()
-          ..color = skin.bodyColor
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 1.25 * s
-          ..strokeCap = StrokeCap.round,
-      );
-      canvas.drawCircle(Offset(-14 * s, -27 * s), 1.2 * s, Paint()..color = skin.bodyColor);
-      canvas.drawCircle(Offset(-14 * s, -27 * s), 1.2 * s, outlinePaint);
-      final wavePaint = Paint()
-        ..color = skin.accentColor.withValues(alpha: 0.6)
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 0.4 * s
-        ..strokeCap = StrokeCap.round;
-      for (final i in [0, 1, 2]) {
-        final radius = (3 + i * 1.5) * s;
-        canvas.drawArc(
-          Rect.fromCenter(center: Offset(-14 * s, -27 * s), width: radius * 2, height: radius * 2),
-          -pi * 0.2, pi * 0.6, false, wavePaint,
-        );
-      }
-    } else if (pose == SupTechPose.thinking) {
-      _drawClaspedHands(canvas, s, skin.bodyColor, outlinePaint, y: -11 * s);
-    } else if (pose == SupTechPose.working) {
-      _drawHolographicScreen(canvas, s, skin.accentColor, outlinePaint, y: -14 * s);
+    if (pose != SupTechPose.none && pose != SupTechPose.neutral) {
+      drawSupTechPoseOverlay(canvas, skin, s, pose, eyeY, eyeSpacing);
     }
 
     canvas.restore();
@@ -830,311 +809,6 @@ class _InteractiveConceptPainter extends CustomPainter {
       old.earAccessory != earAccessory ||
       old.chestAccessory != chestAccessory ||
       old.pose != pose;
-}
-
-// ═══════════════════════════════════════════════════════════════════
-// Shared helpers used by painters below
-// ═══════════════════════════════════════════════════════════════════
-
-void _drawGlowingOvalEye(
-  Canvas canvas, Offset center, double s, {
-  required double rx, required double ry, required Color glowColor,
-}) {
-  canvas.drawOval(
-    Rect.fromCenter(center: center, width: (rx + 2.5 * s) * 2, height: (ry + 2.5 * s) * 2),
-    Paint()
-      ..shader = RadialGradient(colors: [
-        glowColor.withValues(alpha: 0.35),
-        glowColor.withValues(alpha: 0.0),
-      ]).createShader(Rect.fromCircle(center: center, radius: (rx + 2.5 * s))),
-  );
-  canvas.drawOval(
-    Rect.fromCenter(center: center, width: rx * 2, height: ry * 2),
-    Paint()..color = Colors.white,
-  );
-}
-
-void _drawReferenceEyes(
-  Canvas canvas, double s,
-  SupTechExpression expression, double eyeY, double eyeSpacing,
-  Color glowColor, {
-  bool large = false,
-}) {
-  final rx = large ? 1.8 * s : 1.0 * s;
-  final ry = large ? 3.1 * s : 1.4 * s;
-  final stroke = large ? 2.0 * s : 1.4 * s;
-
-  switch (expression) {
-    case SupTechExpression.neutral:
-      for (final dx in [-eyeSpacing, eyeSpacing]) {
-        _drawGlowingOvalEye(canvas, Offset(dx, eyeY), s, rx: rx, ry: ry, glowColor: glowColor);
-      }
-    case SupTechExpression.happy:
-      final arcPaint = Paint()
-        ..color = Colors.white
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = stroke
-        ..strokeCap = StrokeCap.round;
-      for (final dx in [-eyeSpacing, eyeSpacing]) {
-        canvas.drawPath(
-          Path()
-            ..moveTo(dx - 2.5 * s, eyeY + 0.5 * s)
-            ..quadraticBezierTo(dx, eyeY - 2.0 * s, dx + 2.5 * s, eyeY + 0.5 * s),
-          arcPaint,
-        );
-      }
-    case SupTechExpression.angry:
-      for (final dx in [-eyeSpacing, eyeSpacing]) {
-        canvas.save();
-        canvas.translate(dx, eyeY);
-        canvas.rotate(dx < 0 ? 0.35 : -0.35);
-        _drawGlowingOvalEye(canvas, Offset.zero, s, rx: rx * 0.9, ry: ry * 0.85, glowColor: glowColor);
-        canvas.restore();
-      }
-    case SupTechExpression.surprised:
-      for (final dx in [-eyeSpacing, eyeSpacing]) {
-        canvas.drawCircle(Offset(dx, eyeY), large ? 1.6 * s : 0.9 * s, Paint()..color = Colors.white);
-        canvas.drawLine(
-          Offset(dx - 1.5 * s, eyeY - 2.8 * s),
-          Offset(dx + 1.5 * s, eyeY - 2.8 * s),
-          Paint()
-            ..color = Colors.white
-            ..strokeWidth = large ? 0.5 * s : 0.3 * s
-            ..strokeCap = StrokeCap.round,
-        );
-      }
-    case SupTechExpression.determined:
-      for (final dx in [-eyeSpacing, eyeSpacing]) {
-        canvas.drawRRect(
-          RRect.fromRectAndRadius(
-            Rect.fromCenter(
-              center: Offset(dx, eyeY),
-              width: large ? 5 * s : 3 * s,
-              height: large ? 1.4 * s : 0.8 * s,
-            ),
-            Radius.circular(0.6 * s),
-          ),
-          Paint()..color = Colors.white,
-        );
-      }
-    case SupTechExpression.wink:
-      canvas.drawPath(
-        Path()
-          ..moveTo(-eyeSpacing - 2.5 * s, eyeY)
-          ..quadraticBezierTo(-eyeSpacing, eyeY - 1.2 * s, -eyeSpacing + 2.5 * s, eyeY),
-        Paint()
-          ..color = Colors.white
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = stroke
-          ..strokeCap = StrokeCap.round,
-      );
-      canvas.drawCircle(Offset(eyeSpacing, eyeY), large ? 1.6 * s : 0.9 * s, Paint()..color = Colors.white);
-    case SupTechExpression.sleep:
-      final linePaint = Paint()
-        ..color = Colors.white
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = stroke
-        ..strokeCap = StrokeCap.round;
-      for (final dx in [-eyeSpacing, eyeSpacing]) {
-        canvas.drawLine(Offset(dx - 2.5 * s, eyeY), Offset(dx + 2.5 * s, eyeY), linePaint);
-      }
-    case SupTechExpression.error:
-      final xPaint = Paint()
-        ..color = Colors.white
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = stroke
-        ..strokeCap = StrokeCap.round;
-      for (final dx in [-eyeSpacing, eyeSpacing]) {
-        canvas.drawLine(Offset(dx - 1.5 * s, eyeY - 1.5 * s), Offset(dx + 1.5 * s, eyeY + 1.5 * s), xPaint);
-        canvas.drawLine(Offset(dx + 1.5 * s, eyeY - 1.5 * s), Offset(dx - 1.5 * s, eyeY + 1.5 * s), xPaint);
-      }
-  }
-}
-
-void _drawFocusedEyes(Canvas canvas, double s, double eyeY, double eyeSpacing) {
-  final eyePaint = Paint()
-    ..color = Colors.white
-    ..style = PaintingStyle.stroke
-    ..strokeWidth = 0.9 * s
-    ..strokeCap = StrokeCap.round;
-  canvas.drawLine(
-    Offset(-eyeSpacing - 2 * s, eyeY - 0.5 * s),
-    Offset(-eyeSpacing + 2 * s, eyeY + 0.5 * s),
-    eyePaint,
-  );
-  canvas.drawLine(
-    Offset(eyeSpacing - 2 * s, eyeY - 0.5 * s),
-    Offset(eyeSpacing + 2 * s, eyeY + 0.5 * s),
-    eyePaint,
-  );
-}
-
-void _drawClaspedHands(
-  Canvas canvas, double s, Color bodyColor, Paint outlinePaint, {
-  required double y,
-}) {
-  final handPaint = Paint()..color = bodyColor;
-  canvas.drawOval(
-    Rect.fromCenter(center: Offset(-2 * s, y), width: 3 * s, height: 2.5 * s), handPaint);
-  canvas.drawOval(
-    Rect.fromCenter(center: Offset(2 * s, y), width: 3 * s, height: 2.5 * s), handPaint);
-  canvas.drawOval(
-    Rect.fromCenter(center: Offset(0, y + 1.5 * s), width: 4 * s, height: 3 * s), handPaint);
-  canvas.drawOval(
-    Rect.fromCenter(center: Offset(0, y + 1.5 * s), width: 4 * s, height: 3 * s), outlinePaint);
-}
-
-void _drawHolographicScreen(
-  Canvas canvas, double s, Color accentColor, Paint outlinePaint, {
-  required double y,
-}) {
-  final screenRect = RRect.fromRectAndRadius(
-    Rect.fromCenter(center: Offset(0, y), width: 16 * s, height: 11 * s),
-    Radius.circular(1.2 * s),
-  );
-  canvas.drawRRect(screenRect, Paint()..color = accentColor.withValues(alpha: 0.18));
-  canvas.drawRRect(
-    screenRect,
-    Paint()
-      ..color = outlinePaint.color
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 0.6 * s,
-  );
-  for (final lineY in [y - 3 * s, y, y + 3 * s]) {
-    canvas.drawLine(
-      Offset(-5 * s, lineY), Offset(5 * s, lineY),
-      Paint()..color = accentColor.withValues(alpha: 0.45)..strokeWidth = 0.35 * s,
-    );
-  }
-}
-
-void _drawConceptHeadAccessory(
-  Canvas canvas, double s, SkinDefinition skin,
-  SupTechHeadAccessory accessory, Paint outlinePaint,
-) {
-  switch (accessory) {
-    case SupTechHeadAccessory.none: break;
-    case SupTechHeadAccessory.antenna:
-      canvas.drawLine(Offset(0, -27 * s), Offset(0, -31 * s),
-        Paint()..color = skin.accentColor..strokeWidth = 0.6 * s..strokeCap = StrokeCap.round);
-      canvas.drawCircle(Offset(0, -32 * s), 1.0 * s, Paint()..color = skin.accentColor);
-    case SupTechHeadAccessory.crown:
-      final crown = Path()
-        ..moveTo(-5 * s, -26 * s)..lineTo(-4 * s, -31 * s)..lineTo(-2 * s, -28 * s)
-        ..lineTo(0, -33 * s)..lineTo(2 * s, -28 * s)..lineTo(4 * s, -31 * s)..lineTo(5 * s, -26 * s);
-      canvas.drawPath(crown, Paint()..color = skin.accentColor); canvas.drawPath(crown, outlinePaint);
-    case SupTechHeadAccessory.wizardHat:
-      final cone = Path()..moveTo(-5 * s, -26 * s)..lineTo(5 * s, -26 * s)..lineTo(0, -36 * s);
-      canvas.drawPath(cone, Paint()..color = const Color(0xFF1E293B)); canvas.drawPath(cone, outlinePaint);
-      canvas.drawRect(Rect.fromLTWH(-5 * s, -27 * s, 10 * s, 2 * s), Paint()..color = skin.accentColor);
-    case SupTechHeadAccessory.ninjaHeadband:
-      canvas.drawRect(Rect.fromLTWH(-12 * s, -12 * s, 24 * s, 2.5 * s), Paint()..color = skin.accentColor);
-    case SupTechHeadAccessory.visor:
-      canvas.drawRRect(
-        RRect.fromRectAndRadius(Rect.fromCenter(center: Offset(0, -7 * s), width: 18 * s, height: 5 * s), Radius.circular(2 * s)),
-        Paint()..color = skin.accentColor.withValues(alpha: 0.75),
-      );
-    case SupTechHeadAccessory.horns:
-      for (final dir in [-1, 1]) {
-        canvas.drawPath(
-          Path()..moveTo(dir * 4 * s, -24 * s)..quadraticBezierTo(dir * 7 * s, -30 * s, dir * 5 * s, -34 * s),
-          Paint()..color = skin.accentColor..style = PaintingStyle.stroke..strokeWidth = 1 * s..strokeCap = StrokeCap.round,
-        );
-      }
-    case SupTechHeadAccessory.crest:
-      final crest = Path()..moveTo(0, -34 * s)..lineTo(-2.5 * s, -26 * s)..lineTo(0, -28 * s)..lineTo(2.5 * s, -26 * s);
-      canvas.drawPath(crest, Paint()..color = skin.accentColor); canvas.drawPath(crest, outlinePaint);
-  }
-}
-
-void _drawConceptEarAccessory(
-  Canvas canvas, double s, SkinDefinition skin, SupTechEarAccessory accessory,
-) {
-  switch (accessory) {
-    case SupTechEarAccessory.none: break;
-    case SupTechEarAccessory.headset:
-      for (final dx in [-7 * s, 7 * s]) {
-        canvas.drawOval(Rect.fromCenter(center: Offset(dx, -3 * s), width: 2.5 * s, height: 3.5 * s),
-          Paint()..color = skin.accentColor.withValues(alpha: 0.85));
-        canvas.drawOval(Rect.fromCenter(center: Offset(dx, -3 * s), width: 2.5 * s, height: 3.5 * s),
-          Paint()..color = Colors.black87..style = PaintingStyle.stroke..strokeWidth = 0.4 * s);
-      }
-      canvas.drawArc(
-        Rect.fromCenter(center: Offset(0, -8 * s), width: 14 * s, height: 6 * s),
-        pi, pi, false,
-        Paint()..color = skin.accentColor..style = PaintingStyle.stroke..strokeWidth = 0.6 * s..strokeCap = StrokeCap.round,
-      );
-    case SupTechEarAccessory.scarf:
-      canvas.drawRRect(
-        RRect.fromRectAndRadius(Rect.fromLTWH(-8 * s, -1 * s, 16 * s, 4 * s), Radius.circular(2 * s)),
-        Paint()..color = skin.accentColor,
-      );
-      canvas.drawPath(
-        Path()..moveTo(-8 * s, 2 * s)..quadraticBezierTo(-11 * s, 8 * s, -9 * s, 12 * s),
-        Paint()..color = skin.accentColor..style = PaintingStyle.stroke..strokeWidth = 1.25 * s..strokeCap = StrokeCap.round,
-      );
-    case SupTechEarAccessory.earGlow:
-      for (final dx in [-5.5 * s, 5.5 * s]) {
-        canvas.drawCircle(Offset(dx, -8.5 * s), 2 * s,
-          Paint()..shader = RadialGradient(colors: [
-            skin.accentColor, skin.accentColor.withValues(alpha: 0.0),
-          ]).createShader(Rect.fromCircle(center: Offset(dx, -8.5 * s), radius: 2 * s)));
-      }
-  }
-}
-
-void _drawConceptChestAccessory(
-  Canvas canvas, double s, SkinDefinition skin, SupTechChestAccessory accessory,
-) {
-  final badgeCY = 5.0 * s;
-  switch (accessory) {
-    case SupTechChestAccessory.none: break;
-    case SupTechChestAccessory.badge:
-      canvas.drawOval(Rect.fromCenter(center: Offset(0, badgeCY), width: 14 * s, height: 10 * s),
-        Paint()..shader = RadialGradient(colors: [
-          skin.accentColor.withValues(alpha: 0.35), skin.accentColor.withValues(alpha: 0.0),
-        ]).createShader(Rect.fromCenter(center: Offset(0, badgeCY), width: 16 * s, height: 12 * s)));
-      final stSpan = TextSpan(
-        text: 'ST',
-        style: TextStyle(
-          fontSize: 10 * s, fontWeight: FontWeight.w800, color: Colors.white,
-          shadows: [
-            Shadow(color: skin.accentColor, blurRadius: 6 * s),
-            Shadow(color: skin.accentColor, blurRadius: 2 * s),
-          ],
-        ),
-      );
-      final stPainter = TextPainter(text: stSpan, textDirection: TextDirection.ltr)..layout();
-      stPainter.paint(canvas, Offset(-stPainter.width / 2, badgeCY - stPainter.height / 2));
-    case SupTechChestAccessory.cape:
-      final cape = Path()
-        ..moveTo(-6 * s, 0)..lineTo(-9 * s, 12 * s)..lineTo(9 * s, 12 * s)..lineTo(6 * s, 0);
-      canvas.drawPath(cape, Paint()..color = skin.bodyColor.withValues(alpha: 0.75));
-    case SupTechChestAccessory.codeScroll:
-      canvas.drawRRect(RRect.fromRectAndRadius(Rect.fromCenter(center: Offset(0, badgeCY), width: 8 * s, height: 10 * s), Radius.circular(1 * s)),
-        Paint()..color = const Color(0xFFF8FAFC));
-      canvas.drawLine(Offset(-2 * s, badgeCY - 3 * s), Offset(2 * s, badgeCY - 3 * s),
-        Paint()..color = skin.accentColor..strokeWidth = 0.4 * s);
-      canvas.drawLine(Offset(-2 * s, badgeCY), Offset(2 * s, badgeCY),
-        Paint()..color = skin.accentColor..strokeWidth = 0.4 * s);
-    case SupTechChestAccessory.gear:
-      canvas.drawCircle(Offset(0, badgeCY), 3 * s, Paint()..color = skin.accentColor.withValues(alpha: 0.25));
-      for (var i = 0; i < 6; i++) {
-        final angle = i * pi / 3;
-        canvas.drawLine(Offset(0, badgeCY), Offset(cos(angle) * 4 * s, badgeCY + sin(angle) * 4 * s),
-          Paint()..color = skin.accentColor..strokeWidth = 0.6 * s);
-      }
-    case SupTechChestAccessory.flameEmblem:
-      final flame = Path()
-        ..moveTo(0, badgeCY - 4 * s)
-        ..quadraticBezierTo(-3 * s, badgeCY, 0, badgeCY + 4 * s)
-        ..quadraticBezierTo(3 * s, badgeCY, 0, badgeCY - 4 * s);
-      canvas.drawPath(flame, Paint()..color = const Color(0xFFF97316));
-    case SupTechChestAccessory.staff:
-      canvas.drawLine(Offset(10 * s, -10 * s), Offset(10 * s, 8 * s),
-        Paint()..color = const Color(0xFF92400E)..strokeWidth = 0.75 * s..strokeCap = StrokeCap.round);
-      canvas.drawCircle(Offset(10 * s, -11 * s), 2 * s, Paint()..color = skin.accentColor);
-  }
 }
 
 // ═══════════════════════════════════════════════════════
@@ -1256,7 +930,7 @@ class _ExpressionPainter extends CustomPainter {
         ).createShader(faceRect),
     );
 
-    _drawReferenceEyes(canvas, s, expression, -1.4 * s, 3.3 * s, skin.accentColor);
+    drawSupTechEyes(canvas, skin, s, -1.4 * s, 3.3 * s, 1.4 * s, expression);
 
     canvas.restore();
   }
@@ -1483,9 +1157,9 @@ class _PosePainter extends CustomPainter {
     final eyeY = -1.4 * s;
 
     if (pose == SupTechPose.working) {
-      _drawFocusedEyes(canvas, s, eyeY, eyeSpacing);
+      drawSupTechFocusedEyes(canvas, s, eyeY, eyeSpacing);
     } else {
-      _drawReferenceEyes(canvas, s, SupTechExpression.neutral, eyeY, eyeSpacing, skin.accentColor);
+      drawSupTechEyes(canvas, skin, s, eyeY, eyeSpacing, 1.4 * s, SupTechExpression.neutral);
     }
 
     if (pose == SupTechPose.wave) {
@@ -1514,9 +1188,37 @@ class _PosePainter extends CustomPainter {
         );
       }
     } else if (pose == SupTechPose.thinking) {
-      _drawClaspedHands(canvas, s, skin.bodyColor, robeOutline, y: 1.5 * s);
+      final handPaint = Paint()..color = skin.bodyColor;
+      final handY = 1.5 * s;
+      canvas.drawOval(Rect.fromCenter(center: Offset(-2 * s, handY), width: 3 * s, height: 2.5 * s), handPaint);
+      canvas.drawOval(Rect.fromCenter(center: Offset(2 * s, handY), width: 3 * s, height: 2.5 * s), handPaint);
+      canvas.drawOval(Rect.fromCenter(center: Offset(0, handY + 1.5 * s), width: 4 * s, height: 3 * s), handPaint);
+      canvas.drawOval(Rect.fromCenter(center: Offset(0, handY + 1.5 * s), width: 4 * s, height: 3 * s), robeOutline);
     } else if (pose == SupTechPose.working) {
-      _drawHolographicScreen(canvas, s, skin.accentColor, robeOutline, y: -1 * s);
+      final screenY = -1 * s;
+      final screenRect = RRect.fromRectAndRadius(
+        Rect.fromCenter(center: Offset(0, screenY), width: 16 * s, height: 11 * s),
+        Radius.circular(1.2 * s),
+      );
+      final glowPaint = Paint()
+        ..shader = LinearGradient(
+          begin: Alignment.topLeft, end: Alignment.bottomRight,
+          colors: [skin.accentColor.withValues(alpha: 0.15), skin.accentColor.withValues(alpha: 0.05)],
+        ).createShader(Rect.fromCenter(center: Offset(0, screenY), width: 16 * s, height: 11 * s));
+      canvas.drawRRect(screenRect, glowPaint);
+      canvas.drawRRect(
+        screenRect,
+        Paint()..color = skin.accentColor.withValues(alpha: 0.3)..style = PaintingStyle.stroke..strokeWidth = 0.4 * s,
+      );
+      final dataPaint = Paint()..color = skin.accentColor.withValues(alpha: 0.4)..strokeWidth = 0.3 * s;
+      for (var row = 0; row < 3; row++) {
+        for (var col = 0; col < 4; col++) {
+          final x = (-6 + col * 4) * s;
+          final y = (screenY - 3 + row * 3) * s;
+          canvas.drawLine(Offset(x - 0.5 * s, y), Offset(x + 1.5 * s, y), dataPaint);
+          canvas.drawLine(Offset(x, y - 0.3 * s), Offset(x, y + 0.3 * s), dataPaint);
+        }
+      }
     }
 
     canvas.restore();
