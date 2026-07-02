@@ -281,37 +281,50 @@ void _drawWizardHat(Canvas canvas, SkinDefinition skin, double s, double hoodPea
   final cone = Path()..moveTo(-6 * s, peakY)..lineTo(6 * s, peakY)..lineTo(0, peakY - 14 * s);
   canvas.drawPath(cone, hatPaint);
   canvas.drawPath(cone, Paint()..color = Colors.black87..style = PaintingStyle.stroke..strokeWidth = 0.5 * s);
-  canvas.drawRect(Rect.fromLTWH(-6 * s, peakY - 1.5 * s, 12 * s, 2.5 * s), bandPaint);
+  final bandRect = Rect.fromLTWH(-6 * s, peakY - 1.5 * s, 12 * s, 2.5 * s);
+  canvas.drawRect(bandRect, bandPaint);
+  canvas.drawRect(bandRect, Paint()..color = Colors.black87..style = PaintingStyle.stroke..strokeWidth = 0.5 * s);
   canvas.drawCircle(Offset(0, peakY - 14 * s), 1.5 * s, Paint()..color = skin.accentColor);
 }
 
 void _drawHeadband(Canvas canvas, SkinDefinition skin, double s, double headCY, double headR, double hoodPeakY) {
   final bandY = headCY - headR * 0.3;
   final bandPaint = Paint()..color = skin.accentColor;
-  canvas.drawRect(Rect.fromLTWH(-headR - 2 * s, bandY - 1.5 * s, headR * 2 + 4 * s, 3 * s), bandPaint);
+  final bandRect = Rect.fromLTWH(-headR - 2 * s, bandY - 1.5 * s, headR * 2 + 4 * s, 3 * s);
+  canvas.drawRect(bandRect, bandPaint);
+  canvas.drawRect(bandRect, Paint()..color = Colors.black87..style = PaintingStyle.stroke..strokeWidth = 0.5 * s);
+  final isLight = ThemeData.estimateBrightnessForColor(skin.bodyColor) == Brightness.light;
+  final tailOutline = Paint()
+    ..color = isLight ? const Color(0xFF94A3B8) : Colors.black87
+    ..style = PaintingStyle.stroke..strokeWidth = 0.5 * s;
   final tailPath = Path()
     ..moveTo(-headR - 2 * s, bandY + 1.5 * s)
-    ..quadraticBezierTo(-headR - 6 * s, bandY + 8 * s, -headR - 3 * s, bandY + 12 * s)
+    ..quadraticBezierTo(-headR - 6 * s, bandY + 8 * s, -headR - 3 * s, bandY + 12 * s);
+  canvas.drawPath(tailPath, Paint()..color = skin.accentColor..style = PaintingStyle.stroke..strokeWidth = 1 * s);
+  canvas.drawPath(tailPath, tailOutline);
+  final tailPath2 = Path()
     ..moveTo(headR + 2 * s, bandY + 1.5 * s)
     ..quadraticBezierTo(headR + 6 * s, bandY + 8 * s, headR + 3 * s, bandY + 12 * s);
-  canvas.drawPath(tailPath, Paint()..color = skin.accentColor..style = PaintingStyle.stroke..strokeWidth = 1 * s);
+  canvas.drawPath(tailPath2, Paint()..color = skin.accentColor..style = PaintingStyle.stroke..strokeWidth = 1 * s);
+  canvas.drawPath(tailPath2, tailOutline);
 }
 
 void _drawVisor(Canvas canvas, SkinDefinition skin, double s, double headCY, double headR) {
   final visorY = headCY + headR * 0.15;
-  final visorPaint = Paint()..color = skin.accentColor.withValues(alpha: 0.7);
-  final visorPath = Path()
-    ..addRRect(RRect.fromRectAndRadius(
-      Rect.fromCenter(center: Offset(0, visorY), width: headR * 1.6, height: headR * 0.7),
-      Radius.circular(3 * s),
-    ));
-  canvas.drawPath(visorPath, visorPaint);
+  final isLight = ThemeData.estimateBrightnessForColor(skin.bodyColor) == Brightness.light;
+  final outlineColor = isLight ? const Color(0xFF94A3B8) : Colors.black87;
+  final visorRect = RRect.fromRectAndRadius(
+    Rect.fromCenter(center: Offset(0, visorY), width: headR * 1.6, height: headR * 0.7),
+    Radius.circular(3 * s),
+  );
+  canvas.drawRRect(visorRect, Paint()..color = skin.accentColor.withValues(alpha: 0.35));
+  canvas.drawRRect(visorRect, Paint()..color = outlineColor..style = PaintingStyle.stroke..strokeWidth = 0.5 * s);
   canvas.drawRRect(
     RRect.fromRectAndRadius(
       Rect.fromCenter(center: Offset(0, visorY), width: headR * 1.2, height: headR * 0.35),
       Radius.circular(2 * s),
     ),
-    Paint()..color = Colors.white.withValues(alpha: 0.15),
+    Paint()..color = Colors.white.withValues(alpha: 0.2),
   );
 }
 
@@ -381,7 +394,7 @@ void _drawHeadset(Canvas canvas, SkinDefinition skin, double s, double headCY, d
   canvas.drawPath(bandPath, bandPaint);
   canvas.drawPath(bandPath, outlinePaint);
   final cupPaint = Paint()..color = skin.accentColor.withValues(alpha: 0.85)..style = PaintingStyle.fill;
-  for (final dx in [-headR - 2 * s, headR + 2 * s]) {
+  for (final dx in [-headR - 4 * s, headR + 4 * s]) {
     canvas.drawRRect(
       RRect.fromRectAndRadius(Rect.fromCenter(center: Offset(dx, headCY + 1 * s), width: 3 * s, height: 5 * s), Radius.circular(1.5 * s)),
       cupPaint,
@@ -395,19 +408,22 @@ void _drawHeadset(Canvas canvas, SkinDefinition skin, double s, double headCY, d
 
 void _drawScarf(Canvas canvas, SkinDefinition skin, double s, double headCY, double headR) {
   final scarfPaint = Paint()..color = skin.accentColor;
+  final isLight = ThemeData.estimateBrightnessForColor(skin.bodyColor) == Brightness.light;
+  final outlineColor = isLight ? const Color(0xFF94A3B8) : Colors.black87;
   final neckY = headCY + headR * 0.6;
-  canvas.drawRRect(
-    RRect.fromRectAndRadius(Rect.fromLTWH(-headR - 1 * s, neckY - 2 * s, headR * 2 + 2 * s, 5 * s), Radius.circular(2 * s)),
-    scarfPaint,
-  );
+  final scarfRect = RRect.fromRectAndRadius(Rect.fromLTWH(-headR - 1 * s, neckY - 2 * s, headR * 2 + 2 * s, 5 * s), Radius.circular(2 * s));
+  canvas.drawRRect(scarfRect, scarfPaint);
+  canvas.drawRRect(scarfRect, Paint()..color = outlineColor..style = PaintingStyle.stroke..strokeWidth = 0.5 * s);
   final tailPath = Path()
     ..moveTo(-headR, neckY + 3 * s)
     ..quadraticBezierTo(-headR - 5 * s, neckY + 8 * s, -headR - 3 * s, neckY + 14 * s);
   canvas.drawPath(tailPath, Paint()..color = skin.accentColor..style = PaintingStyle.stroke..strokeWidth = 1.75 * s..strokeCap = StrokeCap.round);
-  canvas.drawPath(tailPath, Paint()..color = Colors.black87..style = PaintingStyle.stroke..strokeWidth = 0.5 * s);
+  canvas.drawPath(tailPath, Paint()..color = outlineColor..style = PaintingStyle.stroke..strokeWidth = 0.5 * s);
 }
 
 void _drawEarGlow(Canvas canvas, SkinDefinition skin, double s, double headCY, double headR) {
+  final isLight = ThemeData.estimateBrightnessForColor(skin.bodyColor) == Brightness.light;
+  final outlineColor = isLight ? skin.accentColor.withValues(alpha: 0.6) : Colors.black87;
   final glowPaint = Paint();
   for (final dx in [-headR * 0.7, headR * 0.7]) {
     final center = Offset(dx, headCY);
@@ -416,6 +432,7 @@ void _drawEarGlow(Canvas canvas, SkinDefinition skin, double s, double headCY, d
         skin.accentColor, skin.accentColor.withValues(alpha: 0.0),
       ]).createShader(Rect.fromCircle(center: center, radius: 3 * s)));
     canvas.drawCircle(center, 1.5 * s, Paint()..color = skin.accentColor);
+    canvas.drawCircle(center, 1.5 * s, Paint()..color = outlineColor..style = PaintingStyle.stroke..strokeWidth = 0.4 * s);
   }
 }
 
@@ -460,6 +477,8 @@ void _drawBadge(Canvas canvas, SkinDefinition skin, double s, double bodyTopY, d
 }
 
 void _drawCape(Canvas canvas, SkinDefinition skin, double s, double bodyTopY, double bodyBotY) {
+  final isLight = ThemeData.estimateBrightnessForColor(skin.bodyColor) == Brightness.light;
+  final outlineColor = isLight ? const Color(0xFF94A3B8) : Colors.black87;
   final capePaint = Paint()..color = skin.bodyColor.withValues(alpha: 0.7);
   final capePath = Path()
     ..moveTo(-6 * s, bodyTopY + 2 * s)
@@ -467,7 +486,7 @@ void _drawCape(Canvas canvas, SkinDefinition skin, double s, double bodyTopY, do
     ..lineTo(8 * s, bodyBotY)
     ..lineTo(6 * s, bodyTopY + 2 * s);
   canvas.drawPath(capePath, capePaint);
-  canvas.drawPath(capePath, Paint()..color = skin.accentColor..style = PaintingStyle.stroke..strokeWidth = 0.4 * s);
+  canvas.drawPath(capePath, Paint()..color = outlineColor..style = PaintingStyle.stroke..strokeWidth = 0.75 * s);
 }
 
 void _drawCodeScroll(Canvas canvas, SkinDefinition skin, double s, double bodyTopY, double bodyBotY) {
@@ -498,6 +517,7 @@ void _drawGear(Canvas canvas, SkinDefinition skin, double s, double bodyTopY, do
     final cx = 5.5 * s * cos(angle);
     final cy = 5.5 * s * sin(angle);
     canvas.drawCircle(Offset(cx, cy + gearY), 1.5 * s, gearPaint..style = PaintingStyle.fill);
+    canvas.drawCircle(Offset(cx, cy + gearY), 1.5 * s, Paint()..color = Colors.black87..style = PaintingStyle.stroke..strokeWidth = 0.3 * s);
   }
   canvas.drawCircle(Offset(0, gearY), 1.5 * s, Paint()..color = Colors.black87);
 }
@@ -520,6 +540,7 @@ void _drawFlameEmblem(Canvas canvas, SkinDefinition skin, double s, double bodyT
     ..quadraticBezierTo(-1 * s, flameY + 2 * s, -2 * s, flameY + 1 * s)
     ..quadraticBezierTo(-1.5 * s, flameY, 0, flameY - 2 * s);
   canvas.drawPath(innerFlame, Paint()..color = const Color(0xFFFDE68A));
+  canvas.drawPath(innerFlame, Paint()..color = Colors.black87..style = PaintingStyle.stroke..strokeWidth = 0.3 * s);
 }
 
 void _drawStaff(Canvas canvas, SkinDefinition skin, double s, double bodyTopY, double bodyBotY) {
@@ -528,6 +549,9 @@ void _drawStaff(Canvas canvas, SkinDefinition skin, double s, double bodyTopY, d
     Paint()..color = const Color(0xFF78350F)..strokeWidth = 0.75 * s..strokeCap = StrokeCap.round);
   final crystalCenter = Offset(staffX, bodyTopY + 1 * s);
   canvas.drawCircle(crystalCenter, 2 * s, Paint()..color = skin.accentColor);
+  final isLight = ThemeData.estimateBrightnessForColor(skin.bodyColor) == Brightness.light;
+  canvas.drawCircle(crystalCenter, 2 * s,
+    Paint()..color = isLight ? const Color(0xFF94A3B8) : Colors.black87..style = PaintingStyle.stroke..strokeWidth = 0.4 * s);
   canvas.drawCircle(crystalCenter, 3 * s,
     Paint()..shader = RadialGradient(colors: [
       skin.accentColor.withValues(alpha: 0.4), skin.accentColor.withValues(alpha: 0.0),
@@ -574,16 +598,18 @@ void drawSupTechPoseOverlay(
 
   switch (pose) {
     case SupTechPose.wave:
+      final armPath = Path()
+        ..moveTo(-8 * s, -15 * s)
+        ..quadraticBezierTo(-12 * s, -20 * s, -14 * s, -25 * s);
       canvas.drawPath(
-        Path()
-          ..moveTo(-8 * s, -15 * s)
-          ..quadraticBezierTo(-12 * s, -20 * s, -14 * s, -25 * s),
+        armPath,
         Paint()
           ..color = skin.bodyColor
           ..style = PaintingStyle.stroke
           ..strokeWidth = 1.25 * s
           ..strokeCap = StrokeCap.round,
       );
+      canvas.drawPath(armPath, outlinePaint);
       canvas.drawCircle(Offset(-14 * s, -27 * s), 1.2 * s, Paint()..color = skin.bodyColor);
       canvas.drawCircle(Offset(-14 * s, -27 * s), 1.2 * s, outlinePaint);
       final wavePaint = Paint()
@@ -602,11 +628,13 @@ void drawSupTechPoseOverlay(
       final handY = -11 * s;
       final handPaint = Paint()..color = skin.bodyColor;
       canvas.drawOval(Rect.fromCenter(center: Offset(-2 * s, handY), width: 3 * s, height: 2.5 * s), handPaint);
+      canvas.drawOval(Rect.fromCenter(center: Offset(-2 * s, handY), width: 3 * s, height: 2.5 * s), outlinePaint);
       canvas.drawOval(Rect.fromCenter(center: Offset(2 * s, handY), width: 3 * s, height: 2.5 * s), handPaint);
+      canvas.drawOval(Rect.fromCenter(center: Offset(2 * s, handY), width: 3 * s, height: 2.5 * s), outlinePaint);
       canvas.drawOval(Rect.fromCenter(center: Offset(0, handY + 1.5 * s), width: 4 * s, height: 3 * s), handPaint);
       canvas.drawOval(Rect.fromCenter(center: Offset(0, handY + 1.5 * s), width: 4 * s, height: 3 * s), outlinePaint);
     case SupTechPose.working:
-      final screenY = -14 * s;
+      final screenY = -17 * s;
       final screenRect = RRect.fromRectAndRadius(
         Rect.fromCenter(center: Offset(0, screenY), width: 16 * s, height: 11 * s),
         Radius.circular(1.2 * s),
