@@ -69,51 +69,68 @@ void drawSupTechHappyEyes(Canvas canvas, SkinDefinition skin, double s, double e
 }
 
 void drawSupTechAngryEyes(Canvas canvas, SkinDefinition skin, double s, double eyeY, double eyeSpacing, double eyeR) {
-  drawSupTechAngryEye(canvas, skin, -eyeSpacing, eyeY, eyeR, s, true);
-  drawSupTechAngryEye(canvas, skin, eyeSpacing, eyeY, eyeR, s, false);
-}
-
-void drawSupTechAngryEye(Canvas canvas, SkinDefinition skin, double cx, double cy, double r, double s, bool left) {
-  final center = Offset(cx, cy);
-
+  final glowPaint = Paint()
+    ..shader = RadialGradient(colors: [
+      skin.accentColor.withValues(alpha: 0.5),
+      skin.accentColor.withValues(alpha: 0.0),
+    ]).createShader(Rect.fromCenter(
+      center: Offset(0, eyeY),
+      width: (eyeR + 6 * s) * 4,
+      height: (eyeR + 6 * s) * 3,
+    ));
   canvas.drawOval(
-    Rect.fromCenter(center: center, width: (r + 4 * s) * 2, height: (r + 4 * s) * 2.5),
-    Paint()
-      ..shader = RadialGradient(colors: [
-        skin.accentColor.withValues(alpha: 0.5),
-        skin.accentColor.withValues(alpha: 0.0),
-      ]).createShader(Rect.fromCenter(center: center, width: (r + 6 * s) * 2, height: (r + 6 * s) * 2.5)),
+    Rect.fromCenter(center: Offset(0, eyeY), width: (eyeR + 5 * s) * 4, height: (eyeR + 5 * s) * 3),
+    glowPaint,
   );
 
-  final Path eyePath;
-  if (left) {
-    eyePath = Path()
-      ..moveTo(cx - r * 0.7, cy + r * 0.5)
-      ..lineTo(cx + r * 0.7, cy - r * 0.8)
-      ..quadraticBezierTo(cx + r * 0.4, cy + r * 0.6, cx - r * 0.7, cy + r * 0.5)
-      ..close();
-  } else {
-    eyePath = Path()
-      ..moveTo(cx + r * 0.7, cy + r * 0.5)
-      ..lineTo(cx - r * 0.7, cy - r * 0.8)
-      ..quadraticBezierTo(cx - r * 0.4, cy + r * 0.6, cx + r * 0.7, cy + r * 0.5)
-      ..close();
+  for (final dx in [-eyeSpacing, eyeSpacing]) {
+    Path wedgePath;
+    if (dx < 0) {
+      wedgePath = Path()
+        ..moveTo(dx - 1.8 * s, eyeY - 2.2 * s)
+        ..lineTo(dx + 1.8 * s, eyeY + 2.5 * s)
+        ..lineTo(dx + 0.8 * s, eyeY + 1.2 * s)
+        ..lineTo(dx - 1.2 * s, eyeY - 1.0 * s)
+        ..close();
+    } else {
+      wedgePath = Path()
+        ..moveTo(dx + 1.8 * s, eyeY - 2.2 * s)
+        ..lineTo(dx - 1.8 * s, eyeY + 2.5 * s)
+        ..lineTo(dx - 0.8 * s, eyeY + 1.2 * s)
+        ..lineTo(dx + 1.2 * s, eyeY - 1.0 * s)
+        ..close();
+    }
+    canvas.drawPath(wedgePath, Paint()..color = Colors.white);
   }
-  canvas.drawPath(eyePath, Paint()..color = Colors.white);
 }
 
 void drawSupTechSurprisedEyes(Canvas canvas, SkinDefinition skin, double s, double eyeY, double eyeSpacing, double eyeR) {
   for (final dx in [-eyeSpacing, eyeSpacing]) {
     final center = Offset(dx, eyeY);
-    final r = eyeR * 1.05;
-    canvas.drawCircle(center, r + 3 * s,
+
+    canvas.drawOval(
+      Rect.fromCenter(center: center, width: (eyeR + 5 * s) * 2.6, height: (eyeR + 5 * s) * 2.8),
       Paint()
         ..shader = RadialGradient(colors: [
-          skin.accentColor.withValues(alpha: 0.5),
+          skin.accentColor.withValues(alpha: 0.6),
           skin.accentColor.withValues(alpha: 0.0),
-        ]).createShader(Rect.fromCircle(center: center, radius: r + 4 * s)),
+        ]).createShader(Rect.fromCenter(center: center, width: (eyeR + 6 * s) * 2.6, height: (eyeR + 6 * s) * 2.8)),
     );
-    canvas.drawCircle(center, r, Paint()..color = Colors.white);
+
+    canvas.drawOval(
+      Rect.fromCenter(center: center, width: (eyeR + 2 * s) * 2.2, height: (eyeR + 2 * s) * 2.4),
+      Paint()
+        ..shader = RadialGradient(colors: [
+          Colors.white.withValues(alpha: 0.35),
+          skin.accentColor.withValues(alpha: 0.6),
+          skin.accentColor.withValues(alpha: 0.0),
+        ]).createShader(Rect.fromCenter(center: center, width: (eyeR + 3 * s) * 2.2, height: (eyeR + 3 * s) * 2.4)),
+    );
+
+    canvas.drawOval(
+      Rect.fromCenter(center: center, width: eyeR * 2.2, height: eyeR * 2.5),
+      Paint()..color = Colors.white,
+    );
   }
 }
 
