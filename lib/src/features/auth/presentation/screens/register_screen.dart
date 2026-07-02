@@ -22,7 +22,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   bool _obscure = true;
   String _icon = '🔧';
 
-  final _icons = ['🔧', '⚙️', '💻', '🛠️', '📱', '🔋', '🖱️', '⌨️'];
+  final _icons = ['🔮', '🌌', '☄️', '⭐', '🌙', '🧪', '🌍', '🐋', '🌊'];
 
   @override
   void dispose() {
