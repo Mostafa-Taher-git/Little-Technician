@@ -64,7 +64,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       const Gap(20),
-                      // Logo
                       Center(
                         child: Image.asset(
                           'assets/icon/icon.png',
@@ -93,7 +92,6 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       const Gap(36),
 
-                      // Quick select accounts
                       if (_users.isNotEmpty) ...[
                         const Text('Quick Login', style: TextStyle(color: Colors.white60, fontSize: 12, letterSpacing: 1)),
                         const Gap(10),
@@ -132,7 +130,6 @@ class _LoginScreenState extends State<LoginScreen> {
                         const Gap(24),
                       ],
 
-                      // Username
                       TextFormField(
                         controller: _usernameCtrl,
                         style: const TextStyle(color: Colors.white),
@@ -155,7 +152,6 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       const Gap(16),
 
-                      // Password
                       TextFormField(
                         controller: _passwordCtrl,
                         obscureText: _obscure,
@@ -192,7 +188,6 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       const Gap(24),
 
-                      // Login button
                       BlocBuilder<AuthCubit, AuthState>(
                         builder: (_, state) {
                           return SizedBox(
@@ -223,7 +218,6 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       const Gap(24),
 
-                      // Register link
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [

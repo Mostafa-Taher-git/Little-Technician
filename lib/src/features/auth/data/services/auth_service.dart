@@ -29,8 +29,6 @@ class AuthService {
     return prefs.getInt('${_sessionKey}_id');
   }
 
-  // ── Password hashing ─────────────────────────────────────────────────────
-
   static String _generateSalt() {
     final rng = Random.secure();
     return List.generate(16, (_) => rng.nextInt(36).toRadixString(36)).join();
@@ -47,7 +45,6 @@ class AuthService {
     return '$salt:$hash';
   }
 
-  /// Returns true if [stored] is in "salt:hash" format.
   static bool _isHashed(String stored) => stored.contains(':');
 
   /// Verify a plaintext password against a stored value (hashed or legacy).
@@ -59,8 +56,6 @@ class AuthService {
     }
     return password == stored;
   }
-
-  // ── Helpers ────────────────────────────────────────────────────────────────
 
   static Future<List<UserModel>> _loadUsers() async {
     final prefs = await _prefs;
@@ -90,8 +85,6 @@ class AuthService {
     final raw = jsonEncode(users.map((u) => u.toJson()).toList());
     await prefs.setString(_usersKey, raw);
   }
-
-  // ── Migration ──────────────────────────────────────────────────────────────
 
   static Future<void> migrateUserData(int userId) async {
     final prefs = await _prefs;
@@ -123,8 +116,6 @@ class AuthService {
       await prefs.remove('lt_problem_counter');
     }
   }
-
-  // ── Public API ─────────────────────────────────────────────────────────────
 
   static Future<bool> register({
     required String username,

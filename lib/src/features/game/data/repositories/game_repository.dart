@@ -214,7 +214,6 @@ class GameRepository {
   }
 
   Future<PlayerProgress> _createTestProgressImpl(int userId) async {
-    // Delete any existing progress for this user
     final existing = await loadProgress(userId);
     if (existing != null) {
       await _isar.writeTxn(() async {

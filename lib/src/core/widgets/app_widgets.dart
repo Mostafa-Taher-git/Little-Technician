@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 
 void showErrorToast(BuildContext context, String text) {
-  final scheme = Theme.of(context).colorScheme;
+  final colorScheme = Theme.of(context).colorScheme;
   ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(
-      backgroundColor: scheme.error,
+      backgroundColor: colorScheme.error,
       behavior: SnackBarBehavior.floating,
       margin: const EdgeInsets.all(12),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -21,10 +21,10 @@ void showErrorToast(BuildContext context, String text) {
 }
 
 void showSuccessToast(BuildContext context, String text) {
-  final scheme = Theme.of(context).colorScheme;
+  final colorScheme = Theme.of(context).colorScheme;
   ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(
-      backgroundColor: scheme.secondary,
+      backgroundColor: colorScheme.secondary,
       behavior: SnackBarBehavior.floating,
       margin: const EdgeInsets.all(12),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),

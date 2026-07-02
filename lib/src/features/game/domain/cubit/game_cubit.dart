@@ -92,31 +92,27 @@ class GameCubit extends Cubit<GameState> {
       : super(GameState(progress: PlayerProgress()..userId = _userId));
 
   Future<void> loadGame() async {
-    try {
-      final validUsers = await AuthService.getAllUsers();
-      final validIds = validUsers.map((u) => u.id).toList();
-      await _repository.cleanupOrphanedProgress(validIds);
-      final progress = await _repository.getOrCreateProgress(_userId);
-      WorldDef? world;
-      if (progress.currentCategoryId != null) {
-        world = GameData.worlds.cast<WorldDef?>().firstWhere(
-          (w) => w!.id == progress.currentCategoryId,
-          orElse: () => GameData.worlds.isNotEmpty ? GameData.worlds.first : null,
-        );
-      } else if (progress.currentWorldId < GameData.worlds.length) {
-        world = GameData.worlds[progress.currentWorldId];
-      } else if (GameData.worlds.isNotEmpty) {
-        world = GameData.worlds.first;
-      }
-      _checkAndUnlockProgressionSkins();
-      final pending = progress.pendingAchievementIds
-          .map((id) => AchievementManager.all.firstWhere((a) => a.id == id))
-          .toList();
-      _safePersist([() => _repository.clearPendingAchievements(progress)]);
-      emit(GameState(progress: progress, currentWorld: world, newlyUnlockedAchievements: pending));
-    } catch (e, st) {
-      debugPrint('loadGame failed: $e\n$st');
+    final validUsers = await AuthService.getAllUsers();
+    final validIds = validUsers.map((u) => u.id).toList();
+    await _repository.cleanupOrphanedProgress(validIds);
+    final progress = await _repository.getOrCreateProgress(_userId);
+    WorldDef? world;
+    if (progress.currentCategoryId != null) {
+      world = GameData.worlds.cast<WorldDef?>().firstWhere(
+        (w) => w!.id == progress.currentCategoryId,
+        orElse: () => GameData.worlds.isNotEmpty ? GameData.worlds.first : null,
+      );
+    } else if (progress.currentWorldId < GameData.worlds.length) {
+      world = GameData.worlds[progress.currentWorldId];
+    } else if (GameData.worlds.isNotEmpty) {
+      world = GameData.worlds.first;
     }
+    _checkAndUnlockProgressionSkins();
+    final pending = progress.pendingAchievementIds
+        .map((id) => AchievementManager.all.firstWhere((a) => a.id == id))
+        .toList();
+    _safePersist([() => _repository.clearPendingAchievements(progress)]);
+    emit(GameState(progress: progress, currentWorld: world, newlyUnlockedAchievements: pending));
   }
 
   void selectWorld(WorldDef world) {
@@ -163,22 +159,29 @@ class GameCubit extends Cubit<GameState> {
     ));
   }
 
-  void saveFeedback(String levelId, bool wasHelpful) {
-    final p = state.progress;
-    final raw = p.getPrepResult(levelId);
+  void _savePrepResultData(String levelId, String key, Map<String, dynamic> value) {
+    final progress = state.progress;
+    final raw = progress.getPrepResult(levelId);
     final data = raw != null
         ? json.decode(raw) as Map<String, dynamic>
         : <String, dynamic>{};
-    data['feedback'] = {'helpful': wasHelpful, 'timestamp': DateTime.now().toIso8601String()};
-    p.setPrepResult(levelId, json.encode(data));
-    _safePersist([() => _repository.saveProgress(p)]);
-    emit(state.copyWith(progress: p));
+    data[key] = value;
+    progress.setPrepResult(levelId, json.encode(data));
+    _safePersist([() => _repository.saveProgress(progress)]);
+    emit(state.copyWith(progress: progress));
+  }
+
+  void saveFeedback(String levelId, bool wasHelpful) {
+    _savePrepResultData(levelId, 'feedback', {
+      'helpful': wasHelpful,
+      'timestamp': DateTime.now().toIso8601String(),
+    });
   }
 
   void addChallengeBonus(int bonusPoints) {
-    final p = state.progress;
-    _safePersist([() => _repository.addPoints(p, bonusPoints)]);
-    emit(state.copyWith(progress: p));
+    final progress = state.progress;
+    _safePersist([() => _repository.addPoints(progress, bonusPoints)]);
+    emit(state.copyWith(progress: progress));
   }
 
   void startBoss(BossEncounterDef boss) {
@@ -235,14 +238,7 @@ class GameCubit extends Cubit<GameState> {
     final completedWithCurrent = [...progress.completedLevelIds, level.id];
     final isWorldComplete = world != null && GameData.isWorldComplete(world, completedWithCurrent);
 
-    // Draw reward safely — ensure state always emits even if reward fails
-    RewardDef? reward;
-    try {
-      reward = RewardPool.draw();
-    } catch (e, st) {
-      debugPrint('Reward draw failed: $e\n$st');
-    }
-
+    final reward = _drawReward();
     final persistOps = <Future<void> Function()>[
       () => _repository.addPoints(progress, totalPoints),
       () => _repository.completeLevel(progress, level.id),
@@ -250,19 +246,18 @@ class GameCubit extends Cubit<GameState> {
       if (isWorldComplete) ...[
         () => _repository.completeCategory(progress, world.id),
       ],
-      if (reward != null) () => _repository.addReward(progress, reward!.id),
+      if (reward != null) () => _repository.addReward(progress, reward.id),
       if (reward?.type == RewardType.skin) () => _repository.unlockSkin(progress, reward!.value),
       if (reward?.type == RewardType.theme) () => _repository.setTheme(progress, reward!.value),
       () => _repository.recordPlayDate(progress),
     ];
 
-    // Complete daily quest if this level was from a daily challenge
     if (state.pointsMultiplier > 1) {
       persistOps.add(() => _repository.saveProgress(progress..setDailyQuestCompleted()));
     }
 
     _safePersist(persistOps);
-    
+
     _checkAndUnlockProgressionSkins();
     final newAchievements = _checkAchievements();
 
@@ -293,21 +288,14 @@ class GameCubit extends Cubit<GameState> {
     final boss = state.currentBoss;
     final bossPoints = boss?.points ?? state.currentWorld?.boss.points ?? 500;
 
-    // Draw reward safely — ensure state always emits even if reward fails
-    RewardDef? reward;
-    try {
-      reward = RewardPool.draw();
-    } catch (e, st) {
-      debugPrint('Boss reward draw failed: $e\n$st');
-    }
-
+    final reward = _drawReward();
     final persistOps = <Future<void> Function()>[
       () => _repository.addPoints(progress, bossPoints * state.pointsMultiplier),
       () => _repository.defeatBoss(progress, bossId: boss?.id),
       () => _repository.recordPlayDate(progress),
       if (boss?.id.startsWith('weekly_') == true)
         () => _repository.saveProgress(progress..setWeeklyBossCompleted()),
-      if (reward != null) () => _repository.addReward(progress, reward!.id),
+      if (reward != null) () => _repository.addReward(progress, reward.id),
       if (reward?.type == RewardType.skin) () => _repository.unlockSkin(progress, reward!.value),
       if (reward?.type == RewardType.theme) () => _repository.setTheme(progress, reward!.value),
     ];
@@ -373,69 +361,44 @@ class GameCubit extends Cubit<GameState> {
   }
 
   void addPoints(int amount) {
-    final p = state.progress;
-    _safePersist([() => _repository.addPoints(p, amount)]);
-    emit(state.copyWith(progress: p));
+    final progress = state.progress;
+    _safePersist([() => _repository.addPoints(progress, amount)]);
+    emit(state.copyWith(progress: progress));
   }
 
   void saveQuizResult(String levelId, int correct, int total, int hearts) {
-    final p = state.progress;
-    final raw = p.getPrepResult(levelId);
-    final data = raw != null
-        ? json.decode(raw) as Map<String, dynamic>
-        : <String, dynamic>{};
-    data['quiz'] = {'correct': correct, 'total': total, 'hearts': hearts};
-    p.setPrepResult(levelId, json.encode(data));
-    _safePersist([() => _repository.saveProgress(p)]);
-    emit(state.copyWith(progress: p));
+    _savePrepResultData(levelId, 'quiz', {
+      'correct': correct,
+      'total': total,
+      'hearts': hearts,
+    });
   }
 
   void saveOrderingResult(String levelId, int attempts, bool passed) {
-    final p = state.progress;
-    final raw = p.getPrepResult(levelId);
-    final data = raw != null
-        ? json.decode(raw) as Map<String, dynamic>
-        : <String, dynamic>{};
-    data['ordering'] = {'attempts': attempts, 'passed': passed};
-    p.setPrepResult(levelId, json.encode(data));
-    _safePersist([() => _repository.saveProgress(p)]);
-    emit(state.copyWith(progress: p));
+    _savePrepResultData(levelId, 'ordering', {
+      'attempts': attempts,
+      'passed': passed,
+    });
   }
 
   void saveTrapsResult(String levelId, int correct, int total, bool passed) {
-    final p = state.progress;
-    final raw = p.getPrepResult(levelId);
-    final data = raw != null
-        ? json.decode(raw) as Map<String, dynamic>
-        : <String, dynamic>{};
-    data['traps'] = {'correct': correct, 'total': total, 'passed': passed};
-    p.setPrepResult(levelId, json.encode(data));
-    _safePersist([() => _repository.saveProgress(p)]);
-    emit(state.copyWith(progress: p));
+    _savePrepResultData(levelId, 'traps', {
+      'correct': correct,
+      'total': total,
+      'passed': passed,
+    });
   }
 
   void saveScenariosResult(String levelId, int correct, int total, bool passed) {
-    final p = state.progress;
-    final raw = p.getPrepResult(levelId);
-    final data = raw != null
-        ? json.decode(raw) as Map<String, dynamic>
-        : <String, dynamic>{};
-    data['scenarios'] = {'correct': correct, 'total': total, 'passed': passed};
-    p.setPrepResult(levelId, json.encode(data));
-    _safePersist([() => _repository.saveProgress(p)]);
-    emit(state.copyWith(progress: p));
+    _savePrepResultData(levelId, 'scenarios', {
+      'correct': correct,
+      'total': total,
+      'passed': passed,
+    });
   }
 
   void saveMistakeResult(String levelId, bool passed) {
-    final p = state.progress;
-    final raw = p.getPrepResult(levelId);
-    final data = raw != null
-        ? json.decode(raw) as Map<String, dynamic>
-        : <String, dynamic>{};
-    data['mistakes'] = {'passed': passed};
-    p.setPrepResult(levelId, json.encode(data));
-    _safePersist([() => _repository.saveProgress(p)]);
-    emit(state.copyWith(progress: p));
+    _savePrepResultData(levelId, 'mistakes', {'passed': passed});
   }
 
   Future<void> setThemeId(String? themeId) async {
@@ -443,6 +406,15 @@ class GameCubit extends Cubit<GameState> {
     progress.themeId = themeId;
     _safePersist([() => _repository.saveProgress(progress)]);
     emit(state.copyWith(progress: progress));
+  }
+
+  RewardDef? _drawReward() {
+    try {
+      return RewardPool.draw();
+    } catch (e, st) {
+      debugPrint('Reward draw failed: $e\n$st');
+      return null;
+    }
   }
 
   void _checkAndUnlockProgressionSkins() {

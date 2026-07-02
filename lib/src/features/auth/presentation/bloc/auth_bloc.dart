@@ -2,8 +2,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:littletech/src/features/auth/data/models/user_model.dart';
 import 'package:littletech/src/features/auth/data/services/auth_service.dart';
 
-// ── States ────────────────────────────────────────────────────────────────────
-
 abstract class AuthState {
   const AuthState();
 }
@@ -28,8 +26,6 @@ class AuthError extends AuthState {
   final String message;
   const AuthError(this.message);
 }
-
-// ── Cubit ─────────────────────────────────────────────────────────────────────
 
 class AuthCubit extends Cubit<AuthState> {
   AuthCubit() : super(AuthInitial());
