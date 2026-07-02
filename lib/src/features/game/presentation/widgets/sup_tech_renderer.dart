@@ -598,20 +598,24 @@ void drawSupTechPoseOverlay(
 
   switch (pose) {
     case SupTechPose.wave:
+      final armStartX = -8 * s;
+      final armStartY = -1 * s;
+      final handX = -15 * s;
+      final handY = -25 * s;
       final armPath = Path()
-        ..moveTo(-8 * s, -15 * s)
-        ..quadraticBezierTo(-12 * s, -20 * s, -14 * s, -25 * s);
+        ..moveTo(armStartX, armStartY)
+        ..quadraticBezierTo(armStartX - 4 * s, (armStartY + handY) / 2, handX, handY);
       canvas.drawPath(
         armPath,
         Paint()
           ..color = skin.bodyColor
           ..style = PaintingStyle.stroke
-          ..strokeWidth = 1.25 * s
+          ..strokeWidth = 3 * s
           ..strokeCap = StrokeCap.round,
       );
       canvas.drawPath(armPath, outlinePaint);
-      canvas.drawCircle(Offset(-14 * s, -27 * s), 1.2 * s, Paint()..color = skin.bodyColor);
-      canvas.drawCircle(Offset(-14 * s, -27 * s), 1.2 * s, outlinePaint);
+      canvas.drawCircle(Offset(handX, handY - 2 * s), 2.5 * s, Paint()..color = skin.bodyColor);
+      canvas.drawCircle(Offset(handX, handY - 2 * s), 2.5 * s, outlinePaint);
       final wavePaint = Paint()
         ..color = skin.accentColor.withValues(alpha: 0.6)
         ..style = PaintingStyle.stroke
@@ -620,19 +624,19 @@ void drawSupTechPoseOverlay(
       for (final i in [0, 1, 2]) {
         final radius = (3 + i * 1.5) * s;
         canvas.drawArc(
-          Rect.fromCenter(center: Offset(-14 * s, -27 * s), width: radius * 2, height: radius * 2),
+          Rect.fromCenter(center: Offset(handX, handY - 2 * s), width: radius * 2, height: radius * 2),
           -pi * 0.2, pi * 0.6, false, wavePaint,
         );
       }
     case SupTechPose.thinking:
-      final handY = -11 * s;
+      final handY = -1 * s;
       final handPaint = Paint()..color = skin.bodyColor;
-      canvas.drawOval(Rect.fromCenter(center: Offset(-2 * s, handY), width: 3 * s, height: 2.5 * s), handPaint);
-      canvas.drawOval(Rect.fromCenter(center: Offset(-2 * s, handY), width: 3 * s, height: 2.5 * s), outlinePaint);
-      canvas.drawOval(Rect.fromCenter(center: Offset(2 * s, handY), width: 3 * s, height: 2.5 * s), handPaint);
-      canvas.drawOval(Rect.fromCenter(center: Offset(2 * s, handY), width: 3 * s, height: 2.5 * s), outlinePaint);
-      canvas.drawOval(Rect.fromCenter(center: Offset(0, handY + 1.5 * s), width: 4 * s, height: 3 * s), handPaint);
-      canvas.drawOval(Rect.fromCenter(center: Offset(0, handY + 1.5 * s), width: 4 * s, height: 3 * s), outlinePaint);
+      canvas.drawOval(Rect.fromCenter(center: Offset(-2.5 * s, handY), width: 4 * s, height: 3.5 * s), handPaint);
+      canvas.drawOval(Rect.fromCenter(center: Offset(-2.5 * s, handY), width: 4 * s, height: 3.5 * s), outlinePaint);
+      canvas.drawOval(Rect.fromCenter(center: Offset(2.5 * s, handY), width: 4 * s, height: 3.5 * s), handPaint);
+      canvas.drawOval(Rect.fromCenter(center: Offset(2.5 * s, handY), width: 4 * s, height: 3.5 * s), outlinePaint);
+      canvas.drawOval(Rect.fromCenter(center: Offset(0, handY + 2 * s), width: 5.5 * s, height: 4 * s), handPaint);
+      canvas.drawOval(Rect.fromCenter(center: Offset(0, handY + 2 * s), width: 5.5 * s, height: 4 * s), outlinePaint);
     case SupTechPose.working:
       final screenY = -17 * s;
       final screenRect = RRect.fromRectAndRadius(
