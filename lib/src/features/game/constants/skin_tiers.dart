@@ -15,6 +15,8 @@ enum SupTechEarAccessory { none, headset, scarf, earGlow }
 
 enum SupTechChestAccessory { none, badge, cape, codeScroll, gear, flameEmblem, staff }
 
+enum SupTechPose { none, neutral, wave, thinking, working }
+
 class AvatarState {
   final SupTechExpression expression;
   final bool blinking;

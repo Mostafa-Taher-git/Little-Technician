@@ -9,6 +9,7 @@ import 'package:littletech/src/features/home/presentation/screens/home_screen.da
 import 'package:littletech/src/features/splash/presentation/screens/splash_screen.dart';
 import 'package:littletech/src/features/game/data/repositories/game_repository.dart';
 import 'package:littletech/src/features/game/domain/cubit/game_cubit.dart';
+import 'package:littletech/src/features/game/domain/cubit/suptech_customization_cubit.dart';
 import 'package:littletech/src/features/game/domain/cubit/theme_cubit.dart';
 
 class LittleTechApp extends StatefulWidget {
@@ -72,6 +73,11 @@ class _LittleTechAppState extends State<LittleTechApp> {
             create: (_) => CounterCubit(),
           ),
         BlocProvider(create: (_) => ThemeCubit()),
+        if (_userId != null)
+          BlocProvider(
+            key: ValueKey('supCustom_$_userId'),
+            create: (_) => SupTechCustomizationCubit(),
+          ),
         if (_userId != null)
           BlocProvider(
             key: ValueKey('game_$_userId'),

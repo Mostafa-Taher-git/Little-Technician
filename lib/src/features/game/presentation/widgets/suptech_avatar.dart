@@ -2,7 +2,10 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:littletech/src/features/game/constants/skin_tiers.dart';
+import 'package:littletech/src/features/game/domain/cubit/suptech_customization_cubit.dart';
+import 'package:littletech/src/features/game/domain/models/suptech_customization.dart';
 
 class SupTechAvatar extends StatefulWidget {
   final double size;
@@ -62,6 +65,7 @@ class _SupTechAvatarState extends State<SupTechAvatar>
 
   @override
   Widget build(BuildContext context) {
+    final customization = context.watch<SupTechCustomizationCubit?>()?.state;
     return SizedBox(
       width: widget.size,
       height: widget.size,
@@ -75,6 +79,7 @@ class _SupTechAvatarState extends State<SupTechAvatar>
               animationValue: _controller.value,
               isBlinking: _isBlinking,
               state: widget.state,
+              customization: customization,
             ),
           );
         },
@@ -89,6 +94,7 @@ class _SkinPainter extends CustomPainter {
   final double animationValue;
   final bool isBlinking;
   final AvatarState state;
+  final SupTechCustomization? customization;
 
   _SkinPainter({
     required this.skinId,
@@ -96,12 +102,20 @@ class _SkinPainter extends CustomPainter {
     required this.animationValue,
     required this.isBlinking,
     required this.state,
+    this.customization,
   });
 
   @override
   void paint(Canvas canvas, Size size) {
     if (size.width == 0 || size.height == 0) return;
     final skin = SkinTierManager.fromId(skinId);
+
+    final c = customization;
+    final resolvedExpression = c?.expression ?? state.expression;
+    final resolvedHeadAccessory = c?.headAccessory ?? skin.headAccessory;
+    final resolvedEarAccessory = c?.earAccessory ?? skin.earAccessory;
+    final resolvedChestAccessory = c?.chestAccessory ?? skin.chestAccessory;
+    final resolvedPose = c?.pose;
 
     canvas.save();
     final s = size.width / 60;
@@ -154,12 +168,23 @@ class _SkinPainter extends CustomPainter {
         break;
     }
     _drawFace(canvas, skin, s, faceCY, faceW, faceH);
-    _drawEyes(canvas, skin, s, eyeY, eyeSpacing, eyeR, faceCY);
-    _drawMouth(canvas, skin, s, faceCY);
-    _drawHeadAccessory(canvas, skin, s, headCY, headR, hoodPeakY);
-    _drawEarAccessory(canvas, skin, s, headCY, headR);
-    _drawChestAccessory(canvas, skin, s, bodyTopY, bodyBotY);
+
+    final resolvedState = AvatarState(
+      expression: resolvedExpression,
+      blinking: isBlinking,
+      lookDirection: state.lookDirection,
+    );
+    _drawEyesWithOverride(canvas, skin, s, eyeY, eyeSpacing, eyeR, faceCY,
+        resolvedState, resolvedPose);
+    _drawMouth(canvas, skin, s, faceCY, resolvedExpression);
+    _drawHeadAccessoryValue(canvas, skin, s, headCY, headR, hoodPeakY,
+        resolvedHeadAccessory);
+    _drawEarAccessoryValue(canvas, skin, s, headCY, headR,
+        resolvedEarAccessory);
+    _drawChestAccessoryValue(canvas, skin, s, bodyTopY, bodyBotY,
+        resolvedChestAccessory);
     _drawUniqueDetail(canvas, skin, s);
+    _drawPoseOverlay(canvas, skin, s, resolvedPose, eyeY, eyeSpacing);
     _drawGlow(canvas, skin, s);
 
     canvas.restore();
@@ -757,14 +782,30 @@ class _SkinPainter extends CustomPainter {
   // Eyes (expression-based)
   // ─────────────────────────────────────────────
 
+  void _drawEyesWithOverride(Canvas canvas, SkinDefinition skin, double s,
+      double eyeY, double eyeSpacing, double eyeR, double faceCY,
+      AvatarState resolvedState, SupTechPose? pose) {
+    if (pose == SupTechPose.working) {
+      _drawFocusedEyes(canvas, s, eyeY, eyeSpacing);
+      return;
+    }
+    if (resolvedState.blinking) {
+      _drawBlinkLines(canvas, skin, s, eyeY, eyeSpacing);
+      return;
+    }
+    _drawEyes(canvas, skin, s, eyeY, eyeSpacing, eyeR, faceCY, resolvedState);
+  }
+
   void _drawEyes(Canvas canvas, SkinDefinition skin, double s,
-      double eyeY, double eyeSpacing, double eyeR, double faceCY) {
-    if (isBlinking) {
+      double eyeY, double eyeSpacing, double eyeR, double faceCY,
+      [AvatarState? resolvedState]) {
+    final effectiveState = resolvedState ?? state;
+    if (effectiveState.blinking) {
       _drawBlinkLines(canvas, skin, s, eyeY, eyeSpacing);
       return;
     }
 
-    switch (state.expression) {
+    switch (effectiveState.expression) {
       case SupTechExpression.neutral:
         for (final dx in [-eyeSpacing, eyeSpacing]) {
           _drawRoundEye(canvas, skin, dx, eyeY, eyeR, s);
@@ -1060,14 +1101,16 @@ class _SkinPainter extends CustomPainter {
   // Mouth
   // ─────────────────────────────────────────────
 
-  void _drawMouth(Canvas canvas, SkinDefinition skin, double s, double faceCY) {
+  void _drawMouth(Canvas canvas, SkinDefinition skin, double s, double faceCY,
+      [SupTechExpression? overrideExpression]) {
+    final effectiveExpression = overrideExpression ?? state.expression;
     final mouthY = faceCY + 8 * s;
     final mouthPaint = Paint()
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.2 * s
       ..strokeCap = StrokeCap.round;
 
-    switch (state.expression) {
+    switch (effectiveExpression) {
       case SupTechExpression.happy:
         mouthPaint.color = skin.accentColor.withValues(alpha: 0.6);
         canvas.drawPath(
@@ -1117,9 +1160,10 @@ class _SkinPainter extends CustomPainter {
   // Head Accessory (antenna)
   // ─────────────────────────────────────────────
 
-  void _drawHeadAccessory(Canvas canvas, SkinDefinition skin, double s,
-      double headCY, double headR, double hoodPeakY) {
-    switch (skin.headAccessory) {
+  void _drawHeadAccessoryValue(Canvas canvas, SkinDefinition skin, double s,
+      double headCY, double headR, double hoodPeakY,
+      SupTechHeadAccessory accessory) {
+    switch (accessory) {
       case SupTechHeadAccessory.none:
         return;
       case SupTechHeadAccessory.antenna:
@@ -1247,9 +1291,10 @@ class _SkinPainter extends CustomPainter {
   // Ear Accessory (headset)
   // ─────────────────────────────────────────────
 
-  void _drawEarAccessory(Canvas canvas, SkinDefinition skin, double s,
-      double headCY, double headR) {
-    switch (skin.earAccessory) {
+  void _drawEarAccessoryValue(Canvas canvas, SkinDefinition skin, double s,
+      double headCY, double headR,
+      SupTechEarAccessory accessory) {
+    switch (accessory) {
       case SupTechEarAccessory.none:
         return;
       case SupTechEarAccessory.headset:
@@ -1322,9 +1367,10 @@ class _SkinPainter extends CustomPainter {
   // Chest Accessory (badge + ST logo)
   // ─────────────────────────────────────────────
 
-  void _drawChestAccessory(Canvas canvas, SkinDefinition skin, double s,
-      double bodyTopY, double bodyBotY) {
-    switch (skin.chestAccessory) {
+  void _drawChestAccessoryValue(Canvas canvas, SkinDefinition skin, double s,
+      double bodyTopY, double bodyBotY,
+      SupTechChestAccessory accessory) {
+    switch (accessory) {
       case SupTechChestAccessory.none:
         return;
       case SupTechChestAccessory.badge:
@@ -1453,6 +1499,128 @@ class _SkinPainter extends CustomPainter {
         skin.accentColor.withValues(alpha: 0.4),
         skin.accentColor.withValues(alpha: 0.0),
       ]).createShader(Rect.fromCircle(center: crystalCenter, radius: 3 * s)));
+  }
+
+  // ─────────────────────────────────────────────
+  // Focused eyes (for working pose)
+  // ─────────────────────────────────────────────
+
+  void _drawFocusedEyes(Canvas canvas, double s, double eyeY, double eyeSpacing) {
+    final eyePaint = Paint()
+      ..color = Colors.white
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.8 * s
+      ..strokeCap = StrokeCap.round;
+    canvas.drawLine(
+      Offset(-eyeSpacing - 2 * s, eyeY - 0.5 * s),
+      Offset(-eyeSpacing + 2 * s, eyeY + 0.5 * s),
+      eyePaint,
+    );
+    canvas.drawLine(
+      Offset(eyeSpacing - 2 * s, eyeY - 0.5 * s),
+      Offset(eyeSpacing + 2 * s, eyeY + 0.5 * s),
+      eyePaint,
+    );
+  }
+
+  // ─────────────────────────────────────────────
+  // Pose overlay (wave arm, thinking hands, working screen)
+  // ─────────────────────────────────────────────
+
+  void _drawPoseOverlay(Canvas canvas, SkinDefinition skin, double s,
+      SupTechPose? pose, double eyeY, double eyeSpacing) {
+    if (pose == null || pose == SupTechPose.none || pose == SupTechPose.neutral) return;
+
+    final isLightBody =
+        ThemeData.estimateBrightnessForColor(skin.bodyColor) == Brightness.light;
+    final outlinePaint = Paint()
+      ..color = isLightBody ? const Color(0xFF94A3B8) : Colors.black87
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.5 * s
+      ..strokeCap = StrokeCap.round;
+
+    switch (pose) {
+      case SupTechPose.wave:
+        canvas.drawPath(
+          Path()
+            ..moveTo(-8 * s, -15 * s)
+            ..quadraticBezierTo(-12 * s, -20 * s, -14 * s, -25 * s),
+          Paint()
+            ..color = skin.bodyColor
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = 2.5 * s
+            ..strokeCap = StrokeCap.round,
+        );
+        canvas.drawCircle(Offset(-14 * s, -27 * s), 1.2 * s, Paint()..color = skin.bodyColor);
+        canvas.drawCircle(Offset(-14 * s, -27 * s), 1.2 * s, outlinePaint);
+        final wavePaint = Paint()
+          ..color = skin.accentColor.withValues(alpha: 0.6)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 0.8 * s
+          ..strokeCap = StrokeCap.round;
+        for (final i in [0, 1, 2]) {
+          final radius = (3 + i * 1.5) * s;
+          canvas.drawArc(
+            Rect.fromCenter(
+              center: Offset(-14 * s, -27 * s),
+              width: radius * 2,
+              height: radius * 2,
+            ),
+            -pi * 0.2,
+            pi * 0.6,
+            false,
+            wavePaint,
+          );
+        }
+      case SupTechPose.thinking:
+        final handY = -11 * s;
+        final handPaint = Paint()..color = skin.bodyColor;
+        canvas.drawOval(
+          Rect.fromCenter(center: Offset(-2 * s, handY), width: 3 * s, height: 2.5 * s),
+          handPaint,
+        );
+        canvas.drawOval(
+          Rect.fromCenter(center: Offset(2 * s, handY), width: 3 * s, height: 2.5 * s),
+          handPaint,
+        );
+        canvas.drawOval(
+          Rect.fromCenter(center: Offset(0, handY + 1.5 * s), width: 4 * s, height: 3 * s),
+          handPaint,
+        );
+        canvas.drawOval(
+          Rect.fromCenter(center: Offset(0, handY + 1.5 * s), width: 4 * s, height: 3 * s),
+          outlinePaint,
+        );
+      case SupTechPose.working:
+        final screenY = -14 * s;
+        final screenRect = RRect.fromRectAndRadius(
+          Rect.fromCenter(center: Offset(0, screenY), width: 16 * s, height: 11 * s),
+          Radius.circular(1.2 * s),
+        );
+        canvas.drawRRect(
+          screenRect,
+          Paint()..color = skin.accentColor.withValues(alpha: 0.18),
+        );
+        canvas.drawRRect(
+          screenRect,
+          Paint()
+            ..color = outlinePaint.color
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = 1.2 * s,
+        );
+        for (final lineY in [screenY - 3 * s, screenY, screenY + 3 * s]) {
+          canvas.drawLine(
+            Offset(-5 * s, lineY),
+            Offset(5 * s, lineY),
+            Paint()
+              ..color = skin.accentColor.withValues(alpha: 0.45)
+              ..strokeWidth = 0.7 * s,
+          );
+        }
+      case SupTechPose.none:
+      case SupTechPose.neutral:
+        break;
+    }
   }
 
   // ─────────────────────────────────────────────
@@ -1641,5 +1809,6 @@ class _SkinPainter extends CustomPainter {
       old.isGlowing != isGlowing ||
       old.animationValue != animationValue ||
       old.isBlinking != isBlinking ||
-      old.state.expression != state.expression;
+      old.state.expression != state.expression ||
+      old.customization != customization;
 }
